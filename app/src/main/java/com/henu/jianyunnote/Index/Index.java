@@ -37,7 +37,7 @@ public class Index extends AppCompatActivity {
             String password = "";
             EditText editText2 = findViewById(R.id.password);
             password = editText2.getText().toString();
-            if (username.equals(user) & password.equals(pass)) {
+            if (username.equals(user) && password.equals(pass)) {
                 Intent intent = new Intent(Index.this, NoteParttion.class);
                 startActivity(intent);
             } else {
