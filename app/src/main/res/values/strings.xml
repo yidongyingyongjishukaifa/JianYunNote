@@ -11,6 +11,8 @@
 
     <string name="email">邮箱</string>
     <string name="password">密码</string>
+    <string name="repassword">重复密码</string>
+    <string name="Return">返回</string>
     <string name="forgot_password">忘记密码？</string>
     <string name="sign_in">登入</string>
     <string name="sign_up">注册</string>

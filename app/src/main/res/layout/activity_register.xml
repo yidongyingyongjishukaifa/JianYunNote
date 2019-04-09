@@ -12,27 +12,33 @@
         android:orientation="vertical">
 
         <EditText
-            android:id="@+id/et_email"
+            android:id="@+id/email"
             style="@style/SignInEditText"
             android:textColorHint="@color/lightGray"
             android:hint="@string/email" />
 
         <EditText
-            android:id="@+id/et_password"
+            android:id="@+id/password"
             style="@style/SignInEditText"
-            android:layout_below="@id/et_email"
-            android:layout_marginBottom="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_below="@id/email"
             android:hint="@string/password"
             android:textColorHint="@color/lightGray"
             android:inputType="textPassword" />
 
+        <EditText
+            android:id="@+id/repassword"
+            style="@style/SignInEditText"
+            android:layout_below="@id/password"
+            android:layout_marginBottom="16dp"
+            android:hint="@string/repassword"
+            android:textColorHint="@color/lightGray"
+            android:inputType="textPassword" />
 
         <LinearLayout
             android:id="@+id/ll_action"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/et_password"
+            android:layout_below="@id/repassword"
             android:layout_marginTop="16dp"
             android:orientation="vertical">
 
@@ -50,8 +56,8 @@
                     android:layout_marginEnd="16dp"
                     android:layout_weight="1">
 
-                    <TextView
-                        android:id="@+id/tv_sign_up"
+                    <Button
+                        android:id="@+id/register"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
@@ -63,7 +69,7 @@
                         android:textSize="18sp" />
 
                     <ProgressBar
-                        android:id="@+id/progress_sign_up"
+                        android:id="@+id/progress_register"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:layout_centerInParent="true"
@@ -77,20 +83,20 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1">
 
-                    <TextView
-                        android:id="@+id/tv_sign_in"
+                    <Button
+                        android:id="@+id/Return"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:background="#1582b0"
                         android:gravity="center"
                         android:padding="8dp"
-                        android:text="@string/sign_in"
+                        android:text="@string/Return"
                         android:textColor="@color/lightGray"
                         android:textSize="18sp" />
 
                     <ProgressBar
-                        android:id="@+id/progress_sign_in"
+                        android:id="@+id/progress_login"
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:layout_centerInParent="true"
@@ -102,7 +108,7 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/tv_forgot_password"
+                android:id="@+id/forgot_password"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -133,7 +139,7 @@
 
 
         <TextView
-            android:id="@+id/tv_example"
+            android:id="@+id/example"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="16dp"
