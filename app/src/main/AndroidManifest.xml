@@ -15,7 +15,11 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+            </intent-filter>
+        </activity>
+        <activity android:name=".Index.Index">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -23,6 +27,7 @@
         <activity
             android:name=".Page.NotePage"
             android:label="页面" />
+        <activity android:name=".Index.Register" />
     </application>
 
 </manifest>
