@@ -12,8 +12,14 @@
     <string name="email">邮箱</string>
     <string name="password">密码</string>
     <string name="repassword">重复密码</string>
+    <string name="safepassword">密保密码(用于找回密码)</string>
     <string name="Return">返回</string>
+    <string name="findpassword">确认修改</string>
     <string name="forgot_password">忘记密码？</string>
     <string name="sign_in">登入</string>
     <string name="sign_up">注册</string>
+    <string name="newpassword">新密码</string>
+    <string name="safepassword_input">请输入密保密码</string>
+    <string name="find_email">请输入你的邮箱</string>
+    <string name="renewpassword">确认新密码</string>
 </resources>
