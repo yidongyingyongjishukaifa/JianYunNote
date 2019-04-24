@@ -3,7 +3,6 @@ package com.henu.jianyunnote.Index;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -27,7 +26,7 @@ import cn.bmob.v3.listener.FindListener;
 
 import static android.widget.Toast.LENGTH_LONG;
 
-public class Index extends AppCompatActivity {
+public class Login extends AppCompatActivity {
 
     public static boolean isEmail(String email){   //判断邮箱是否合法
         if (null==email || "".equals(email)) return false;
@@ -36,7 +35,7 @@ public class Index extends AppCompatActivity {
         return m.matches();
     }
     public void MyAlertDialog(String message, String button) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(Index.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(Login.this);
         builder.setMessage(message);
         builder.setPositiveButton(button, new DialogInterface.OnClickListener() {
             @Override
@@ -48,7 +47,7 @@ public class Index extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_index);
+        setContentView(R.layout.activity_login);
         Bmob.initialize(this, "bc95d28fa2c059530870d4dbb550b38f");//初始化Bmob  后面是服务器端应用ID
         Button login = findViewById(R.id.login);
         final EditText Email_local =findViewById(R.id.email);
@@ -63,7 +62,7 @@ public class Index extends AppCompatActivity {
                 if (isEmail(Email_local.getText().toString())==false)
                 {
                     String info = "请输入正确的邮箱";
-                    Toast.makeText(Index.this, info, LENGTH_LONG).show();
+                    Toast.makeText(Login.this, info, LENGTH_LONG).show();
                 }
                 else {
                     BmobQuery<Users> query = new BmobQuery<Users>();
@@ -81,15 +80,15 @@ public class Index extends AppCompatActivity {
                                     for (Users u : object)
                                         if (u.getPassword().equals(Password_local.getText().toString())) {
                                             String info = "登录成功";
-                                            Toast.makeText(Index.this, info, LENGTH_LONG).show();
-                                            Intent intent = new Intent(Index.this,NoteParttion.class);
+                                            Toast.makeText(Login.this, info, LENGTH_LONG).show();
+                                            Intent intent = new Intent(Login.this,NoteParttion.class);
                                             startActivity(intent);
                                             finish();
                                         }
                                         else if(Password_local.getText().length()==0)
                                         {
                                             String info = "请输入密码";
-                                            Toast.makeText(Index.this, info, LENGTH_LONG).show();
+                                            Toast.makeText(Login.this, info, LENGTH_LONG).show();
                                         }
                                         else {
 
@@ -115,7 +114,7 @@ public class Index extends AppCompatActivity {
       register.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
-              Intent intent = new Intent(Index.this, Register.class);
+              Intent intent = new Intent(Login.this, Register.class);
               startActivity(intent);
               finish();
           }
@@ -124,7 +123,7 @@ public class Index extends AppCompatActivity {
       forgotpassword.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
-              Intent intent = new Intent(Index.this, FindPassword.class);
+              Intent intent = new Intent(Login.this, FindPassword.class);
               startActivity(intent);
               finish();
           }
