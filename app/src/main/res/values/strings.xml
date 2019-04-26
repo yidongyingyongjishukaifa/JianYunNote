@@ -22,4 +22,6 @@
     <string name="safepassword_input">请输入密保密码</string>
     <string name="find_email">请输入你的邮箱</string>
     <string name="renewpassword">确认新密码</string>
+    <string name="remember_password">记住密码</string>
+    <string name="auto_login">自动登录</string>
 </resources>
