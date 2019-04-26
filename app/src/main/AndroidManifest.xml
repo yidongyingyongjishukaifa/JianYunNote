@@ -38,7 +38,7 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity android:name=".Index.Index">
+        <activity android:name=".Index.Login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -49,6 +49,10 @@
             android:name=".Page.NotePage"
             android:label="页面" />
         <activity android:name=".Index.Register" />
+        <provider
+            android:name="cn.bmob.v3.util.BmobContentProvider"
+            android:authorities="com.henu.jianyunnote.BmobContentProvider">
+        </provider>
     </application>
 
 </manifest>

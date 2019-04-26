@@ -21,6 +21,7 @@
             android:id="@+id/password"
             style="@style/SignInEditText"
             android:layout_below="@id/email"
+            android:layout_marginTop="16dp"
             android:hint="@string/password"
             android:textColorHint="@color/lightGray"
             android:inputType="textPassword" />
@@ -29,7 +30,7 @@
             android:id="@+id/repassword"
             style="@style/SignInEditText"
             android:layout_below="@id/password"
-            android:layout_marginBottom="16dp"
+            android:layout_marginTop="16dp"
             android:hint="@string/repassword"
             android:textColorHint="@color/lightGray"
             android:inputType="textPassword" />
@@ -38,7 +39,8 @@
             android:id="@+id/safepassword"
             style="@style/SignInEditText"
             android:layout_below="@id/repassword"
-            android:layout_marginBottom="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="6dp"
             android:hint="@string/safepassword"
             android:textColorHint="@color/lightGray"
             android:inputType="textPassword" />

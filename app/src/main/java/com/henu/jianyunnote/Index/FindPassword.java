@@ -5,14 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Size;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.henu.jianyunnote.Beans.Users;
-import com.henu.jianyunnote.Parttion.NoteParttion;
 import com.henu.jianyunnote.R;
 
 import java.util.List;
@@ -23,10 +20,7 @@ import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
-import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
-
-import static android.widget.Toast.LENGTH_LONG;
 
 public class FindPassword extends AppCompatActivity {
 
@@ -129,7 +123,7 @@ public class FindPassword extends AppCompatActivity {
         Return.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(FindPassword.this, Index.class);
+                Intent intent = new Intent(FindPassword.this, Login.class);
                 startActivity(intent);
                 finish();
             }
