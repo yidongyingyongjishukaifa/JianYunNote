@@ -21,18 +21,27 @@
             android:id="@+id/password"
             style="@style/SignInEditText"
             android:layout_below="@id/email"
-            android:layout_marginBottom="16dp"
             android:layout_marginTop="16dp"
             android:hint="@string/password"
             android:textColorHint="@color/lightGray"
             android:inputType="textPassword" />
 
+        <CheckBox
+            android:id="@+id/remember_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/password"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="6dp"
+            android:text="记住密码"
+            android:textColor="@color/lightGray" />
 
         <LinearLayout
             android:id="@+id/ll_action"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/password"
+            android:layout_below="@id/remember_password"
             android:layout_marginTop="16dp"
             android:orientation="vertical">
 
