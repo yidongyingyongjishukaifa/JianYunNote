@@ -49,10 +49,6 @@
             android:name=".Page.NotePage"
             android:label="页面" />
         <activity android:name=".Index.Register" />
-        <provider
-            android:name="cn.bmob.v3.util.BmobContentProvider"
-            android:authorities="com.henu.jianyunnote.BmobContentProvider">
-        </provider>
     </application>
 
 </manifest>

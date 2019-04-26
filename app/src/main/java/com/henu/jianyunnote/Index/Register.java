@@ -13,9 +13,7 @@ import android.widget.Toast;
 
 import com.henu.jianyunnote.Beans.Users;
 import com.henu.jianyunnote.R;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.henu.jianyunnote.Util.MD5Util;
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.exception.BmobException;
@@ -23,13 +21,7 @@ import cn.bmob.v3.listener.SaveListener;
 
 public class Register extends AppCompatActivity {
     private Button Return;
-    public static boolean isEmail(String email){
-        if (null==email || "".equals(email)) return false;
-        //Pattern p = Pattern.compile("\\w+@(\\w+.)+[a-z]{2,3}"); //简单匹配
-        Pattern p =  Pattern.compile("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*");//复杂匹配
-        Matcher m = p.matcher(email);
-        return m.matches();
-    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
@@ -45,7 +37,7 @@ public class Register extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(isEmail(Email.getText().toString())==false)
+                if(Login.isEmail(Email.getText().toString())==false)
                 {
                     String info = "请输入正确的邮箱";
                     Toast.makeText(Register.this, info, Toast.LENGTH_LONG).show();
@@ -53,7 +45,7 @@ public class Register extends AppCompatActivity {
                 else if((password.getText().toString()).equals(repassword.getText().toString())&&(password.getText().length()!=0)&&(safepassword.getText().length()!=0))
                 {
                     String email_s= Email.getText().toString();
-                    String password_s=password.getText().toString();
+                    String password_s= MD5Util.Encode(password.getText().toString());
                     String safepassword_s=safepassword.getText().toString();
                     Users users =new Users();
                     users.setEmail(email_s);

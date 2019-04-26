@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +19,7 @@ import com.henu.jianyunnote.Beans.Users;
 import com.henu.jianyunnote.Parttion.NoteParttion;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.Util.AESUtil;
+import com.henu.jianyunnote.Util.MD5Util;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -33,6 +35,7 @@ import static android.widget.Toast.LENGTH_LONG;
 public class Login extends AppCompatActivity {
 
     private CheckBox remember_password;
+    private CheckBox auto_login;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
     @Override
@@ -46,8 +49,10 @@ public class Login extends AppCompatActivity {
         final TextView forgotpassword=findViewById(R.id.forgot_password);
         Button  register = findViewById(R.id.register);
         remember_password=findViewById(R.id.remember_password);
+        auto_login=findViewById(R.id.auto_login);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isRemember = pref.getBoolean("remember_password",false);
+        boolean autoLogin = pref.getBoolean("auto_login",false);
         if(isRemember){
             // 将账号和密码都设置到文本框中
             String d_email = pref.getString("email","");
@@ -58,6 +63,10 @@ public class Login extends AppCompatActivity {
             Email_local.setText(email);
             Password_local.setText(password);
             remember_password.setChecked(true);
+            if(autoLogin){
+                auto_login.setChecked(true);
+                gotoNote();
+            }
         }
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,12 +90,15 @@ public class Login extends AppCompatActivity {
                             {
                                 if (e == null) {
                                     for (Users u : object)
-                                        if (u.getPassword().equals(Password_local.getText().toString())) {
+                                        if (u.getPassword().equals(MD5Util.Encode(Password_local.getText().toString()))) {
                                             String info = "登录成功";
                                             Toast.makeText(Login.this, info, LENGTH_LONG).show();
                                             editor=pref.edit();
                                             if(remember_password.isChecked()){
                                                 editor.putBoolean("remember_password",true);
+                                                if(auto_login.isChecked()){
+                                                    editor.putBoolean("auto_login",true);
+                                                }
                                                 String d_email= AESUtil.encrypt(Email_local.getText().toString());
                                                 editor.putString("email",d_email);
                                                 String d_password=AESUtil.encrypt(Password_local.getText().toString());
@@ -95,9 +107,7 @@ public class Login extends AppCompatActivity {
                                                 editor.clear();
                                             }
                                             editor.apply();
-                                            Intent intent = new Intent(Login.this,NoteParttion.class);
-                                            startActivity(intent);
-                                            finish();
+                                            gotoNote();
                                         }
                                         else if(Password_local.getText().length()==0)
                                         {
@@ -142,6 +152,21 @@ public class Login extends AppCompatActivity {
               finish();
           }
       });
+
+      auto_login.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+          @Override
+          public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+              if(!remember_password.isChecked()){
+                  remember_password.setChecked(true);
+              }
+          }
+      });
+    }
+
+    private void gotoNote() {
+        Intent intent = new Intent(Login.this,NoteParttion.class);
+        startActivity(intent);
+        finish();
     }
 
     public static boolean isEmail(String email){   //判断邮箱是否合法
