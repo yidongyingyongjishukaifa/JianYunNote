@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.henu.jianyunnote.Index.Login;
 import com.henu.jianyunnote.Page.NotePage;
 import com.henu.jianyunnote.R;
 
@@ -51,6 +52,15 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView =  findViewById( R.id.nav_view );
         navigationView.setNavigationItemSelectedListener( this );
+
+        //        View view = navigationView.inflateHeaderView( R.layout.nav_header_main );
+//        ImageView imageView = view.findViewById( R.id.imageView111 );
+//        imageView.setOnClickListener( new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                //此处可跳转用户设置
+//            }
+//        } );
 
         initParttion();
         parttionAdapter = new ParttionAdapter( NoteParttion.this,R.layout.parttion_item, parttionList);
@@ -103,7 +113,7 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the camera action
+            Login.ActionStart( NoteParttion.this );
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {

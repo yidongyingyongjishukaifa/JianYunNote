@@ -4,7 +4,7 @@ import org.litepal.crud.LitePalSupport;
 
 import java.util.Date;
 
-public class notebook extends LitePalSupport {
+public class Notebook extends LitePalSupport {
     private int id;
     private  int userid;
     private String notebookname;

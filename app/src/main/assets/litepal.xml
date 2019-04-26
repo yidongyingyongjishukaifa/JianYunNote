@@ -32,7 +32,8 @@
     	</list>
     -->
     <list>
-        <mapping class="com.henu.jianyunnote.DataBase.User"></mapping>
+        <mapping class="com.henu.jianyunnote.DataBase.Notebook"></mapping>
+        <mapping class="com.henu.jianyunnote.DataBase.Note"></mapping>
     </list>
 
     <!--
