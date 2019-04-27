@@ -93,10 +93,10 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.backup:
+            case R.id.search_:
                 //
                 break;
-            case R.id.delete:
+            case R.id.feedback:
                 //
                 break;
             case R.id.setting:
