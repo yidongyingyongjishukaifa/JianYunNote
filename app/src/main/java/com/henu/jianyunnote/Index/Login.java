@@ -1,5 +1,6 @@
 package com.henu.jianyunnote.Index;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -185,6 +186,11 @@ public class Login extends AppCompatActivity {
             }
         });
         builder.show();
+    }
+
+    public static void ActionStart(Context context){
+        Intent intent = new Intent(context, Login.class);
+        context.startActivity(intent);
     }
 }
 
