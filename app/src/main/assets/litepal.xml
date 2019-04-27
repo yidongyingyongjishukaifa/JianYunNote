@@ -33,6 +33,8 @@
     -->
     <list>
         <mapping class="com.henu.jianyunnote.DataBase.User"></mapping>
+        <mapping class="com.henu.jianyunnote.DataBase.Note"></mapping>
+        <mapping class="com.henu.jianyunnote.DataBase.NoteBook"></mapping>
     </list>
 
     <!--
