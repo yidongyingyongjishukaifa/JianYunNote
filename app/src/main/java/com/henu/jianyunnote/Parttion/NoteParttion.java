@@ -18,6 +18,7 @@ import android.widget.ListView;
 import com.henu.jianyunnote.Index.Login;
 import com.henu.jianyunnote.Page.NotePage;
 import com.henu.jianyunnote.R;
+import com.henu.jianyunnote.Setting.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +102,7 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
                 //
                 break;
             case R.id.setting:
-                //
+                Settings.ActionStart( NoteParttion.this );
                 break;
         }
         return true;
@@ -118,7 +119,7 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
-
+            Settings.ActionStart( NoteParttion.this );
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {

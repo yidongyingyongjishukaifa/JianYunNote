@@ -2,6 +2,7 @@ package com.henu.jianyunnote.Page;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,8 +12,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.support.v7.widget.Toolbar;
 
+import com.google.gson.internal.bind.ReflectiveTypeAdapterFactory;
 import com.henu.jianyunnote.Content.NoteContent;
+import com.henu.jianyunnote.Parttion.NoteParttion;
 import com.henu.jianyunnote.R;
+import com.henu.jianyunnote.Setting.Settings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +24,7 @@ import java.util.List;
 public class NotePage extends AppCompatActivity {
 
     private List<Page> pageList = new ArrayList<>();
+    private PageAdapter pageAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +50,13 @@ public class NotePage extends AppCompatActivity {
             }
         } );
 
+        FloatingActionButton floatingActionButton = findViewById( R.id.page_fab );
+        floatingActionButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //添加笔记
+            }
+        } );
     }
 
 
@@ -73,7 +85,7 @@ public class NotePage extends AppCompatActivity {
                 //
                 break;
             case R.id.setting:
-                //
+                Settings.ActionStart( NotePage.this );
                 break;
         }
         return true;

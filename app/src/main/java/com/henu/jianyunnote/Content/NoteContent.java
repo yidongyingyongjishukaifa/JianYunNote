@@ -9,7 +9,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.henu.jianyunnote.Parttion.NoteParttion;
 import com.henu.jianyunnote.R;
+import com.henu.jianyunnote.Setting.Settings;
 
 public class NoteContent extends AppCompatActivity {
 
@@ -44,7 +46,7 @@ public class NoteContent extends AppCompatActivity {
                 //
                 break;
             case R.id.setting:
-                //
+                Settings.ActionStart( NoteContent.this );
                 break;
         }
         return true;
