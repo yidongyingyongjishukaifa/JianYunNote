@@ -33,6 +33,7 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar =  findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
 
+
         FloatingActionButton fab =  findViewById( R.id.fab );
         fab.setOnClickListener( new View.OnClickListener() {
             @Override

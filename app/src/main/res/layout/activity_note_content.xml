@@ -6,30 +6,46 @@
     android:layout_height="match_parent"
     tools:context=".Content.NoteContent">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="实例标题"
-            android:textSize="30dp"
-            />
 
-        <TextView
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="15dp"
-            android:text="时间"/>
+            android:layout_height="match_parent">
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="实例文本"
-            android:textSize="20dp"/>
+            <android.support.v7.widget.Toolbar
+                app:navigationIcon="@mipmap/left"
+                android:id="@+id/page_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
 
-    </LinearLayout>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="实例标题"
+                android:textSize="30dp"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15dp"
+                android:text="时间"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="实例文本"
+                android:textSize="20dp"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
 
 </android.support.constraint.ConstraintLayout>

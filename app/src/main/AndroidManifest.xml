@@ -45,7 +45,8 @@
                 <!--<action android:name="android.intent.action.MAIN" />-->
             <!--</intent-filter>-->
         </activity>
-        <activity android:name=".Content.NoteContent" />
+        <activity android:name=".Content.NoteContent"
+            android:label="笔记"/>
         <activity
             android:name=".Page.NotePage"
             android:label="页面" />
