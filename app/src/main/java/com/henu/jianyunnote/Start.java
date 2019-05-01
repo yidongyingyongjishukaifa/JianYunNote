@@ -5,12 +5,13 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import com.henu.jianyunnote.Parttion.NoteParttion;
 
 public class Start extends AppCompatActivity {
 
-    private  final int SPLASH_DISPLAY_LENGHT = 2000;//两秒后进入系统，时间可自行调整
+    private  final int SPLASH_DISPLAY_LENGHT = 1000;//两秒后进入系统，时间可自行调整
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

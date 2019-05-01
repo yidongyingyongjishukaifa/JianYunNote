@@ -7,9 +7,17 @@
     tools:context=".Start">
 
     <ImageView
+        android:id="@+id/img_id"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"/>
+
+    <ImageView
+        android:id="@+id/icon_mark"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/start"
+        android:layout_centerInParent="true"
         />
 
 </android.support.constraint.ConstraintLayout>
