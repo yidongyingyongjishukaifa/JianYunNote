@@ -1,4 +1,4 @@
-package com.henu.jianyunnote;
+package com.henu.jianyunnote.Start;
 
 
 import android.content.Intent;
@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.view.WindowManager;
 
 import com.henu.jianyunnote.Parttion.NoteParttion;
+import com.henu.jianyunnote.R;
+
+import org.litepal.tablemanager.Connector;
 
 public class Start extends AppCompatActivity {
 
@@ -32,5 +35,6 @@ public class Start extends AppCompatActivity {
             }
         },SPLASH_DISPLAY_LENGHT);
 
+        Connector.getDatabase();
     }
 }
