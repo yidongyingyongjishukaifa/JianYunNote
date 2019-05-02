@@ -8,7 +8,7 @@
     	For example:
     	<dbname value="demo" />
     -->
-    <dbname value="notebook" />
+    <dbname value="yunnote" />
 
     <!--
     	Define the version of your database. Each time you want

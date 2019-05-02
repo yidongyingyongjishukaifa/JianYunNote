@@ -2,9 +2,10 @@ package com.henu.jianyunnote.DataBase;
 
 import org.litepal.crud.LitePalSupport;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Note extends LitePalSupport {
+public class Note extends LitePalSupport implements Serializable {
     private int id;
     private int userid;
     private int notebookid;
