@@ -12,9 +12,25 @@ public class User extends LitePalSupport implements Serializable {
     private String icon;
     private int gender;
     private int age;
-    private Date createtime;
-    private Date updatatime;
+    private Date updateTime;
     private int status;
+    private int isLogin;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getIsLogin() {
+        return isLogin;
+    }
+
+    public void setIsLogin(int isLogin) {
+        this.isLogin = isLogin;
+    }
 
     public String getUsername() {
         return username;
@@ -56,20 +72,12 @@ public class User extends LitePalSupport implements Serializable {
         this.age = age;
     }
 
-    public Date getCreatetime() {
-        return createtime;
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setCreatetime(Date createtime) {
-        this.createtime = createtime;
-    }
-
-    public Date getUpdatatime() {
-        return updatatime;
-    }
-
-    public void setUpdatatime(Date updatatime) {
-        this.updatatime = updatatime;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     public int getStatus() {
@@ -80,5 +88,18 @@ public class User extends LitePalSupport implements Serializable {
         this.status = status;
     }
 
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", icon='" + icon + '\'' +
+                ", gender=" + gender +
+                ", age=" + age +
+                ", updateTime=" + updateTime +
+                ", status=" + status +
+                ", isLogin=" + isLogin +
+                '}';
+    }
 }

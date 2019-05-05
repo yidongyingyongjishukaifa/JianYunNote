@@ -5,12 +5,11 @@ import org.litepal.crud.LitePalSupport;
 import java.io.Serializable;
 import java.util.Date;
 
-public class Note extends LitePalSupport implements Serializable {
+public class NoteBook extends LitePalSupport implements Serializable {
     private int id;
     private int userId;
-    private int noteBookId;
-    private String title;
-    private String content;
+    private String noteBookName;
+    private int noteNumber;
     private int isDelete;
     private Date createTime;
     private Date updateTime;
@@ -31,12 +30,21 @@ public class Note extends LitePalSupport implements Serializable {
         this.userId = userId;
     }
 
-    public int getNoteBookId() {
-        return noteBookId;
+
+    public String getNoteBookName() {
+        return noteBookName;
     }
 
-    public void setNoteBookId(int noteBookId) {
-        this.noteBookId = noteBookId;
+    public void setNoteBookName(String noteBookName) {
+        this.noteBookName = noteBookName;
+    }
+
+    public int getNoteNumber() {
+        return noteNumber;
+    }
+
+    public void setNoteNumber(int noteNumber) {
+        this.noteNumber = noteNumber;
     }
 
     public int getIsDelete() {
@@ -63,30 +71,13 @@ public class Note extends LitePalSupport implements Serializable {
         this.updateTime = updateTime;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     @Override
     public String toString() {
-        return "Note{" +
+        return "NoteBook{" +
                 "id=" + id +
                 ", userId=" + userId +
-                ", noteBookId=" + noteBookId +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
+                ", noteBookName='" + noteBookName + '\'' +
+                ", noteNumber=" + noteNumber +
                 ", isDelete=" + isDelete +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +

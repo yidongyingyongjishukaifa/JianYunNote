@@ -68,17 +68,16 @@ public class Login extends AppCompatActivity {
             // 将账号和密码都设置到文本框中
             int usernum = pref.getInt("user_num", 0) - 1;
             int nowNum = pref.getInt("now_num", 0);
-            String email = "";
-            String d_password = "";
+            String email;
+            String d_password;
             if (nowNum < usernum) {
                 email = pref.getString("email" + nowNum, "");
-                //对读取到的密码进行解密
                 d_password = pref.getString("password" + nowNum, "");
             } else {
                 email = pref.getString("email" + usernum, "");
-                //对读取到的密码进行解密
                 d_password = pref.getString("password" + usernum, "");
             }
+            //对读取到的密码进行解密
             String password = AESUtil.decrypt(d_password);
             Email_local.setText(email);
             Password_local.setText(password);
@@ -93,11 +92,11 @@ public class Login extends AppCompatActivity {
             public void onClick(View v) {
                 email = Email_local.getText().toString();
                 password = Password_local.getText().toString();
-                if (isEmail(email) == false) {
+                if (!isEmail(email)) {
                     String info = "请输入正确的邮箱";
                     Toast.makeText(Login.this, info, LENGTH_LONG).show();
                 } else {
-                    BmobQuery<Users> query = new BmobQuery<Users>();
+                    BmobQuery<Users> query = new BmobQuery<>();
                     //查询Email的数据
                     query.addWhereEqualTo("Email", Email_local.getText());
                     //返回50条数据，如果不加上这条语句，默认返回10条数据
@@ -110,13 +109,14 @@ public class Login extends AppCompatActivity {
                                 if (e == null) {
                                     for (Users u : object)
                                         if (u.getPassword().equals(MD5Util.Encode(password))) {
-                                            String info = "登录成功";
-                                            Toast.makeText(Login.this, info, LENGTH_LONG).show();
+//                                            String info = "登录成功";
+//                                            Toast.makeText(Login.this, info, LENGTH_LONG).show();
                                             editor = pref.edit();
+                                            editor.putString("login_email", email);
                                             if (remember_password.isChecked()) {
                                                 String d_password = AESUtil.encrypt(password);
                                                 boolean isFind = isFind(email);
-                                                int usernum = 0;
+                                                int usernum;
                                                 int nowNum = 0;
                                                 if (isFind) {
                                                     usernum = getPosition(email);
@@ -133,16 +133,13 @@ public class Login extends AppCompatActivity {
                                                 if (auto_login.isChecked()) {
                                                     editor.putBoolean("auto_login", true);
                                                 }
-                                                editor.putString("login_email", email);
                                                 editor.putInt("user_num", usernum + 1);
                                                 editor.putInt("now_num", nowNum);
                                             } else {
                                                 editor.clear();
                                             }
                                             editor.apply();
-                                            Intent intent=new Intent(Login.this, NoteParttion.class);
-                                            intent.putExtra("email",email);//把当前登陆成功的账号的数据传递给下一个活动，用来显示是谁登陆成功了
-                                            startActivity(intent);
+                                            gotoNote();
                                         } else if (Password_local.getText().length() == 0) {
                                             String info = "请输入密码";
                                             Toast.makeText(Login.this, info, LENGTH_LONG).show();
@@ -209,10 +206,11 @@ public class Login extends AppCompatActivity {
     }
 
     public boolean isFind(String email) {
-        final String acc[] = new String[pref.getInt("user_num", 0)];//定义一个账号数组，长度为选择记住密码的登录成功的账号个数
+        int user_num = pref.getInt("user_num", 0);
+        final String acc[] = new String[user_num];//定义一个账号数组，长度为选择记住密码的登录成功的账号个数
         boolean isFind = false;
         int l = email.length();
-        for (int a = 0; a < pref.getInt("user_num", 0); a++) {
+        for (int a = 0; a < user_num; a++) {
             acc[a] = pref.getString("email" + a, "");//初始化账号数组，把已保存的账号放到数组里面去
             if (email.equals(acc[a].substring(0, l))) {
                 isFind = true;
@@ -222,10 +220,11 @@ public class Login extends AppCompatActivity {
     }
 
     public int getPosition(String email) {
-        final String acc[] = new String[pref.getInt("user_num", 0)];//定义一个账号数组，长度为选择记住密码的登录成功的账号个数
+        int user_num = pref.getInt("user_num", 0);
+        final String acc[] = new String[user_num];//定义一个账号数组，长度为选择记住密码的登录成功的账号个数
         int position = 0;
         int l = email.length();
-        for (int a = 0; a < pref.getInt("user_num", 0); a++) {
+        for (int a = 0; a < user_num; a++) {
             acc[a] = pref.getString("email" + a, "");//初始化账号数组，把已保存的账号放到数组里面去
             if (email.equals(acc[a].substring(0, l))) {
                 position = a;
@@ -234,10 +233,11 @@ public class Login extends AppCompatActivity {
         return position;
     }
 
-    public void showListPopulWindow() {//用来显示下拉框               
-        final String acc[] = new String[pref.getInt("user_num", 0)];//定义一个账号数组，长度为选择记住密码的登录成功的账号个数               
-        final String pas[] = new String[pref.getInt("user_num", 0)];//定义一个密码数组，长度为选择记住密码的登录成功的账号个数               
-        for (int a = pref.getInt("user_num", 0) - 1; a >= 0; a--) {
+    public void showListPopulWindow() {//用来显示下拉框     
+        int user_num = pref.getInt("user_num", 0);
+        final String acc[] = new String[user_num];//定义一个账号数组，长度为选择记住密码的登录成功的账号个数               
+        final String pas[] = new String[user_num];//定义一个密码数组，长度为选择记住密码的登录成功的账号个数               
+        for (int a = user_num - 1; a >= 0; a--) {
             acc[a] = pref.getString("email" + a, "");//初始化账号数组，把已保存的账号放到数组里面去                   
             pas[a] = AESUtil.decrypt(pref.getString("password" + a, ""));//初始化密码数组，把已保存的密码放到数组里面去               
         }
