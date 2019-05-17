@@ -1,75 +1,122 @@
 package com.henu.jianyunnote.Parttion;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.henu.jianyunnote.DataBase.Note;
 import com.henu.jianyunnote.DataBase.NoteBook;
 import com.henu.jianyunnote.DataBase.User;
 import com.henu.jianyunnote.Index.Login;
 import com.henu.jianyunnote.Page.NotePage;
 import com.henu.jianyunnote.R;
+import com.henu.jianyunnote.Util.MyAdapter;
+import com.henu.jianyunnote.Util.TimeUtil;
 
 import org.litepal.LitePal;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NoteParttion extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public static int[] local_notebooks_id;
-    private List<Parttion> parttionList = new ArrayList<>();
-    private ParttionAdapter parttionAdapter;
+    private MyAdapter myAdapter;
     private SharedPreferences pref;
     private TextView login_Email;
     public static int local_user_id;
     private String login_email;
     private int local_count;
+    private List<NoteBook> noteBooks;
+    private List<Map<String, Object>> listItems = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_parttion);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        final FloatingActionsMenu menu = findViewById(R.id.fab_menu);
+        final com.getbase.floatingactionbutton.FloatingActionButton actionA = findViewById(R.id.fab_1);
+        actionA.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NoteBook notebook = new NoteBook();
-                if (!login_email.equals("未登录") || local_user_id != 0) {
-                    notebook.setUserId(local_user_id);
-                }
-                notebook.setNoteBookName("未命名笔记本");
-                notebook.setCreateTime(new Date());
-                notebook.setUpdateTime(new Date());
-                notebook.save();
-                local_notebooks_id= (int[]) arrayAddLength(local_notebooks_id,1);
-                local_notebooks_id[local_notebooks_id.length-1]=notebook.getId();
-                Parttion parttion = new Parttion(notebook.getNoteBookName());
-                parttionList.add(parttion);
-                parttionAdapter.notifyDataSetChanged();
-                //Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
+                menu.collapse();
+                final AlertDialog.Builder builder = new AlertDialog.Builder(NoteParttion.this);
+                final LayoutInflater layoutInflater = LayoutInflater.from(NoteParttion.this);
+                final View myView = layoutInflater.inflate(R.layout.new_notebook, null);
+                builder.setTitle("新建笔记本")
+                        .setIcon(R.mipmap.ic_launcher)
+                        .setView(myView)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                final EditText Notebook_Name = myView.findViewById(R.id.notebook_Name);
+                                String s = Notebook_Name.getText().toString();
+                                NoteBook notebook = new NoteBook();
+                                if (!login_email.equals("未登录") || local_user_id != 0) {
+                                    notebook.setUserId(local_user_id);
+                                }
+                                if ("".equals(s)) {
+                                    notebook.setNoteBookName("未命名笔记本");
+                                } else {
+                                    notebook.setNoteBookName(s);
+                                }
+                                notebook.setCreateTime(new Date());
+                                notebook.setUpdateTime(new Date());
+                                notebook.save();
+                                local_notebooks_id = (int[]) arrayAddLength(local_notebooks_id, 1);
+                                local_notebooks_id[local_notebooks_id.length - 1] = notebook.getId();
+                                Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
+                                listItem.put("NOTE_MESSAGE", notebook.getNoteBookName());
+                                listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(notebook.getUpdateTime()));
+                                listItems.add(listItem);
+                                myAdapter.notifyDataSetChanged();
+//                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
+                            }
+                        })
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                AlertDialog ad = builder.create();
+                ad.show();
+            }
+        });
+        final com.getbase.floatingactionbutton.FloatingActionButton actionB = findViewById(R.id.fab_2);
+        actionB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(NoteParttion.this, "press 2", Toast.LENGTH_SHORT).show();
+                menu.collapse();
             }
         });
 
@@ -84,26 +131,32 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
         login_Email = navigationView.inflateHeaderView(R.layout.nav_header_main).findViewById(R.id.login_email);
         login_email = pref.getString("login_email", "未登录");
         login_Email.setText(login_email);
+        final ListView mListView = findViewById(R.id.parttion_listview);
         if (!login_email.equals("未登录")) {
             List<User> user = LitePal.where("username=?", login_email).find(User.class);
             if (user != null && user.size() != 0) {
+                // 本地已登录的用户
                 for (User u : user) {
                     local_user_id = u.getId();
                 }
                 String uid = String.valueOf(local_user_id);
-                List<NoteBook> noteBooks = LitePal.where("userId=?", uid).order("updateTime desc").find(NoteBook.class);
+                noteBooks = LitePal.where("userId=?", uid).order("updateTime desc").find(NoteBook.class);
                 if (noteBooks != null && noteBooks.size() != 0) {
                     local_count = 0;
                     local_notebooks_id = new int[noteBooks.size()];
+                    listItems.clear();
                     for (NoteBook noteBook : noteBooks) {
                         local_notebooks_id[local_count] = noteBook.getId();
                         local_count++;
-                        Parttion parttion = new Parttion(noteBook.getNoteBookName());
-                        parttionList.add(parttion);
+                        Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
+                        listItem.put("NOTE_MESSAGE", noteBook.getNoteBookName());
+                        listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(noteBook.getUpdateTime()));
+                        listItems.add(listItem);
                     }
                 }
 //                List<Note> notes = LitePal.where("noteBookId=? and userId=?", "0", uid).order("updateTime desc").find(Note.class);
             } else {
+                // 本地登录的新用户
                 User u = new User();
                 u.setUsername(login_email);
                 u.save();
@@ -126,23 +179,29 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
                 notebook.save();
                 local_notebooks_id = new int[1];
                 local_notebooks_id[0] = notebook.getId();
-                Parttion parttion = new Parttion(notebook.getNoteBookName());
-                parttionList.add(parttion);
+                listItems.clear();
+                Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
+                listItem.put("NOTE_MESSAGE", notebook.getNoteBookName());
+                listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(notebook.getUpdateTime()));
+                listItems.add(listItem);
             }
         } else {
-            List<NoteBook> noteBooks = LitePal.where("userId=?", "0").order("updateTime desc").find(NoteBook.class);
+            noteBooks = LitePal.where("userId=?", "0").order("updateTime desc").find(NoteBook.class);
             List<Note> notes = LitePal.where("noteBookId=? and userId=?", "0", "0").order("updateTime desc").find(Note.class);
             NoteBook notebook = new NoteBook();
-            boolean isAdd=false;//用于判断是否将存入数据库中的notebook添加到parttion
+            boolean isAdd = false;//用于判断是否将存入数据库中的notebook添加了
             if (noteBooks != null && noteBooks.size() != 0) {
+                listItems.clear();
                 local_count = 0;
                 local_notebooks_id = new int[noteBooks.size()];
                 for (NoteBook noteBook : noteBooks) {
-                    isAdd=true;
+                    isAdd = true;
                     local_notebooks_id[local_count] = noteBook.getId();
                     local_count++;
-                    Parttion parttion = new Parttion(noteBook.getNoteBookName());
-                    parttionList.add(parttion);
+                    Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
+                    listItem.put("NOTE_MESSAGE", noteBook.getNoteBookName());
+                    listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(noteBook.getUpdateTime()));
+                    listItems.add(listItem);
                 }
             } else {
                 notebook.setCreateTime(new Date());
@@ -169,9 +228,12 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
                 note2.setUpdateTime(new Date());
                 note2.save();
             }
-            if(!isAdd){
-                Parttion parttion = new Parttion(notebook.getNoteBookName());
-                parttionList.add(parttion);
+            if (!isAdd) {
+                listItems.clear();
+                Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
+                listItem.put("NOTE_MESSAGE", notebook.getNoteBookName());
+                listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(notebook.getUpdateTime()));
+                listItems.add(listItem);
             }
         }
 //        View view = navigationView.inflateHeaderView( R.layout.nav_header_main );
@@ -183,10 +245,12 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
 //            }
 //        } );
 
-        parttionAdapter = new ParttionAdapter(NoteParttion.this, R.layout.parttion_item, parttionList);
-        ListView listView = findViewById(R.id.parttion_listview);
-        listView.setAdapter(parttionAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        myAdapter = new MyAdapter(NoteParttion.this, listItems);
+        // 为ListView设置Adapter
+        mListView.setAdapter(myAdapter);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(NoteParttion.this, NotePage.class);
@@ -254,14 +318,16 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    public static Object arrayAddLength(Object oldArray,int addLength) {
+    public static Object arrayAddLength(Object oldArray, int addLength) {
         Class c = oldArray.getClass();
-        if(!c.isArray())return null;
+        if (!c.isArray()) return null;
         Class componentType = c.getComponentType();
         int length = Array.getLength(oldArray);
         int newLength = length + addLength;
-        Object newArray = Array.newInstance(componentType,newLength);
-        System.arraycopy(oldArray,0,newArray,0,length);
+        Object newArray = Array.newInstance(componentType, newLength);
+        System.arraycopy(oldArray, 0, newArray, 0, length);
         return newArray;
     }
+
+
 }
