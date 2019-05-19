@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.henu.jianyunnote.DataBase.Note;
 import com.henu.jianyunnote.Page.NotePage;
+import com.henu.jianyunnote.Parttion.NoteParttion;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.Util.TimeUtil;
 
@@ -20,6 +21,7 @@ public class NoteContent extends AppCompatActivity {
     private EditText noteTitle;
     private EditText noteContent;
     private static final String TAG = "NOTE_CONTENT_DEBUG";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,9 +32,14 @@ public class NoteContent extends AppCompatActivity {
     }
 
     private void initNoteContent() {
+        boolean flag = NoteContent.this.getIntent().getBooleanExtra("is_note", false);
         int p = Integer.parseInt(NoteContent.this.getIntent().getStringExtra("position"));
+        if (flag) {
+            local_note_id = NoteParttion.local_notes_id[p];
+        } else {
 //        System.out.println("p------------------\n"+p+"\n-----------------------\n");
-        local_note_id = NotePage.local_notes_id[p];
+            local_note_id = NotePage.local_notes_id[p];
+        }
         String noteid = String.valueOf((local_note_id));
 //        System.out.println("note_id------------------\n"+noteid+"\n-----------------------\n");
         List<Note> noteList = LitePal.where("id=?", noteid).find(Note.class);

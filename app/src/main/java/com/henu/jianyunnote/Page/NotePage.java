@@ -23,13 +23,12 @@ import com.henu.jianyunnote.Util.TimeUtil;
 
 import org.litepal.LitePal;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.henu.jianyunnote.Parttion.NoteParttion.arrayAddLength;
 
 public class NotePage extends AppCompatActivity {
 
@@ -93,12 +92,11 @@ public class NotePage extends AppCompatActivity {
                                 note.save();
 
                                 local_notes_id = (int[]) arrayAddLength(local_notes_id, 1);
-                                int nowLength = local_notes_id.length - 1;
-                                local_notes_id[nowLength] = note.getId();
+                                local_notes_id[0] = note.getId();
                                 Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
                                 listItem.put("NOTE_MESSAGE", note.getTitle());
                                 listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(note.getUpdateTime()));
-                                listItems.add(listItem);
+                                listItems.add(0,listItem);
                                 myAdapter.notifyDataSetChanged();
 //                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
                             }
@@ -114,6 +112,17 @@ public class NotePage extends AppCompatActivity {
             }
         });
 
+    }
+
+    private Object arrayAddLength(Object oldArray, int addLength) {
+        Class c = oldArray.getClass();
+        if (!c.isArray()) return null;
+        Class componentType = c.getComponentType();
+        int length = Array.getLength(oldArray);
+        int newLength = length + addLength;
+        Object newArray = Array.newInstance(componentType, newLength);
+        System.arraycopy(oldArray, 0, newArray, 1, length);
+        return newArray;
     }
 
     private void initNotePage() {
