@@ -253,6 +253,7 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                menu.collapse();
                 Intent intent = new Intent(NoteParttion.this, NotePage.class);
 //                System.out.println("position------------------\n"+position+"\n-----------------------\n");
                 intent.putExtra("position", position + "");
@@ -328,6 +329,4 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
         System.arraycopy(oldArray, 0, newArray, 0, length);
         return newArray;
     }
-
-
 }
