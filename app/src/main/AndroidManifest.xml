@@ -28,27 +28,26 @@
             android:label="笔记分区"
             android:theme="@style/AppTheme.NoActionBar">
             <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+            <!--<action android:name="android.intent.action.MAIN" />-->
 
             <!--</intent-filter>-->
         </activity>
-        <activity
-            android:name=".Index.FindPassword"
-            android:label=" "
-            android:theme="@style/AppTheme.NoActionBar">
+        <activity android:name=".Index.FindPassword">
             <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+            <!--<action android:name="android.intent.action.MAIN" />-->
             <!--</intent-filter>-->
         </activity>
         <activity android:name=".Index.Login">
             <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+            <!--<action android:name="android.intent.action.MAIN" />-->
             <!--</intent-filter>-->
         </activity>
-        <activity android:name=".Content.NoteContent" />
+        <activity android:name=".Content.NoteContent"
+            android:label="笔记">
+        </activity>
         <activity
             android:name=".Page.NotePage"
-            android:label="页面" />
+            android:label="笔记列表" />
         <activity android:name=".Index.Register" />
     </application>
 
