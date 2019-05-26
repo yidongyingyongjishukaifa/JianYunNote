@@ -13,9 +13,27 @@ public class User extends LitePalSupport implements Serializable {
     private int gender;
     private int age;
     private Date updateTime;
+    private Date loginTime;
     private int status;
     private int isLogin;
     private int isRemember;
+    private boolean autoLogin;
+
+    public boolean isAutoLogin() {
+        return autoLogin;
+    }
+
+    public void setAutoLogin(boolean autoLogin) {
+        this.autoLogin = autoLogin;
+    }
+
+    public Date getLoginTime() {
+        return loginTime;
+    }
+
+    public void setLoginTime(Date loginTime) {
+        this.loginTime = loginTime;
+    }
 
     public int getIsRemember() {
         return isRemember;

@@ -216,13 +216,10 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
     private void init() {
         List<NoteBook> noteBooks;
         List<User> user;
-        user = LitePal.where("isLogin = ? and isRemember = ?", "1", "1").find(User.class);
-//        if (user != null && user.size() != 0) {
-//
-//        } else {
-//
-//        }
-        user = LitePal.where("isLogin = ?", "1").find(User.class);
+        user = LitePal.where("isRemember = ?", "1").order("loginTime desc").limit(1).find(User.class);
+        if (user == null || user.size() == 0) {
+            user = LitePal.where("isLogin = ?", "1").find(User.class);
+        }
         if (user != null && user.size() != 0) {
             for (User u : user) {
                 login_Email.setText(u.getUsername());
