@@ -57,7 +57,6 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
     private List<Map<String, Object>> listItems = new ArrayList<>();
     private User current_user;
     private long mExitTime;
-    boolean isRemember;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,8 +70,8 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         login_Email = navigationView.inflateHeaderView(R.layout.nav_header_main).findViewById(R.id.login_email);
-
-        isRemember = pref.getBoolean("remember_password", false);
+        final ListView mListView = findViewById(R.id.parttion_listview);
+        init();
         final FloatingActionsMenu menu = findViewById(R.id.fab_menu);
         final com.getbase.floatingactionbutton.FloatingActionButton actionA = findViewById(R.id.fab_1);
         actionA.setOnClickListener(new View.OnClickListener() {
@@ -91,9 +90,7 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
                                 final EditText Notebook_Name = myView.findViewById(R.id.notebook_Name);
                                 String s = Notebook_Name.getText().toString();
                                 NoteBook notebook = new NoteBook();
-                                if (!login_email.equals("未登录") || local_user_id != 0) {
-                                    notebook.setUserId(local_user_id);
-                                }
+                                notebook.setUserId(local_user_id);
                                 if ("".equals(s)) {
                                     notebook.setNoteBookName("未命名笔记本");
                                 } else {
@@ -180,8 +177,6 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
 
-        final ListView mListView = findViewById(R.id.parttion_listview);
-        init();
 //        View view = navigationView.inflateHeaderView( R.layout.nav_header_main );
 //        ImageView imageView = view.findViewById( R.id.imageView111 );
 //        imageView.setOnClickListener( new View.OnClickListener() {
