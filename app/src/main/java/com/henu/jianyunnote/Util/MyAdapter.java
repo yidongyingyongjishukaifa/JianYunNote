@@ -56,6 +56,7 @@ public class MyAdapter extends BaseAdapter {
         }
         // 设置控件的数据
         viewHolder.NOTE_MESSAGE.setText(data.get(position).get("NOTE_MESSAGE").toString());
+        viewHolder.NOTE_UPDATE_TIME.setTextSize( 13 );
         viewHolder.NOTE_UPDATE_TIME.setText(data.get(position).get("NOTE_UPDATE_TIME").toString());
 
         return convertView;

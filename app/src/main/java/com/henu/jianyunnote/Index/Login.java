@@ -176,7 +176,7 @@ public class Login extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(Login.this, Register.class);
                 startActivity(intent);
-                finish();
+//                finish();
             }
         });
 
