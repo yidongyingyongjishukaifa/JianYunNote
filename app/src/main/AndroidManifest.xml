@@ -17,9 +17,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Start.Start">
+        <activity android:name=".Setting.Setting"></activity>
+        <activity android:name=".Start.Start"
+            android:theme="@style/AppTheme.NoActionBarAndTitle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -27,24 +30,28 @@
             android:name=".Parttion.NoteParttion"
             android:label="笔记分区"
             android:theme="@style/AppTheme.NoActionBar">
-            <!--<intent-filter>-->
-            <!--<action android:name="android.intent.action.MAIN" />-->
 
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- </intent-filter> -->
         </activity>
         <activity android:name=".Index.FindPassword">
-            <!--<intent-filter>-->
-            <!--<action android:name="android.intent.action.MAIN" />-->
-            <!--</intent-filter>-->
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity android:name=".Index.Login">
-            <!--<intent-filter>-->
-            <!--<action android:name="android.intent.action.MAIN" />-->
-            <!--</intent-filter>-->
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+            <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".Content.NoteContent"
-            android:label="笔记">
-        </activity>
+        <activity
+            android:name=".Content.NoteContent"
+            android:label="笔记"></activity>
         <activity
             android:name=".Page.NotePage"
             android:label="笔记列表" />

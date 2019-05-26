@@ -13,15 +13,15 @@ import org.litepal.tablemanager.Connector;
 
 public class Start extends AppCompatActivity {
 
-    private  final int SPLASH_DISPLAY_LENGHT = 2000;//两秒后进入系统，时间可自行调整
+    private  final int SPLASH_DISPLAY_LENGHT = 1;//两秒后进入系统，时间可自行调整。修改为1，减少测试浪费时间
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        getWindow().addFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN);//隐藏状态栏
-        getSupportActionBar().hide();//隐藏标题栏
+//        getWindow().addFlags( WindowManager.LayoutParams.FLAG_FULLSCREEN);//隐藏状态栏
+//        getSupportActionBar().hide();//隐藏标题栏
 
         setContentView(R.layout.activity_start);
 
