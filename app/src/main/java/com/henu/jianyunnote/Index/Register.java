@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.henu.jianyunnote.Beans.Users;
 import com.henu.jianyunnote.R;
+import com.henu.jianyunnote.Util.AtyContainer;
 import com.henu.jianyunnote.Util.MD5Util;
 
 import cn.bmob.v3.Bmob;
@@ -26,6 +27,7 @@ public class Register extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_register );
+        AtyContainer.getInstance().addActivity(this);
         Bmob.initialize(this, "bc95d28fa2c059530870d4dbb550b38f");
         Button register_btn = findViewById(R.id.register);
         Button return_btn = findViewById(R.id.Return);

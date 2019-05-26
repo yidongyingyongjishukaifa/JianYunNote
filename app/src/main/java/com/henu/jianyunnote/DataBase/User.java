@@ -15,6 +15,15 @@ public class User extends LitePalSupport implements Serializable {
     private Date updateTime;
     private int status;
     private int isLogin;
+    private int isRemember;
+
+    public int getIsRemember() {
+        return isRemember;
+    }
+
+    public void setIsRemember(int isRemember) {
+        this.isRemember = isRemember;
+    }
 
     public int getId() {
         return id;

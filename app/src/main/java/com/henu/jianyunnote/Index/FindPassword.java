@@ -11,6 +11,7 @@ import android.widget.EditText;
 
 import com.henu.jianyunnote.Beans.Users;
 import com.henu.jianyunnote.R;
+import com.henu.jianyunnote.Util.AtyContainer;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -45,6 +46,7 @@ public class FindPassword extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_findpassword);
+        AtyContainer.getInstance().addActivity(this);
         Bmob.initialize(this, "bc95d28fa2c059530870d4dbb550b38f");
         final EditText email = findViewById(R.id.email);
         final EditText safepassword = findViewById(R.id.safepassword);

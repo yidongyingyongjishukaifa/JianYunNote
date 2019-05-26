@@ -21,11 +21,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.henu.jianyunnote.Beans.Users;
+import com.henu.jianyunnote.DataBase.Note;
+import com.henu.jianyunnote.DataBase.NoteBook;
+import com.henu.jianyunnote.DataBase.User;
 import com.henu.jianyunnote.Parttion.NoteParttion;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.Util.AESUtil;
+import com.henu.jianyunnote.Util.AtyContainer;
 import com.henu.jianyunnote.Util.MD5Util;
 
+import org.litepal.LitePal;
+
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,11 +55,13 @@ public class Login extends AppCompatActivity {
     private EditText Password_local;
     private String email;
     private String password;
+    private boolean is_Remember;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        AtyContainer.getInstance().addActivity(this);
         Bmob.initialize(this, "bc95d28fa2c059530870d4dbb550b38f");//初始化Bmob  后面是服务器端应用ID
         Button login = findViewById(R.id.login);
         Email_local = findViewById(R.id.email);
@@ -130,6 +139,7 @@ public class Login extends AppCompatActivity {
                                                     editor.putString("password" + usernum, d_password);
                                                 }
                                                 editor.putBoolean("remember_password", true);
+                                                is_Remember = true;
                                                 if (auto_login.isChecked()) {
                                                     editor.putBoolean("auto_login", true);
                                                 }
@@ -137,8 +147,10 @@ public class Login extends AppCompatActivity {
                                                 editor.putInt("now_num", nowNum);
                                             } else {
                                                 editor.clear();
+                                                is_Remember = false;
                                             }
                                             editor.apply();
+                                            init();
                                             gotoNote();
                                         } else if (Password_local.getText().length() == 0) {
                                             String info = "请输入密码";
@@ -203,6 +215,47 @@ public class Login extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    private void init() {
+        List<User> user = LitePal.where("username= ?", email).find(User.class);
+        if (user == null || user.size() == 0) {
+            User u = new User();
+            u.setUsername(email);
+            u.setIsLogin(1);
+            if (is_Remember) {
+                u.setIsRemember(1);
+            } else {
+                u.setIsRemember(0);
+            }
+            u.save();
+            NoteBook notebook = new NoteBook();
+            notebook.setUserId(u.getId());
+            notebook.setCreateTime(new Date());
+            notebook.setUpdateTime(new Date());
+            notebook.setNoteBookName("未命名笔记本");
+            notebook.setIsDelete(0);
+            notebook.save();
+            Note note = new Note();
+            note.setUserId(u.getId());
+            note.setNoteBookId(notebook.getId());
+            note.setTitle("未命名笔记");
+            note.setContent("测试内容");
+            note.setCreateTime(new Date());
+            note.setUpdateTime(new Date());
+            note.setIsDelete(0);
+            note.save();
+            notebook.setNoteNumber(1);
+            notebook.save();
+            Note note2 = new Note();
+            note2.setUserId(u.getId());
+            note2.setTitle("未命名笔记");
+            note2.setContent("测试内容");
+            note2.setCreateTime(new Date());
+            note2.setUpdateTime(new Date());
+            note2.setIsDelete(0);
+            note2.save();
+        }
     }
 
     public boolean isFind(String email) {
