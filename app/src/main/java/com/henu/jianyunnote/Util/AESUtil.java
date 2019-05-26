@@ -21,9 +21,9 @@ public class AESUtil {
 
     //填充类型
     public static final String AES_TYPE = "AES/ECB/PKCS5Padding";
-
+    private
     //私钥
-    private static final String AES_KEY="1111222233334444";   //AES固定格式为128/192/256 bits.即：16/24/32bytes。DES固定格式为128bits，即8bytes。
+     static final String AES_KEY="1111222233334444";   //AES固定格式为128/192/256 bits.即：16/24/32bytes。DES固定格式为128bits，即8bytes。
 
     //字符补全
     private static final String[] consult = new String[]{"0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F","G"};
