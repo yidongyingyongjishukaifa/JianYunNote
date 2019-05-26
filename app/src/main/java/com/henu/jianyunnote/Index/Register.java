@@ -63,6 +63,7 @@ public class Register extends AppCompatActivity {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which)
                                     {
+                                        finish();
                                     }
                                 });
                                 builder.show();
