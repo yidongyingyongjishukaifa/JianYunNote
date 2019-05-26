@@ -21,11 +21,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.henu.jianyunnote.Beans.Users;
+import com.henu.jianyunnote.DataBase.Note;
+import com.henu.jianyunnote.DataBase.NoteBook;
+import com.henu.jianyunnote.DataBase.User;
 import com.henu.jianyunnote.Parttion.NoteParttion;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.Util.AESUtil;
+import com.henu.jianyunnote.Util.AtyContainer;
 import com.henu.jianyunnote.Util.MD5Util;
 
+import org.litepal.LitePal;
+
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,11 +55,14 @@ public class Login extends AppCompatActivity {
     private EditText Password_local;
     private String email;
     private String password;
+    private boolean is_Remember;
+    private boolean autoLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        AtyContainer.getInstance().addActivity(this);
         Bmob.initialize(this, "bc95d28fa2c059530870d4dbb550b38f");//初始化Bmob  后面是服务器端应用ID
         Button login = findViewById(R.id.login);
         Email_local = findViewById(R.id.email);
@@ -62,31 +72,24 @@ public class Login extends AppCompatActivity {
         remember_password = findViewById(R.id.remember_password);
         auto_login = findViewById(R.id.auto_login);
         pref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean isRemember = pref.getBoolean("remember_password", false);
-        boolean autoLogin = pref.getBoolean("auto_login", false);
-        if (isRemember) {
-            // 将账号和密码都设置到文本框中
-            int usernum = pref.getInt("user_num", 0) - 1;
-            int nowNum = pref.getInt("now_num", 0);
-            String email;
-            String d_password;
-            if (nowNum < usernum) {
-                email = pref.getString("email" + nowNum, "");
-                d_password = pref.getString("password" + nowNum, "");
-            } else {
-                email = pref.getString("email" + usernum, "");
-                d_password = pref.getString("password" + usernum, "");
-            }
-            //对读取到的密码进行解密
-            String password = AESUtil.decrypt(d_password);
-            Email_local.setText(email);
-            Password_local.setText(password);
-            remember_password.setChecked(true);
-            if (autoLogin) {
-                auto_login.setChecked(true);
-                gotoNote();
+        List<User> userList = LitePal.where("isRemember = ?", "1").order("loginTime desc").limit(1).find(User.class);
+        if (userList != null && userList.size() != 0) {
+            for (User u : userList) {
+                String email = u.getUsername();
+                String d_password = u.getPassword();
+                //对读取到的密码进行解密
+                String password = AESUtil.decrypt(d_password);
+                Email_local.setText(email);
+                Password_local.setText(password);
+                remember_password.setChecked(true);
+                boolean autoLogin = pref.getBoolean("auto_login", false);
+                if (autoLogin) {
+                    auto_login.setChecked(true);
+                    gotoNote();
+                }
             }
         }
+
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,32 +116,10 @@ public class Login extends AppCompatActivity {
 //                                            Toast.makeText(Login.this, info, LENGTH_LONG).show();
                                             editor = pref.edit();
                                             editor.putString("login_email", email);
-                                            if (remember_password.isChecked()) {
-                                                String d_password = AESUtil.encrypt(password);
-                                                boolean isFind = isFind(email);
-                                                int usernum;
-                                                int nowNum = 0;
-                                                if (isFind) {
-                                                    usernum = getPosition(email);
-                                                    nowNum = usernum;
-                                                    editor.putString("email" + usernum, email);
-                                                    editor.putString("password" + usernum, d_password);
-                                                    usernum = pref.getInt("user_num", 0) - 1;
-                                                } else {
-                                                    usernum = pref.getInt("user_num", 0);
-                                                    editor.putString("email" + usernum, email);
-                                                    editor.putString("password" + usernum, d_password);
-                                                }
-                                                editor.putBoolean("remember_password", true);
-                                                if (auto_login.isChecked()) {
-                                                    editor.putBoolean("auto_login", true);
-                                                }
-                                                editor.putInt("user_num", usernum + 1);
-                                                editor.putInt("now_num", nowNum);
-                                            } else {
-                                                editor.clear();
-                                            }
+                                            is_Remember = remember_password.isChecked();
+                                            autoLogin = auto_login.isChecked();
                                             editor.apply();
+                                            init();
                                             gotoNote();
                                         } else if (Password_local.getText().length() == 0) {
                                             String info = "请输入密码";
@@ -205,41 +186,74 @@ public class Login extends AppCompatActivity {
         });
     }
 
-    public boolean isFind(String email) {
-        int user_num = pref.getInt("user_num", 0);
-        final String acc[] = new String[user_num];//定义一个账号数组，长度为选择记住密码的登录成功的账号个数
-        boolean isFind = false;
-        int l = email.length();
-        for (int a = 0; a < user_num; a++) {
-            acc[a] = pref.getString("email" + a, "");//初始化账号数组，把已保存的账号放到数组里面去
-            if (email.equals(acc[a].substring(0, l))) {
-                isFind = true;
+    private void init() {
+        List<User> user = LitePal.where("username= ?", email).find(User.class);
+        String d_password = AESUtil.encrypt(password);
+        if (user == null || user.size() == 0) {
+            User u = new User();
+            u.setUsername(email);
+            u.setPassword(d_password);
+            u.setIsLogin(1);
+            u.setLoginTime(new Date());
+            if (is_Remember) {
+                u.setIsRemember(1);
+            } else {
+                u.setIsRemember(0);
+            }
+            u.setAutoLogin(autoLogin);
+            u.save();
+            NoteBook notebook = new NoteBook();
+            notebook.setUserId(u.getId());
+            notebook.setCreateTime(new Date());
+            notebook.setUpdateTime(new Date());
+            notebook.setNoteBookName("未命名笔记本");
+            notebook.setIsDelete(0);
+            notebook.save();
+            Note note = new Note();
+            note.setUserId(u.getId());
+            note.setNoteBookId(notebook.getId());
+            note.setTitle("未命名笔记");
+            note.setContent("测试内容");
+            note.setCreateTime(new Date());
+            note.setUpdateTime(new Date());
+            note.setIsDelete(0);
+            note.save();
+            notebook.setNoteNumber(1);
+            notebook.save();
+            Note note2 = new Note();
+            note2.setUserId(u.getId());
+            note2.setTitle("未命名笔记");
+            note2.setContent("测试内容");
+            note2.setCreateTime(new Date());
+            note2.setUpdateTime(new Date());
+            note2.setIsDelete(0);
+            note2.save();
+        } else {
+            for (User u : user) {
+                u.setPassword(d_password);
+                u.setIsLogin(1);
+                if (is_Remember) {
+                    u.setIsRemember(1);
+                } else {
+                    u.setIsRemember(0);
+                }
+                u.setAutoLogin(autoLogin);
+                u.setLoginTime(new Date());
+                u.save();
             }
         }
-        return isFind;
-    }
-
-    public int getPosition(String email) {
-        int user_num = pref.getInt("user_num", 0);
-        final String acc[] = new String[user_num];//定义一个账号数组，长度为选择记住密码的登录成功的账号个数
-        int position = 0;
-        int l = email.length();
-        for (int a = 0; a < user_num; a++) {
-            acc[a] = pref.getString("email" + a, "");//初始化账号数组，把已保存的账号放到数组里面去
-            if (email.equals(acc[a].substring(0, l))) {
-                position = a;
-            }
-        }
-        return position;
     }
 
     public void showListPopulWindow() {//用来显示下拉框     
-        int user_num = pref.getInt("user_num", 0);
-        final String acc[] = new String[user_num];//定义一个账号数组，长度为选择记住密码的登录成功的账号个数               
-        final String pas[] = new String[user_num];//定义一个密码数组，长度为选择记住密码的登录成功的账号个数               
-        for (int a = user_num - 1; a >= 0; a--) {
-            acc[a] = pref.getString("email" + a, "");//初始化账号数组，把已保存的账号放到数组里面去                   
-            pas[a] = AESUtil.decrypt(pref.getString("password" + a, ""));//初始化密码数组，把已保存的密码放到数组里面去               
+        int userCount = LitePal.count(User.class);
+        final String[] acc = new String[userCount];//定义一个账号数组，长度为选择记住密码的登录成功的账号个数               
+        final String[] pas = new String[userCount];//定义一个密码数组，长度为选择记住密码的登录成功的账号个数     
+        List<User> userList = LitePal.order("loginTime desc").find(User.class);
+        for (int i = 0; i < userCount; i++) {
+            if (userList.get(i).getIsRemember() == 1) {
+                acc[i] = userList.get(i).getUsername();//初始化账号数组，把已保存的账号放到数组里面去     
+                pas[i] = AESUtil.decrypt(userList.get(i).getPassword());//初始化密码数组，把已保存的密码放到数组里面去   
+            }
         }
         listPopupWindow = new ListPopupWindow(Login.this);
         listPopupWindow.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, acc));//把账号的数据显示到下拉列表里面去       
