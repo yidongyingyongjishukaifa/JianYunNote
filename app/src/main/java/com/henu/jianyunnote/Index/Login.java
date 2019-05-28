@@ -3,9 +3,7 @@ package com.henu.jianyunnote.Index;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ListPopupWindow;
@@ -48,8 +46,6 @@ public class Login extends AppCompatActivity {
 
     private CheckBox remember_password;
     private CheckBox auto_login;
-    private SharedPreferences pref;
-    private SharedPreferences.Editor editor;
     private ListPopupWindow listPopupWindow;
     private EditText Email_local;
     private EditText Password_local;
@@ -71,7 +67,6 @@ public class Login extends AppCompatActivity {
         Button register = findViewById(R.id.register);
         remember_password = findViewById(R.id.remember_password);
         auto_login = findViewById(R.id.auto_login);
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
         List<User> userList = LitePal.where("isRemember = ?", "1").order("loginTime desc").limit(1).find(User.class);
         if (userList != null && userList.size() != 0) {
             for (User u : userList) {
@@ -82,8 +77,7 @@ public class Login extends AppCompatActivity {
                 Email_local.setText(email);
                 Password_local.setText(password);
                 remember_password.setChecked(true);
-                boolean autoLogin = pref.getBoolean("auto_login", false);
-                if (autoLogin) {
+                if (u.isAutoLogin()) {
                     auto_login.setChecked(true);
                     gotoNote();
                 }
@@ -114,11 +108,8 @@ public class Login extends AppCompatActivity {
                                         if (u.getPassword().equals(MD5Util.Encode(password))) {
 //                                            String info = "登录成功";
 //                                            Toast.makeText(Login.this, info, LENGTH_LONG).show();
-                                            editor = pref.edit();
-                                            editor.putString("login_email", email);
                                             is_Remember = remember_password.isChecked();
                                             autoLogin = auto_login.isChecked();
-                                            editor.apply();
                                             init();
                                             gotoNote();
                                         } else if (Password_local.getText().length() == 0) {

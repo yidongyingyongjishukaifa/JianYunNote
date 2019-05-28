@@ -98,9 +98,7 @@ public class NotePage extends AppCompatActivity {
                                 note.setUpdateTime(new Date());
                                 note.setIsDelete(0);
                                 note.save();
-
-                                local_notes_id = (int[]) ArrayUtil.arrayAddLength(local_notes_id, 1);
-                                local_notes_id[0] = note.getId();
+                                local_notes_id = ArrayUtil.insert2Array(local_notes_id, note.getId());
                                 Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
                                 listItem.put("NOTE_MESSAGE", note.getTitle());
                                 listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(note.getUpdateTime()));
