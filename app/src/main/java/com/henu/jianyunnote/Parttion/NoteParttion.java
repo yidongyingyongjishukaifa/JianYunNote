@@ -54,7 +54,7 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
     private int local_count;
     public static int notebooks_count = 0;
     private List<Map<String, Object>> listItems = new ArrayList<>();
-    private User current_user;
+    public static User current_user;
     private long mExitTime;
 
     @Override
@@ -107,6 +107,7 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
                                 notebook.setUpdateTime(new Date());
                                 notebook.setIsDelete(0);
                                 notebook.save();
+                                updateUser(current_user);
                                 local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, notebook.getId());
                                 notebooks_count = local_notebooks_id.length;
                                 Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
@@ -154,6 +155,7 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
                                 note.setUpdateTime(new Date());
                                 note.setIsDelete(0);
                                 note.save();
+                                updateUser(current_user);
                                 local_notes_id = ArrayUtil.insert2Array(local_notes_id, note.getId());
                                 Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
                                 listItem.put("NOTE_MESSAGE", note.getTitle());
@@ -199,6 +201,74 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
                 startActivity(intent);
             }
         });
+
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                menu.collapse();
+                //定义AlertDialog.Builder对象，当长按列表项的时候弹出确认删除对话框
+                AlertDialog.Builder builder = new AlertDialog.Builder(NoteParttion.this);
+                builder.setMessage("确定删除?");
+                builder.setTitle("提示");
+                final int p = position;
+                //添加AlertDialog.Builder对象的setPositiveButton()方法
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        listItems.remove(p);
+                        int id;
+                        if (p < notebooks_count) {
+                            id = local_notebooks_id[p];
+                            updateNoteBook(id);
+                            local_notebooks_id = ArrayUtil.deleteIdInArray(local_notebooks_id, p);
+                            notebooks_count = local_notebooks_id.length;
+                        } else {
+                            id = local_notes_id[p - notebooks_count];
+                            updateNote(id);
+                            local_notes_id = ArrayUtil.deleteIdInArray(local_notes_id, p);
+                        }
+
+                        updateUser(current_user);
+                        myAdapter.notifyDataSetChanged();
+                        Toast.makeText(getBaseContext(), "删除列表项", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                //添加AlertDialog.Builder对象的setNegativeButton()方法
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.create().show();
+                return true;
+            }
+        });
+    }
+
+    public static void updateNoteBook(int id) {
+        List<NoteBook> noteBookList = LitePal.where("id = ?", String.valueOf(id)).find(NoteBook.class);
+        for (NoteBook noteBook : noteBookList) {
+            noteBook.setIsDelete(1);
+            noteBook.setUpdateTime(new Date());
+            noteBook.save();
+        }
+    }
+
+    public static void updateNote(int id) {
+        List<Note> noteList = LitePal.where("id = ?", String.valueOf(id)).find(Note.class);
+        for (Note note : noteList) {
+            note.setIsDelete(1);
+            note.setUpdateTime(new Date());
+            note.save();
+        }
+    }
+
+    public static void updateUser(User user) {
+        if (user != null) {
+            user.setUpdateTime(new Date());
+            user.save();
+        }
     }
 
     private void init() {
