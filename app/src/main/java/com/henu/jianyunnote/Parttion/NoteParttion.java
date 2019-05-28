@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +32,7 @@ import com.henu.jianyunnote.DataBase.User;
 import com.henu.jianyunnote.Index.Login;
 import com.henu.jianyunnote.Page.NotePage;
 import com.henu.jianyunnote.R;
+import com.henu.jianyunnote.Setting.Setting;
 import com.henu.jianyunnote.Util.ArrayUtil;
 import com.henu.jianyunnote.Util.AtyContainer;
 import com.henu.jianyunnote.Util.MyAdapter;
@@ -50,6 +52,7 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
     private MyAdapter myAdapter;
     private SharedPreferences pref;
     private TextView login_Email;
+    private ImageView imageView;
     public static int local_user_id;
     private String login_email;
     private int local_count;
@@ -67,9 +70,26 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+//        NavigationView navigationView = findViewById(R.id.nav_view);
+//        navigationView.setNavigationItemSelectedListener(this);
+//        login_Email = navigationView.inflateHeaderView(R.layout.nav_header_main).findViewById(R.id.login_email);
+
         NavigationView navigationView = findViewById(R.id.nav_view);
+
         navigationView.setNavigationItemSelectedListener(this);
-        login_Email = navigationView.inflateHeaderView(R.layout.nav_header_main).findViewById(R.id.login_email);
+//        login_Email = navigationView.inflateHeaderView(R.layout.nav_header_main).findViewById(R.id.login_email);
+//        login_email = pref.getString("login_email", "未登录");
+        View view = navigationView.inflateHeaderView( R.layout.nav_header_main );
+        login_Email = view.findViewById( R.id.login_email );
+        login_Email.setText(login_email);
+        imageView = view.findViewById( R.id.imageView );
+        imageView.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent( NoteParttion.this, Setting.class );
+                startActivity( intent );
+            }
+        } );
         final ListView mListView = findViewById(R.id.parttion_listview);
         init();
         final FloatingActionsMenu menu = findViewById(R.id.fab_menu);
