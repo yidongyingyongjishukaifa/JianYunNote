@@ -1,16 +1,15 @@
 package com.henu.jianyunnote.Util;
 
-import java.lang.reflect.Array;
-
 public class ArrayUtil {
-    public static Object arrayAddLength(Object oldArray, int addLength) {
-        Class c = oldArray.getClass();
-        if (!c.isArray()) return null;
-        Class componentType = c.getComponentType();
-        int length = Array.getLength(oldArray);
-        int newLength = length + addLength;
-        Object newArray = Array.newInstance(componentType, newLength);
-        System.arraycopy(oldArray, 0, newArray, 1, length);
+    public static int[] insert2Array(int[] oldArray, int id) {
+        int[] newArray = new int[oldArray.length + 1];
+        for (int i = 0; i < newArray.length; i++) {
+            if(i==0){
+                newArray[i]=id;
+            }else{
+                newArray[i]=oldArray[i-1];
+            }
+        }
         return newArray;
     }
 }
