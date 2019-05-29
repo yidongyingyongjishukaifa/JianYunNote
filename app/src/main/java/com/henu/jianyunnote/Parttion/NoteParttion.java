@@ -2,9 +2,7 @@ package com.henu.jianyunnote.Parttion;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -50,15 +48,13 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
     public static int[] local_notebooks_id;
     public static int[] local_notes_id;
     private MyAdapter myAdapter;
-    private SharedPreferences pref;
     private TextView login_Email;
     private ImageView imageView;
     public static int local_user_id;
-    private String login_email;
     private int local_count;
     public static int notebooks_count = 0;
     private List<Map<String, Object>> listItems = new ArrayList<>();
-    private User current_user;
+    public static User current_user;
     private long mExitTime;
 
     @Override
@@ -67,29 +63,20 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_note_parttion);
         // 添加Activity到堆栈
         AtyContainer.getInstance().addActivity(this);
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-//        NavigationView navigationView = findViewById(R.id.nav_view);
-//        navigationView.setNavigationItemSelectedListener(this);
-//        login_Email = navigationView.inflateHeaderView(R.layout.nav_header_main).findViewById(R.id.login_email);
-
         NavigationView navigationView = findViewById(R.id.nav_view);
-
         navigationView.setNavigationItemSelectedListener(this);
-//        login_Email = navigationView.inflateHeaderView(R.layout.nav_header_main).findViewById(R.id.login_email);
-//        login_email = pref.getString("login_email", "未登录");
-        View view = navigationView.inflateHeaderView( R.layout.nav_header_main );
-        login_Email = view.findViewById( R.id.login_email );
-        login_Email.setText(login_email);
-        imageView = view.findViewById( R.id.imageView );
-        imageView.setOnClickListener( new View.OnClickListener() {
+        View view = navigationView.inflateHeaderView(R.layout.nav_header_main);
+        login_Email = view.findViewById(R.id.login_email);
+        imageView = view.findViewById(R.id.imageView);
+        imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent( NoteParttion.this, Setting.class );
-                startActivity( intent );
+                Intent intent = new Intent(NoteParttion.this, Setting.class);
+                startActivity(intent);
             }
-        } );
+        });
         final ListView mListView = findViewById(R.id.parttion_listview);
         init();
         final FloatingActionsMenu menu = findViewById(R.id.fab_menu);
@@ -120,9 +107,9 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
                                 notebook.setUpdateTime(new Date());
                                 notebook.setIsDelete(0);
                                 notebook.save();
-                                notebooks_count += 1;
-                                local_notebooks_id = (int[]) ArrayUtil.arrayAddLength(local_notebooks_id, 1);
-                                local_notebooks_id[0] = notebook.getId();
+                                updateUser(current_user);
+                                local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, notebook.getId());
+                                notebooks_count = local_notebooks_id.length;
                                 Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
                                 listItem.put("NOTE_MESSAGE", notebook.getNoteBookName());
                                 listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(notebook.getUpdateTime()));
@@ -168,9 +155,8 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
                                 note.setUpdateTime(new Date());
                                 note.setIsDelete(0);
                                 note.save();
-
-                                local_notes_id = (int[]) ArrayUtil.arrayAddLength(local_notes_id, 1);
-                                local_notes_id[0] = note.getId();
+                                updateUser(current_user);
+                                local_notes_id = ArrayUtil.insert2Array(local_notes_id, note.getId());
                                 Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
                                 listItem.put("NOTE_MESSAGE", note.getTitle());
                                 listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(note.getUpdateTime()));
@@ -196,19 +182,8 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-
-//        View view = navigationView.inflateHeaderView( R.layout.nav_header_main );
-//        ImageView imageView = view.findViewById( R.id.imageView111 );
-//        imageView.setOnClickListener( new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                //此处可跳转用户设置
-//            }
-//        } );
-
         // 为ListView设置Adapter
         mListView.setAdapter(myAdapter);
-
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -226,6 +201,74 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
                 startActivity(intent);
             }
         });
+
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                menu.collapse();
+                //定义AlertDialog.Builder对象，当长按列表项的时候弹出确认删除对话框
+                AlertDialog.Builder builder = new AlertDialog.Builder(NoteParttion.this);
+                builder.setMessage("确定删除?");
+                builder.setTitle("提示");
+                final int p = position;
+                //添加AlertDialog.Builder对象的setPositiveButton()方法
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        listItems.remove(p);
+                        int id;
+                        if (p < notebooks_count) {
+                            id = local_notebooks_id[p];
+                            updateNoteBook(id);
+                            local_notebooks_id = ArrayUtil.deleteIdInArray(local_notebooks_id, p);
+                            notebooks_count = local_notebooks_id.length;
+                        } else {
+                            id = local_notes_id[p - notebooks_count];
+                            updateNote(id);
+                            local_notes_id = ArrayUtil.deleteIdInArray(local_notes_id, p);
+                        }
+
+                        updateUser(current_user);
+                        myAdapter.notifyDataSetChanged();
+                        Toast.makeText(getBaseContext(), "删除列表项", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                //添加AlertDialog.Builder对象的setNegativeButton()方法
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.create().show();
+                return true;
+            }
+        });
+    }
+
+    public static void updateNoteBook(int id) {
+        List<NoteBook> noteBookList = LitePal.where("id = ?", String.valueOf(id)).find(NoteBook.class);
+        for (NoteBook noteBook : noteBookList) {
+            noteBook.setIsDelete(1);
+            noteBook.setUpdateTime(new Date());
+            noteBook.save();
+        }
+    }
+
+    public static void updateNote(int id) {
+        List<Note> noteList = LitePal.where("id = ?", String.valueOf(id)).find(Note.class);
+        for (Note note : noteList) {
+            note.setIsDelete(1);
+            note.setUpdateTime(new Date());
+            note.save();
+        }
+    }
+
+    public static void updateUser(User user) {
+        if (user != null) {
+            user.setUpdateTime(new Date());
+            user.save();
+        }
     }
 
     private void init() {
