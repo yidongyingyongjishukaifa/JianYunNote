@@ -2,6 +2,8 @@ package com.henu.jianyunnote.Content;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
+import android.view.Gravity;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -31,7 +33,12 @@ public class NoteContent extends AppCompatActivity {
         AtyContainer.getInstance().addActivity(this);
 
         noteTitle = findViewById(R.id.note_title);
-        noteContent = findViewById(R.id.note_content);
+        noteContent = findViewById(R.id.note_content);//自动换行
+        noteContent.setInputType( InputType.TYPE_TEXT_FLAG_MULTI_LINE );
+        noteContent.setGravity( Gravity.TOP );
+        noteContent.setSingleLine(false);
+        noteContent.setHorizontallyScrolling( false );
+
         timeView = findViewById( R.id.time_info );
 
         initNoteContent();
@@ -51,15 +58,23 @@ public class NoteContent extends AppCompatActivity {
             for (Note note : noteList) {
                 noteTitle.setText(note.getTitle());
                 noteContent.setText(note.getContent());
-                note.setUpdateTime( new Date() );
                 timeView.setText( TimeUtil.Date2String( note.getUpdateTime() ) );
             }
-        }else {
-            Note note = new Note();
-            note.setCreateTime( new Date() );
-            note.setUpdateTime( new Date() );
         }
     }
 
-
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        String noteid = String.valueOf((local_note_id));
+        List<Note> noteList = LitePal.where("id=?", noteid).find(Note.class);
+        if (noteList != null && noteList.size() != 0) {
+            for (Note note : noteList) {
+                note.setUpdateTime( new Date(  ) );
+                note.setContent( noteContent.getText().toString() );
+                note.setTitle( noteTitle.getText().toString() );
+                note.save();
+            }
+        }
+    }
 }
