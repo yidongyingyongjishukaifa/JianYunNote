@@ -418,7 +418,8 @@ public class NoteParttion extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
-
+            Intent intent = new Intent( NoteParttion.this, Setting.class );
+            startActivity( intent );
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
