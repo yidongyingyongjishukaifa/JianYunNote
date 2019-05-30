@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.Model;
+package com.henu.jianyunnote.Model.LitePal;
 
 import org.litepal.crud.LitePalSupport;
 
@@ -73,7 +73,7 @@ public class NoteBook_LitePal extends LitePalSupport implements Serializable {
 
     @Override
     public String toString() {
-        return "NoteBook_LitePal{" +
+        return "NoteBook_Bmob{" +
                 "id=" + id +
                 ", userId=" + userId +
                 ", noteBookName='" + noteBookName + '\'' +

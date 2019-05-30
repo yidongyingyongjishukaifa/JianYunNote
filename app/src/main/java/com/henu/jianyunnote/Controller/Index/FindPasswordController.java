@@ -9,7 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.henu.jianyunnote.Model.Users_Bmob;
+import com.henu.jianyunnote.Model.Bmob.Users_Bmob;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.Util.AtyUtil;
 

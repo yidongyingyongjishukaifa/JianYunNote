@@ -11,7 +11,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.henu.jianyunnote.Model.Users_Bmob;
+import com.henu.jianyunnote.Dao.INoteBookDao_Bmob;
+import com.henu.jianyunnote.Dao.impl.INoteBookDaoImpl_Bmob;
+import com.henu.jianyunnote.Model.Bmob.Users_Bmob;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.Util.AtyUtil;
 import com.henu.jianyunnote.Util.MD5Util;
@@ -22,7 +24,7 @@ import cn.bmob.v3.listener.SaveListener;
 
 public class RegisterController extends AppCompatActivity {
     private Button Return;
-
+    private INoteBookDao_Bmob noteBookDao_bmob = new INoteBookDaoImpl_Bmob();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
@@ -49,7 +51,7 @@ public class RegisterController extends AppCompatActivity {
                     String email_s= Email.getText().toString();
                     String password_s= MD5Util.Encode(password.getText().toString());
                     String safepassword_s=safepassword.getText().toString();
-                    Users_Bmob users =new Users_Bmob();
+                    final Users_Bmob users =new Users_Bmob();
                     users.setEmail(email_s);
                     users.setPassword(password_s);
                     users.setSafePassword(safepassword_s);
@@ -58,6 +60,7 @@ public class RegisterController extends AppCompatActivity {
                         public void done(String s, BmobException e) {
                             if(e==null)
                             {
+                                noteBookDao_bmob.insert2NoteBook("未命名筆記本",users.getObjectId());
                                 AlertDialog.Builder builder = new AlertDialog.Builder(RegisterController.this);
                                 builder.setMessage("注册成功，请返回登录");
                                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener()

@@ -1,34 +1,20 @@
-package com.henu.jianyunnote.Model;
+package com.henu.jianyunnote.Model.Bmob;
 
-import org.litepal.crud.LitePalSupport;
+import cn.bmob.v3.BmobObject;
 
-import java.io.Serializable;
-import java.util.Date;
-
-public class Note_LitePal extends LitePalSupport implements Serializable {
-    private int id;
-    private int userId;
+public class Note_Bmob extends BmobObject {
+    private String userId;
     private int noteBookId;
     private String title;
     private String content;
     private int isDelete;
-    private Date createTime;
-    private Date updateTime;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 
     public int getNoteBookId() {
@@ -45,22 +31,6 @@ public class Note_LitePal extends LitePalSupport implements Serializable {
 
     public void setIsDelete(int isDelete) {
         this.isDelete = isDelete;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
     }
 
     public String getTitle() {
@@ -81,15 +51,12 @@ public class Note_LitePal extends LitePalSupport implements Serializable {
 
     @Override
     public String toString() {
-        return "Note_LitePal{" +
-                "id=" + id +
+        return "Note_Bmob{" +
                 ", userId=" + userId +
                 ", noteBookId=" + noteBookId +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 ", isDelete=" + isDelete +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
                 '}';
     }
 }

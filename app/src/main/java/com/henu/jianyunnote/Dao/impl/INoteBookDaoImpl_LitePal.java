@@ -1,15 +1,15 @@
-package com.henu.jianyunnote.Service.impl;
+package com.henu.jianyunnote.Dao.impl;
 
-import com.henu.jianyunnote.Model.NoteBook_LitePal;
-import com.henu.jianyunnote.Model.Note_LitePal;
-import com.henu.jianyunnote.Service.INoteBookService;
+import com.henu.jianyunnote.Model.LitePal.NoteBook_LitePal;
+import com.henu.jianyunnote.Model.LitePal.Note_LitePal;
+import com.henu.jianyunnote.Dao.INoteBookDao_LitePal;
 
 import org.litepal.LitePal;
 
 import java.util.Date;
 import java.util.List;
 
-public class INoteBookServiceImpl implements INoteBookService {
+public class INoteBookDaoImpl_LitePal implements INoteBookDao_LitePal {
     @Override
     public void updateNoteBookById(Integer id) {
         List<Note_LitePal> noteList = LitePal.where("noteBookId = ?", String.valueOf(id)).find(Note_LitePal.class);
