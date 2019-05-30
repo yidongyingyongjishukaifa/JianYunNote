@@ -16,14 +16,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:text="title" />
+            android:text="title"
+            android:textSize="30dp"/>
+
+        <TextView
+            android:id="@+id/time_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <EditText
             android:id="@+id/note_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:ems="10"
-            android:text="content" />
+            android:textSize="20dp"
+            android:background="@null" />
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
