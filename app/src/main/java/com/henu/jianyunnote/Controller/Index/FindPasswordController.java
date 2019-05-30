@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.Index;
+package com.henu.jianyunnote.Controller.Index;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,9 +9,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.henu.jianyunnote.Beans.Users;
+import com.henu.jianyunnote.Model.Users_Bmob;
 import com.henu.jianyunnote.R;
-import com.henu.jianyunnote.Util.AtyContainer;
+import com.henu.jianyunnote.Util.AtyUtil;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -23,7 +23,7 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 
-public class FindPassword extends AppCompatActivity {
+public class FindPasswordController extends AppCompatActivity {
 
     public static boolean isEmail(String email){   //判断邮箱是否合法
         if (null==email || "".equals(email)) return false;
@@ -33,7 +33,7 @@ public class FindPassword extends AppCompatActivity {
     }
 
     public void MyAlertDialog(String message, String button) {  //AlertDialog 两个参数
-        AlertDialog.Builder builder = new AlertDialog.Builder(FindPassword.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(FindPasswordController.this);
         builder.setMessage(message);
         builder.setPositiveButton(button, new DialogInterface.OnClickListener() {
             @Override
@@ -46,7 +46,7 @@ public class FindPassword extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_findpassword);
-        AtyContainer.getInstance().addActivity(this);
+        AtyUtil.getInstance().addActivity(this);
         Bmob.initialize(this, "bc95d28fa2c059530870d4dbb550b38f");
         final EditText email = findViewById(R.id.email);
         final EditText safepassword = findViewById(R.id.safepassword);
@@ -68,21 +68,21 @@ public class FindPassword extends AppCompatActivity {
                 }
                 else
                 {
-                    BmobQuery<Users> query = new BmobQuery<Users>();
+                    BmobQuery<Users_Bmob> query = new BmobQuery<Users_Bmob>();
                     //查询Email为“***”的数据
                     query.addWhereEqualTo("Email", email.getText());
                     //返回1条数据，如果不加上这条语句，默认返回10条数据
                     query.setLimit(1);
-                    query.findObjects(new FindListener<Users>() {
+                    query.findObjects(new FindListener<Users_Bmob>() {
                         @Override
-                        public void done(List<Users> object, BmobException e) {
+                        public void done(List<Users_Bmob> object, BmobException e) {
                             if (object.size() == 1) {
-                                for (Users u : object) {
+                                for (Users_Bmob u : object) {
                                     if ((u.getSafePassword()).equals(safepassword.getText().toString())) {
                                         if(newpassword.getText().length() != 0 && newpassword.getText().toString().equals(renewpassword.getText().toString()))
                                         {
                                             String Id = u.getObjectId();
-                                            Users user = new Users();
+                                            Users_Bmob user = new Users_Bmob();
                                             user.setPassword(newpassword.getText().toString());
                                             user.update(Id, new UpdateListener() {
                                                 @Override
@@ -125,7 +125,7 @@ public class FindPassword extends AppCompatActivity {
         Return.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(FindPassword.this, Login.class);
+                Intent intent = new Intent(FindPasswordController.this, LoginController.class);
                 startActivity(intent);
                 finish();
             }

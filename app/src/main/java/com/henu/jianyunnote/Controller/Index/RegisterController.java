@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.Index;
+package com.henu.jianyunnote.Controller.Index;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,23 +11,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.henu.jianyunnote.Beans.Users;
+import com.henu.jianyunnote.Model.Users_Bmob;
 import com.henu.jianyunnote.R;
-import com.henu.jianyunnote.Util.AtyContainer;
+import com.henu.jianyunnote.Util.AtyUtil;
 import com.henu.jianyunnote.Util.MD5Util;
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
 
-public class Register extends AppCompatActivity {
+public class RegisterController extends AppCompatActivity {
     private Button Return;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_register );
-        AtyContainer.getInstance().addActivity(this);
+        AtyUtil.getInstance().addActivity(this);
         Bmob.initialize(this, "bc95d28fa2c059530870d4dbb550b38f");
         Button register_btn = findViewById(R.id.register);
         Button return_btn = findViewById(R.id.Return);
@@ -39,17 +39,17 @@ public class Register extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(Login.isEmail(Email.getText().toString())==false)
+                if(LoginController.isEmail(Email.getText().toString())==false)
                 {
                     String info = "请输入正确的邮箱";
-                    Toast.makeText(Register.this, info, Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterController.this, info, Toast.LENGTH_LONG).show();
                 }
                 else if((password.getText().toString()).equals(repassword.getText().toString())&&(password.getText().length()!=0)&&(safepassword.getText().length()!=0))
                 {
                     String email_s= Email.getText().toString();
                     String password_s= MD5Util.Encode(password.getText().toString());
                     String safepassword_s=safepassword.getText().toString();
-                    Users users =new Users();
+                    Users_Bmob users =new Users_Bmob();
                     users.setEmail(email_s);
                     users.setPassword(password_s);
                     users.setSafePassword(safepassword_s);
@@ -58,7 +58,7 @@ public class Register extends AppCompatActivity {
                         public void done(String s, BmobException e) {
                             if(e==null)
                             {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(RegisterController.this);
                                 builder.setMessage("注册成功，请返回登录");
                                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener()
                                 {
@@ -73,7 +73,7 @@ public class Register extends AppCompatActivity {
                             else
                             {
                                 String info = "注册失败"+e.getErrorCode();
-                                Toast.makeText(Register.this, info, Toast.LENGTH_LONG).show();
+                                Toast.makeText(RegisterController.this, info, Toast.LENGTH_LONG).show();
                             }
                         }
                     });
@@ -82,22 +82,22 @@ public class Register extends AppCompatActivity {
                 else if(password.getText().length()==0)
                 {
                     String info = "请输入密码";
-                    Toast.makeText(Register.this, info, Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterController.this, info, Toast.LENGTH_LONG).show();
                 }
                 else if(repassword.getText().length()==0)
                 {
                     String info = "请确认密码";
-                    Toast.makeText(Register.this, info, Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterController.this, info, Toast.LENGTH_LONG).show();
                 }
                 else if(safepassword.getText().length()==0)
                 {
                     String info = "请输入密保密码";
-                    Toast.makeText(Register.this, info, Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterController.this, info, Toast.LENGTH_LONG).show();
                 }
                 else if(password.getText().toString()!=repassword.getText().toString())
                 {
                     String info = "输入的两次密码不一致，请重试";
-                    Toast.makeText(Register.this, info, Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterController.this, info, Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -106,7 +106,7 @@ public class Register extends AppCompatActivity {
         return_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Register.this, Login.class);
+                Intent intent = new Intent(RegisterController.this, LoginController.class);
                 startActivity(intent);
                 finish();
             }

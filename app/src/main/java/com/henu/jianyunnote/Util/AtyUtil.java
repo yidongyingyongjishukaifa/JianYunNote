@@ -5,14 +5,14 @@ import android.app.Activity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AtyContainer {
-    private AtyContainer() {
+public class AtyUtil {
+    private AtyUtil() {
     }
 
-    private static AtyContainer instance = new AtyContainer();
+    private static AtyUtil instance = new AtyUtil();
     private static List<Activity> activityStack = new ArrayList<Activity>();
 
-    public static AtyContainer getInstance() {
+    public static AtyUtil getInstance() {
         return instance;
     }
 

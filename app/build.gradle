@@ -36,6 +36,10 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.squareup.okhttp3:okhttp:3.12.0'
     implementation files('libs/BASE64Encoder.jar')
+    implementation files('libs/nineoldandroids-2.4.0.jar')
     implementation 'org.litepal.android:java:3.0.0'
     implementation 'com.getbase:floatingactionbutton:1.10.1'
+    implementation "com.daimajia.swipelayout:library:1.1.7@aar"
+    implementation 'com.daimajia.easing:library:2.0@aar'
+    implementation 'com.daimajia.androidanimations:library:2.3@aar'
 }

@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.Page;
+package com.henu.jianyunnote.Controller.NotePage;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,15 +13,19 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.henu.jianyunnote.Content.NoteContent;
-import com.henu.jianyunnote.DataBase.Note;
-import com.henu.jianyunnote.DataBase.NoteBook;
-import com.henu.jianyunnote.Parttion.NoteParttion;
+import com.henu.jianyunnote.Model.NoteBook_LitePal;
+import com.henu.jianyunnote.Model.Note_LitePal;
 import com.henu.jianyunnote.R;
+import com.henu.jianyunnote.Service.INoteService;
+import com.henu.jianyunnote.Service.IUserService;
+import com.henu.jianyunnote.Service.impl.INoteServiceImpl;
+import com.henu.jianyunnote.Service.impl.IUserServiceImpl;
 import com.henu.jianyunnote.Util.ArrayUtil;
-import com.henu.jianyunnote.Util.AtyContainer;
-import com.henu.jianyunnote.Util.MyAdapter;
+import com.henu.jianyunnote.Util.AtyUtil;
+import com.henu.jianyunnote.Util.NoteAdapter;
 import com.henu.jianyunnote.Util.TimeUtil;
+import com.henu.jianyunnote.Controller.NoteContent.NoteContentController;
+import com.henu.jianyunnote.Controller.NoteParttion.NoteParttionController;
 
 import org.litepal.LitePal;
 
@@ -31,23 +35,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NotePage extends AppCompatActivity {
+public class NotePageController extends AppCompatActivity {
     private List<Map<String, Object>> listItems = new ArrayList<>();
     public static int[] local_notes_id;
     private int local_notebook_id;
     private int local_count;
-    private MyAdapter myAdapter;
+    private NoteAdapter myAdapter;
     private String uid;
     private String notebookid;
+    public static boolean flag = false;
+    private IUserService userService = new IUserServiceImpl();
+    private INoteService noteService = new INoteServiceImpl();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_page);
-        AtyContainer.getInstance().addActivity(this);
-        int p = Integer.parseInt(NotePage.this.getIntent().getStringExtra("position"));
-        local_notebook_id = NoteParttion.local_notebooks_id[p];
-        uid = String.valueOf(NoteParttion.local_user_id);
+        AtyUtil.getInstance().addActivity(this);
+        int p = Integer.parseInt(NotePageController.this.getIntent().getStringExtra("position"));
+        local_notebook_id = NoteParttionController.local_notebooks_id[p];
+        uid = String.valueOf(NoteParttionController.local_user_id);
         notebookid = String.valueOf(local_notebook_id);
         initNotePage();
         final ListView mListView = findViewById(R.id.parttion_listview);
@@ -58,7 +65,7 @@ public class NotePage extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 menu.collapse();
-                Intent intent = new Intent(NotePage.this, NoteContent.class);
+                Intent intent = new Intent(NotePageController.this, NoteContentController.class);
                 intent.putExtra("position", position + "");
                 startActivity(intent);
             }
@@ -68,7 +75,7 @@ public class NotePage extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 menu.collapse();
                 //定义AlertDialog.Builder对象，当长按列表项的时候弹出确认删除对话框
-                AlertDialog.Builder builder = new AlertDialog.Builder(NotePage.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(NotePageController.this);
                 builder.setMessage("确定删除?");
                 builder.setTitle("提示");
                 final int p = position;
@@ -77,9 +84,10 @@ public class NotePage extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         listItems.remove(p);
+                        flag = true;
                         int id = local_notes_id[p];
-                        NoteParttion.updateNote(id);
-                        NoteParttion.updateUser(NoteParttion.current_user);
+                        noteService.updateNoteById(id);
+                        userService.updateUserByUser(NoteParttionController.current_user);
                         local_notes_id = ArrayUtil.deleteIdInArray(local_notes_id, p);
                         myAdapter.notifyDataSetChanged();
                         Toast.makeText(getBaseContext(), "删除列表项", Toast.LENGTH_SHORT).show();
@@ -101,8 +109,8 @@ public class NotePage extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 menu.collapse();
-                final AlertDialog.Builder builder = new AlertDialog.Builder(NotePage.this);
-                final LayoutInflater layoutInflater = LayoutInflater.from(NotePage.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(NotePageController.this);
+                final LayoutInflater layoutInflater = LayoutInflater.from(NotePageController.this);
                 final View myView = layoutInflater.inflate(R.layout.new_notebook, null);
                 builder.setTitle("新建笔记")
                         .setIcon(R.mipmap.ic_launcher)
@@ -111,35 +119,21 @@ public class NotePage extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 final EditText Notebook_Name = myView.findViewById(R.id.notebook_Name);
-                                String s = Notebook_Name.getText().toString();
-                                String notebookid = String.valueOf(local_notebook_id);
-                                List<NoteBook> noteBookList = LitePal.where("id=? and userId=?", notebookid, uid).order("updateTime desc").find(NoteBook.class);
-                                int notebook_id = 0;
-                                for (NoteBook noteBook : noteBookList) {
-                                    notebook_id = noteBook.getId();
-                                    noteBook.setNoteNumber(noteBook.getNoteNumber() + 1);
-                                    noteBook.setUpdateTime(new Date());
-                                    noteBook.save();
+                                String s = "";
+                                if (Notebook_Name.getText() != null) {
+                                    s = Notebook_Name.getText().toString();
                                 }
-                                Note note = new Note();
-                                if ("".equals(s)) {
-                                    note.setTitle("未命名笔记");
-                                } else {
-                                    note.setTitle(s);
+                                Note_LitePal note_litePal = noteService.insert2Note(s,null, local_notebook_id, NoteParttionController.local_user_id);
+                                if (note_litePal != null) {
+                                    flag = true;
+                                    userService.updateUserByUser(NoteParttionController.current_user);
+                                    local_notes_id = ArrayUtil.insert2Array(local_notes_id, note_litePal.getId());
+                                    Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
+                                    listItem.put("NOTE_MESSAGE", note_litePal.getTitle());
+                                    listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(note_litePal.getUpdateTime()));
+                                    listItems.add(0, listItem);
+                                    myAdapter.notifyDataSetChanged();
                                 }
-                                note.setUserId(Integer.parseInt(uid));
-                                note.setNoteBookId(notebook_id);
-                                note.setCreateTime(new Date());
-                                note.setUpdateTime(new Date());
-                                note.setIsDelete(0);
-                                note.save();
-                                NoteParttion.updateUser(NoteParttion.current_user);
-                                local_notes_id = ArrayUtil.insert2Array(local_notes_id, note.getId());
-                                Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
-                                listItem.put("NOTE_MESSAGE", note.getTitle());
-                                listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(note.getUpdateTime()));
-                                listItems.add(0, listItem);
-                                myAdapter.notifyDataSetChanged();
 //                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
                             }
                         })
@@ -157,11 +151,11 @@ public class NotePage extends AppCompatActivity {
     }
 
     private void initNotePage() {
-        List<Note> notes = LitePal.where("noteBookId = ? and userId = ? and isDelete = ?", notebookid, uid, "0").order("updateTime desc").find(Note.class);
+        List<Note_LitePal> notes = LitePal.where("noteBookId = ? and isDelete = ?", notebookid, "0").order("updateTime desc").find(Note_LitePal.class);
         if (notes != null && notes.size() != 0) {
             local_count = 0;
             local_notes_id = new int[notes.size()];
-            for (Note note : notes) {
+            for (Note_LitePal note : notes) {
                 local_notes_id[local_count] = note.getId();
                 local_count++;
                 Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
@@ -170,6 +164,23 @@ public class NotePage extends AppCompatActivity {
                 listItems.add(listItem);
             }
         }
-        myAdapter = new MyAdapter(NotePage.this, listItems);
+        myAdapter = new NoteAdapter(NotePageController.this, listItems);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (flag) {
+            List<NoteBook_LitePal> noteBookList = LitePal.where("id = ?", notebookid).find(NoteBook_LitePal.class);
+            int num = 0;
+            if (local_notes_id != null) {
+                num = local_notes_id.length;
+            }
+            for (NoteBook_LitePal noteBook : noteBookList) {
+                noteBook.setUpdateTime(new Date());
+                noteBook.setNoteNumber(num);
+                noteBook.save();
+            }
+        }
     }
 }

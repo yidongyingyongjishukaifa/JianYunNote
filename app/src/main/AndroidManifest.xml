@@ -17,8 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Setting.Setting"></activity>
-        <activity android:name=".Start.Start"
+        <activity android:name=".Controller.Setting.SettingController"></activity>
+        <activity android:name=".Controller.Start.StartController"
             android:theme="@style/AppTheme.NoActionBarAndTitle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Parttion.NoteParttion"
+            android:name=".Controller.NoteParttion.NoteParttionController"
             android:label="笔记分区"
             android:theme="@style/AppTheme.NoActionBar">
 
@@ -37,25 +37,25 @@
 
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".Index.FindPassword">
+        <activity android:name=".Controller.Index.FindPasswordController">
 
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".Index.Login">
+        <activity android:name=".Controller.Index.LoginController">
 
             <!-- <intent-filter> -->
             <!-- <action android:name="android.intent.action.MAIN" /> -->
             <!-- </intent-filter> -->
         </activity>
         <activity
-            android:name=".Content.NoteContent"
+            android:name=".Controller.NoteContent.NoteContentController"
             android:label="笔记"></activity>
         <activity
-            android:name=".Page.NotePage"
+            android:name=".Controller.NotePage.NotePageController"
             android:label="笔记列表" />
-        <activity android:name=".Index.Register" />
+        <activity android:name=".Controller.Index.RegisterController" />
     </application>
 
 </manifest>

@@ -7,11 +7,11 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="笔记本名："
+        android:text="笔记名："
         android:textSize="20sp" />
 
     <EditText
-        android:id="@+id/notebook_Name"
+        android:id="@+id/note_Name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp" />
