@@ -1,11 +1,11 @@
-package com.henu.jianyunnote.DataBase;
+package com.henu.jianyunnote.Model;
 
 import org.litepal.crud.LitePalSupport;
 
 import java.io.Serializable;
 import java.util.Date;
 
-public class User extends LitePalSupport implements Serializable {
+public class User_LitePal extends LitePalSupport implements Serializable {
     private int id;
     private String username;
     private String password;
@@ -117,7 +117,7 @@ public class User extends LitePalSupport implements Serializable {
 
     @Override
     public String toString() {
-        return "User{" +
+        return "User_LitePal{" +
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +

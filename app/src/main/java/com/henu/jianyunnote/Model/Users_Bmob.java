@@ -1,10 +1,10 @@
-package com.henu.jianyunnote.Beans;
+package com.henu.jianyunnote.Model;
 
 import java.io.Serializable;
 
 import cn.bmob.v3.BmobObject;
 
-public class Users extends BmobObject implements Serializable {
+public class Users_Bmob extends BmobObject implements Serializable {
 
     private String Name;
     private String Password;
