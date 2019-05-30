@@ -3,22 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/backup"
-        android:icon="@drawable/arrowleft"
-        android:title="返回"
-        app:showAsAction="always"
-        />
+        android:id="@+id/search"
+        android:icon="@drawable/search"
+        android:title="搜索"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView" />
     <item
-        android:id="@+id/delete"
-        android:icon="@drawable/rest_fill"
-        android:title="删除"
-        app:showAsAction="always"
-        />
-    <item
-        android:id="@+id/setting"
-        android:icon="@drawable/setting"
-        android:title="设置"
-        app:showAsAction="always"
+        android:id="@+id/syns"
+        android:title="同步"
         />
 
 </menu>

@@ -17,8 +17,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Controller.Setting.SettingController"></activity>
-        <activity android:name=".Controller.Start.StartController"
+        <activity android:name=".Controller.Setting.About_Setting"></activity>
+        <activity android:name=".Controller.Setting.SettingController" />
+        <activity
+            android:name=".Controller.Start.StartController"
             android:theme="@style/AppTheme.NoActionBarAndTitle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -51,7 +53,7 @@
         </activity>
         <activity
             android:name=".Controller.NoteContent.NoteContentController"
-            android:label="笔记"></activity>
+            android:label="笔记" />
         <activity
             android:name=".Controller.NotePage.NotePageController"
             android:label="笔记列表" />

@@ -393,13 +393,10 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.backup:
+            case R.id.search:
                 //
                 break;
-            case R.id.delete:
-                //
-                break;
-            case R.id.setting:
+            case R.id.syns:
                 //
                 break;
         }
