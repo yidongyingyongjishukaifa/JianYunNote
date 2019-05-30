@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -52,6 +54,7 @@ public class NotePageController extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_page);
         AtyUtil.getInstance().addActivity(this);
+        getSupportActionBar().setDisplayHomeAsUpEnabled( true );
         int p = Integer.parseInt(NotePageController.this.getIntent().getStringExtra("position"));
         local_notebook_id = NoteParttionController.local_notebooks_id[p];
         uid = String.valueOf(NoteParttionController.local_user_id);
@@ -182,5 +185,26 @@ public class NotePageController extends AppCompatActivity {
                 noteBook.save();
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.search:
+                //
+                break;
+            case R.id.syns:
+                //
+                break;
+            case android.R.id.home:
+                finish();
+        }
+        return true;
     }
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/syns"
+        android:title="同步"
+        android:icon="@drawable/sync"
+        app:showAsAction="always"
+        />
+    <item
+        android:id="@+id/photo"
+        android:title="拍照"
+         />
+    <item
+        android:id="@+id/up_pic"
+        android:title="上传图片"
+        />
+</menu>
