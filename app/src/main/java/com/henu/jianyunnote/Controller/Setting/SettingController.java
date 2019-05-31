@@ -2,7 +2,6 @@ package com.henu.jianyunnote.Controller.Setting;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -38,7 +37,7 @@ public class SettingController extends AppCompatActivity {
     public static final int CHOOSE_PHOTO = 2;
     
     private Uri uri;
-    private ImageView imageView;
+    //private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +56,7 @@ public class SettingController extends AppCompatActivity {
             }
         } );
 
-        imageView.findViewById( R.id.header );
+//        ImageView imageView = (ImageView) findViewById( R.id.heade );
         Button button = findViewById( R.id.take_ );
         Button button1 = findViewById( R.id.chose_ );
 
@@ -133,6 +132,7 @@ public class SettingController extends AppCompatActivity {
                     try {
                         //通过url获取图片内容并转为Bitmap格式（用于显示图片）
                         Bitmap bitmap = BitmapFactory.decodeStream( getContentResolver().openInputStream( uri ) );
+                        ImageView imageView = findViewById( R.id.heade );
                         imageView.setImageBitmap( bitmap );   //将图片显示到ImageView上
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
@@ -163,6 +163,7 @@ public class SettingController extends AppCompatActivity {
     private void displayImage(String imagePath) {
         if(imagePath != null){
             Bitmap bitmap = BitmapFactory.decodeFile( imagePath );
+            ImageView imageView = findViewById( R.id.heade );
             imageView.setImageBitmap( bitmap );
         }
         else Toast.makeText( this, "faild to get image", Toast.LENGTH_SHORT ).show();

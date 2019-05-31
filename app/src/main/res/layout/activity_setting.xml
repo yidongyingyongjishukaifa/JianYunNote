@@ -29,11 +29,11 @@
                 <ImageView
                     android:layout_alignParentTop="true"
                     android:layout_centerInParent="true"
-                    android:id="@+id/header"
+                    android:id="@+id/heade"
                     android:layout_width="wrap_content"
                     android:layout_height="100dp" />
                 <TextView
-                    android:layout_below="@+id/header"
+                    android:layout_below="@+id/heade"
                     android:layout_centerInParent="true"
                     android:id="@+id/head"
                     android:text="设置你的头像"
