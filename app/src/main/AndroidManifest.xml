@@ -9,10 +9,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 允许读取手机状态 用于创建BmobInstallation -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <!--低版本读写sd-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name="com.henu.jianyunnote.Util.MyApplication"
+        android:name="com.henu.jianyunnote.util.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -21,56 +21,40 @@
         android:theme="@style/AppTheme">
         <!--url-->
         <provider
-            android:authorities="com.henu.jianyunnote.fileprovider"
             android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.henu.jianyunnote.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"
-                />
+                android:resource="@xml/file_paths" />
         </provider>
-        <activity android:name=".Controller.Setting.About_Setting"></activity>
-        <activity android:name=".Controller.Setting.SettingController" />
+
+        <activity android:name=".controller.setting.About_Setting" />
+        <activity android:name=".controller.setting.SettingController" />
         <activity
-            android:name=".Controller.Start.StartController"
+            android:name="com.henu.jianyunnote.controller.start.StartController"
             android:theme="@style/AppTheme.NoActionBarAndTitle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".Controller.NoteParttion.NoteParttionController"
+            android:name=".controller.noteParttion.NoteParttionController"
             android:label="笔记分区"
-            android:theme="@style/AppTheme.NoActionBar">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- </intent-filter> -->
-        </activity>
-        <activity android:name=".Controller.Index.FindPasswordController">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-            <!-- </intent-filter> -->
-        </activity>
-        <activity android:name=".Controller.Index.LoginController">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-            <!-- </intent-filter> -->
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".controller.index.FindPasswordController" />
+        <activity android:name=".controller.index.LoginController" />
         <activity
-            android:name=".Controller.NoteContent.NoteContentController"
+            android:name=".controller.noteContent.NoteContentController"
             android:label="笔记" />
         <activity
-            android:name=".Controller.NotePage.NotePageController"
+            android:name=".controller.notePage.NotePageController"
             android:label="笔记列表" />
-        <activity android:name=".Controller.Index.RegisterController" />
+        <activity android:name=".controller.index.RegisterController" />
     </application>
 
 </manifest>
