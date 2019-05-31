@@ -1,6 +1,8 @@
 package com.henu.jianyunnote.Util;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,16 +68,27 @@ public class NoteAdapter extends BaseSwipeAdapter {
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int p = (Integer) delete.getTag();
-                mDatas.remove(p);
-                NotePageController.flag = true;
-                int id = NotePageController.local_notes_id[p];
-                noteService.updateNoteById(id);
-                userService.updateUserByUser(NoteParttionController.current_user);
-                NotePageController.local_notes_id = ArrayUtil.deleteIdInArray(NotePageController.local_notes_id, p);
-                notifyDataSetChanged();
-                Toast.makeText(mContext, "删除列表项", Toast.LENGTH_SHORT).show();
-                sl.close();
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setTitle("删除");
+                builder.setMessage("真的要删除吗？");
+                builder.setPositiveButton("是", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int p = (Integer) delete.getTag();
+                        mDatas.remove(p);
+                        NotePageController.flag = true;
+                        int id = NotePageController.local_notes_id[p];
+                        noteService.updateNoteById(id);
+                        userService.updateUserByUser(NoteParttionController.current_user);
+                        NotePageController.local_notes_id = ArrayUtil.deleteIdInArray(NotePageController.local_notes_id, p);
+                        notifyDataSetChanged();
+                        Toast.makeText(MyApplication.getContext(), "删除成功", Toast.LENGTH_SHORT).show();
+                        sl.close();
+                    }
+                });
+                builder.setNegativeButton("否",null);
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
             }
         });
     }

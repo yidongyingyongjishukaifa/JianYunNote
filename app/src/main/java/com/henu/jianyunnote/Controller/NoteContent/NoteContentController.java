@@ -16,6 +16,7 @@ import com.henu.jianyunnote.Util.TimeUtil;
 import com.henu.jianyunnote.Controller.NotePage.NotePageController;
 import com.henu.jianyunnote.Controller.NoteParttion.NoteParttionController;
 
+
 import org.litepal.LitePal;
 
 import java.util.Date;
@@ -32,6 +33,8 @@ public class NoteContentController extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_content);
         AtyUtil.getInstance().addActivity(this);
+
+
 
         getSupportActionBar().setDisplayHomeAsUpEnabled( true );
         noteTitle = findViewById(R.id.note_title);
