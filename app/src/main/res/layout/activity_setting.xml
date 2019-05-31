@@ -22,15 +22,40 @@
             android:id="@+id/h"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <TextView
-                android:text="头像"
-                android:textSize="30dp"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <ImageView
-                android:id="@+id/head"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_alignParentTop="true"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/heade"
+                    android:layout_width="wrap_content"
+                    android:layout_height="100dp" />
+                <TextView
+                    android:layout_below="@+id/heade"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/head"
+                    android:text="设置你的头像"
+                    android:textSize="20dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <Button
+                    android:layout_toLeftOf="@+id/head"
+                    android:layout_below="@+id/head"
+                    android:id="@+id/take_"
+                    android:text="拍照上传"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <Button
+                    android:layout_toRightOf="@+id/head"
+                    android:layout_below="@+id/head"
+                    android:id="@+id/chose_"
+                    android:text="相册选取"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </RelativeLayout>
         </LinearLayout>
 
         <TextView

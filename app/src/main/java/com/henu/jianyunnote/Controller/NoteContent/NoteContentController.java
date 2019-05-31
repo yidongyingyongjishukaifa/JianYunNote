@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -13,6 +15,7 @@ import com.henu.jianyunnote.Util.AtyUtil;
 import com.henu.jianyunnote.Util.TimeUtil;
 import com.henu.jianyunnote.Controller.NotePage.NotePageController;
 import com.henu.jianyunnote.Controller.NoteParttion.NoteParttionController;
+
 
 import org.litepal.LitePal;
 
@@ -31,6 +34,9 @@ public class NoteContentController extends AppCompatActivity {
         setContentView(R.layout.activity_note_content);
         AtyUtil.getInstance().addActivity(this);
 
+
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled( true );
         noteTitle = findViewById(R.id.note_title);
         noteContent = findViewById(R.id.note_content);//自动换行
         noteContent.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
@@ -75,5 +81,26 @@ public class NoteContentController extends AppCompatActivity {
                 note.save();
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_forcontent, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.syns:
+                //
+                break;
+            case R.id.photo:
+                //
+                break;
+            case android.R.id.home:
+                finish();
+        }
+        return true;
     }
 }

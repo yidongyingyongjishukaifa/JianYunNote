@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,6 +71,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_parttion);
         // 添加Activity到堆栈
+
         AtyUtil.getInstance().addActivity(this);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -386,19 +388,33 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener( new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //查询逻辑，确定
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                //查询逻辑，查询中
+                return false;
+            }
+        } );
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.backup:
+            case R.id.search:
                 //
                 break;
-            case R.id.delete:
-                //
-                break;
-            case R.id.setting:
+            case R.id.syns:
                 //
                 break;
         }

@@ -8,17 +8,32 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- 获取sd卡写的权限，用于文件上传和下载 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 允许读取手机状态 用于创建BmobInstallation -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <!--低版本读写sd-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
-        android:name="org.litepal.LitePalApplication"
+        android:name="com.henu.jianyunnote.Util.MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Controller.Setting.SettingController"></activity>
-        <activity android:name="com.henu.jianyunnote.Controller.Start.StartController"
+        <!--url-->
+        <provider
+            android:authorities="com.henu.jianyunnote.fileprovider"
+            android:name="android.support.v4.content.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"
+                />
+        </provider>
+        <activity android:name=".Controller.Setting.About_Setting"></activity>
+        <activity android:name=".Controller.Setting.SettingController" />
+        <activity
+            android:name=".Controller.Start.StartController"
             android:theme="@style/AppTheme.NoActionBarAndTitle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -51,7 +66,7 @@
         </activity>
         <activity
             android:name=".Controller.NoteContent.NoteContentController"
-            android:label="笔记"></activity>
+            android:label="笔记" />
         <activity
             android:name=".Controller.NotePage.NotePageController"
             android:label="笔记列表" />
