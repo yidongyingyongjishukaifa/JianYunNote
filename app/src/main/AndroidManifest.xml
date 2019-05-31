@@ -18,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".Controller.Setting.SettingController"></activity>
-        <activity android:name=".Controller.Start.StartController"
+        <activity android:name="com.henu.jianyunnote.Controller.Start.StartController"
             android:theme="@style/AppTheme.NoActionBarAndTitle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

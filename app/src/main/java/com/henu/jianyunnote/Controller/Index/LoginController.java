@@ -18,10 +18,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.henu.jianyunnote.Model.NoteBook_LitePal;
-import com.henu.jianyunnote.Model.Note_LitePal;
-import com.henu.jianyunnote.Model.User_LitePal;
-import com.henu.jianyunnote.Model.Users_Bmob;
+import com.henu.jianyunnote.Model.LitePal.NoteBook_LitePal;
+import com.henu.jianyunnote.Model.LitePal.Note_LitePal;
+import com.henu.jianyunnote.Model.LitePal.User_LitePal;
+import com.henu.jianyunnote.Model.Bmob.Users_Bmob;
 import com.henu.jianyunnote.Controller.NoteParttion.NoteParttionController;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.Util.AESUtil;
