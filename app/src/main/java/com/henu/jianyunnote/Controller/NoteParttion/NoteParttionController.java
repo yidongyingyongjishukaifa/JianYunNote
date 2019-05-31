@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -387,6 +388,23 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener( new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //查询逻辑，确定
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                //查询逻辑，查询中
+                return false;
+            }
+        } );
+
         return true;
     }
 
