@@ -4,10 +4,28 @@ import cn.bmob.v3.BmobObject;
 
 public class Note_Bmob extends BmobObject {
     private String userId;
-    private int noteBookId;
+    private String noteBookId;
     private String title;
     private String content;
-    private int isDelete;
+    private Integer isDelete;
+    private String note_id;
+
+    public String getNote_id() {
+        return note_id;
+    }
+
+    public void setNote_id(String note_id) {
+        this.note_id = note_id;
+    }
+
+    public void setIsDelete(Integer isDelete) {
+        this.isDelete = isDelete;
+    }
+
+    public Integer getIsDelete() {
+        return isDelete;
+    }
+
 
     public void setUserId(String userId) {
         this.userId = userId;
@@ -17,20 +35,12 @@ public class Note_Bmob extends BmobObject {
         return userId;
     }
 
-    public int getNoteBookId() {
+    public String getNoteBookId() {
         return noteBookId;
     }
 
-    public void setNoteBookId(int noteBookId) {
+    public void setNoteBookId(String noteBookId) {
         this.noteBookId = noteBookId;
-    }
-
-    public int getIsDelete() {
-        return isDelete;
-    }
-
-    public void setIsDelete(int isDelete) {
-        this.isDelete = isDelete;
     }
 
     public String getTitle() {
