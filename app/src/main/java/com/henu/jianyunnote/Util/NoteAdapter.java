@@ -14,10 +14,10 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
-import com.henu.jianyunnote.Service.INoteService;
-import com.henu.jianyunnote.Service.IUserService;
-import com.henu.jianyunnote.Service.impl.INoteServiceImpl;
-import com.henu.jianyunnote.Service.impl.IUserServiceImpl;
+import com.henu.jianyunnote.Dao.INoteDao_LitePal;
+import com.henu.jianyunnote.Dao.IUserDao_LitePal;
+import com.henu.jianyunnote.Dao.impl.INoteDaoImpl_LitePal;
+import com.henu.jianyunnote.Dao.impl.IUserDaoImpl_LitePal;
 import com.henu.jianyunnote.Controller.NotePage.NotePageController;
 import com.henu.jianyunnote.Controller.NoteParttion.NoteParttionController;
 import com.henu.jianyunnote.R;
@@ -29,8 +29,8 @@ public class NoteAdapter extends BaseSwipeAdapter {
     private List<Map<String, Object>> mDatas;
     private Context mContext;
     private int pos;
-    private IUserService userService = new IUserServiceImpl();
-    private INoteService noteService = new INoteServiceImpl();
+    private IUserDao_LitePal userService = new IUserDaoImpl_LitePal();
+    private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
 
     public NoteAdapter(Context context, List<Map<String, Object>> data) {
         this.mContext = context;

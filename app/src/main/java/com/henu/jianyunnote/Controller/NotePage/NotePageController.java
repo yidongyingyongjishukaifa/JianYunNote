@@ -18,13 +18,13 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.henu.jianyunnote.Model.NoteBook_LitePal;
-import com.henu.jianyunnote.Model.Note_LitePal;
+import com.henu.jianyunnote.Model.LitePal.NoteBook_LitePal;
+import com.henu.jianyunnote.Model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.R;
-import com.henu.jianyunnote.Service.INoteService;
-import com.henu.jianyunnote.Service.IUserService;
-import com.henu.jianyunnote.Service.impl.INoteServiceImpl;
-import com.henu.jianyunnote.Service.impl.IUserServiceImpl;
+import com.henu.jianyunnote.Dao.INoteDao_LitePal;
+import com.henu.jianyunnote.Dao.IUserDao_LitePal;
+import com.henu.jianyunnote.Dao.impl.INoteDaoImpl_LitePal;
+import com.henu.jianyunnote.Dao.impl.IUserDaoImpl_LitePal;
 import com.henu.jianyunnote.Util.ArrayUtil;
 import com.henu.jianyunnote.Util.AtyUtil;
 import com.henu.jianyunnote.Util.NoteAdapter;
@@ -49,8 +49,8 @@ public class NotePageController extends AppCompatActivity {
     private String uid;
     private String notebookid;
     public static boolean flag = false;
-    private IUserService userService = new IUserServiceImpl();
-    private INoteService noteService = new INoteServiceImpl();
+    private IUserDao_LitePal userService = new IUserDaoImpl_LitePal();
+    private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

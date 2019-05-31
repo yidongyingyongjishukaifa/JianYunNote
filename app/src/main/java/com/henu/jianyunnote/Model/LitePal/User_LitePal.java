@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.Model;
+package com.henu.jianyunnote.Model.LitePal;
 
 import org.litepal.crud.LitePalSupport;
 

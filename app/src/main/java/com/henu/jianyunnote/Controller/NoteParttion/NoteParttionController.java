@@ -25,15 +25,15 @@ import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.henu.jianyunnote.Controller.Index.LoginController;
-import com.henu.jianyunnote.Model.NoteBook_LitePal;
-import com.henu.jianyunnote.Model.Note_LitePal;
-import com.henu.jianyunnote.Model.User_LitePal;
-import com.henu.jianyunnote.Service.INoteBookService;
-import com.henu.jianyunnote.Service.INoteService;
-import com.henu.jianyunnote.Service.IUserService;
-import com.henu.jianyunnote.Service.impl.INoteBookServiceImpl;
-import com.henu.jianyunnote.Service.impl.INoteServiceImpl;
-import com.henu.jianyunnote.Service.impl.IUserServiceImpl;
+import com.henu.jianyunnote.Model.LitePal.NoteBook_LitePal;
+import com.henu.jianyunnote.Model.LitePal.Note_LitePal;
+import com.henu.jianyunnote.Model.LitePal.User_LitePal;
+import com.henu.jianyunnote.Dao.INoteBookDao_LitePal;
+import com.henu.jianyunnote.Dao.INoteDao_LitePal;
+import com.henu.jianyunnote.Dao.IUserDao_LitePal;
+import com.henu.jianyunnote.Dao.impl.INoteBookDaoImpl_LitePal;
+import com.henu.jianyunnote.Dao.impl.INoteDaoImpl_LitePal;
+import com.henu.jianyunnote.Dao.impl.IUserDaoImpl_LitePal;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.Controller.NoteContent.NoteContentController;
 import com.henu.jianyunnote.Controller.Setting.SettingController;
@@ -46,7 +46,6 @@ import com.henu.jianyunnote.Controller.NotePage.NotePageController;
 import org.litepal.LitePal;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,9 +62,9 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
     private List<Map<String, Object>> listItems = new ArrayList<>();
     public static User_LitePal current_user;
     private long mExitTime;
-    private IUserService userService = new IUserServiceImpl();
-    private INoteBookService noteBookService = new INoteBookServiceImpl();
-    private INoteService noteService = new INoteServiceImpl();
+    private IUserDao_LitePal userService = new IUserDaoImpl_LitePal();
+    private INoteBookDao_LitePal noteBookService = new INoteBookDaoImpl_LitePal();
+    private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

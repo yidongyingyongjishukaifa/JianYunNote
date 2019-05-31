@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.henu.jianyunnote.Model.Note_LitePal;
+import com.henu.jianyunnote.Model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.Util.AtyUtil;
 import com.henu.jianyunnote.Util.TimeUtil;
