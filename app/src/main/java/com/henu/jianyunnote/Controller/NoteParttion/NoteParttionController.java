@@ -72,6 +72,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_parttion);
         // 添加Activity到堆栈
+
         AtyUtil.getInstance().addActivity(this);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
