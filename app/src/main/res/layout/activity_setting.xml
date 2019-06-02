@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Controller.Setting.SettingController">
+    tools:context=".controller.setting.SettingController">
     <RelativeLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
