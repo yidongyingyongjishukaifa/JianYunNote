@@ -4,12 +4,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -83,8 +85,14 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(NoteParttionController.this, SettingController.class);
-                startActivity(intent);
+                if(login_Email.getText() == " 未登录"){
+                    LoginController.ActionStart( NoteParttionController.this );
+                    Log.d( "NoteParttionController", login_Email.getText().toString() + "///////////////////////" );
+                }else {
+                    Log.d( "NoteParttionController", login_Email.getText().toString() + "///////////////////////" );
+                    Intent intent = new Intent(NoteParttionController.this, SettingController.class);
+                    startActivity(intent);
+                }
             }
         });
         final ListView mListView = findViewById(R.id.parttion_listview);
@@ -155,7 +163,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                                     local_notes_id = ArrayUtil.insert2Array(local_notes_id, note_litePal.getId());
                                     addListItem(notebooks_count, note_litePal.getTitle(), TimeUtil.Date2String(note_litePal.getUpdateTime()));
                                 }
-//                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
+                //Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
                             }
                         })
                         .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -422,10 +430,28 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
-            Intent intent = new Intent(NoteParttionController.this, SettingController.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_manage) {
+            if(login_Email.getText() == " 未登录"){
+                LoginController.ActionStart( NoteParttionController.this );
+                Log.d( "NoteParttionController", login_Email.getText().toString() + "///////////////////////" );
+            }else {
+                Log.d( "NoteParttionController", login_Email.getText().toString() + "///////////////////////" );
+                Intent intent = new Intent(NoteParttionController.this, SettingController.class);
+                startActivity(intent);
+            }
 
+        } else if (id == R.id.nav_manage) {
+            if(login_Email.getText() == " 未登录"){
+                View view = findViewById( R.id.sack );
+                Snackbar.make( view, "当前没有登陆", Snackbar.LENGTH_LONG ).setAction( "登陆", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        LoginController.ActionStart( NoteParttionController.this );
+                    }
+                } ).show();
+            }else {
+                login_Email.setText( " 未登录" );
+                Toast.makeText( NoteParttionController.this, "成功注销！", Toast.LENGTH_SHORT ).show();
+            }
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

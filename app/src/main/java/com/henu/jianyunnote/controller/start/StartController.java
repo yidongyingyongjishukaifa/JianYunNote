@@ -36,7 +36,6 @@ public class StartController extends AppCompatActivity {
                 StartController.this.finish();
             }
         },SPLASH_DISPLAY_LENGHT);
-
         Connector.getDatabase();
     }
 }
