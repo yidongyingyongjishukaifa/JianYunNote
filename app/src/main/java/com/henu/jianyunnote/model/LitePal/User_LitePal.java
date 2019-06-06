@@ -10,6 +10,7 @@ public class User_LitePal extends LitePalSupport implements Serializable {
     private String username;
     private String password;
     private String icon;
+    private String bmob_user_id;
     private int gender;
     private int age;
     private Date updateTime;
@@ -18,6 +19,14 @@ public class User_LitePal extends LitePalSupport implements Serializable {
     private int isLogin;
     private int isRemember;
     private boolean autoLogin;
+
+    public String getBmob_user_id() {
+        return bmob_user_id;
+    }
+
+    public void setBmob_user_id(String bmob_user_id) {
+        this.bmob_user_id = bmob_user_id;
+    }
 
     public boolean isAutoLogin() {
         return autoLogin;
@@ -122,11 +131,15 @@ public class User_LitePal extends LitePalSupport implements Serializable {
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", icon='" + icon + '\'' +
+                ", bmob_user_id='" + bmob_user_id + '\'' +
                 ", gender=" + gender +
                 ", age=" + age +
                 ", updateTime=" + updateTime +
+                ", loginTime=" + loginTime +
                 ", status=" + status +
                 ", isLogin=" + isLogin +
+                ", isRemember=" + isRemember +
+                ", autoLogin=" + autoLogin +
                 '}';
     }
 }
