@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -83,8 +84,13 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(NoteParttionController.this, SettingController.class);
-                startActivity(intent);
+                if(login_Email.getText() == " 未登录"){
+                    Intent intent = new Intent(NoteParttionController.this, SettingController.class);
+                    startActivity(intent);
+                    Log.d( "NoteParttionController", login_Email.getText().toString() + "///////////////////////" );
+                }else {
+                    LoginController.ActionStart( NoteParttionController.this );
+                }
             }
         });
         final ListView mListView = findViewById(R.id.parttion_listview);
@@ -432,8 +438,14 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
-            Intent intent = new Intent(NoteParttionController.this, SettingController.class);
-            startActivity(intent);
+            if(login_Email.getText() == " 未登录"){
+                Intent intent = new Intent(NoteParttionController.this, SettingController.class);
+                startActivity(intent);
+                Log.d( "NoteParttionController", login_Email.getText().toString() + "///////////////////////" );
+            }else {
+                LoginController.ActionStart( NoteParttionController.this );
+            }
+
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {

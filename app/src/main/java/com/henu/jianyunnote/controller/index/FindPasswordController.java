@@ -29,6 +29,7 @@ public class FindPasswordController extends AppCompatActivity {
         if (null==email || "".equals(email)) return false;
         Pattern p =  Pattern.compile("\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*");
         Matcher m = p.matcher(email);
+
         return m.matches();
     }
 
