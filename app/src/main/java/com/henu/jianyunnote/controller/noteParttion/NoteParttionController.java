@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -85,11 +86,12 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
             @Override
             public void onClick(View v) {
                 if(login_Email.getText() == " 未登录"){
-                    Intent intent = new Intent(NoteParttionController.this, SettingController.class);
-                    startActivity(intent);
+                    LoginController.ActionStart( NoteParttionController.this );
                     Log.d( "NoteParttionController", login_Email.getText().toString() + "///////////////////////" );
                 }else {
-                    LoginController.ActionStart( NoteParttionController.this );
+                    Log.d( "NoteParttionController", login_Email.getText().toString() + "///////////////////////" );
+                    Intent intent = new Intent(NoteParttionController.this, SettingController.class);
+                    startActivity(intent);
                 }
             }
         });
@@ -168,7 +170,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                                     listItems.add(notebooks_count, listItem);
                                     myAdapter.notifyDataSetChanged();
                                 }
-//                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
+                //Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
                             }
                         })
                         .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -439,15 +441,27 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
 
         } else if (id == R.id.nav_slideshow) {
             if(login_Email.getText() == " 未登录"){
-                Intent intent = new Intent(NoteParttionController.this, SettingController.class);
-                startActivity(intent);
+                LoginController.ActionStart( NoteParttionController.this );
                 Log.d( "NoteParttionController", login_Email.getText().toString() + "///////////////////////" );
             }else {
-                LoginController.ActionStart( NoteParttionController.this );
+                Log.d( "NoteParttionController", login_Email.getText().toString() + "///////////////////////" );
+                Intent intent = new Intent(NoteParttionController.this, SettingController.class);
+                startActivity(intent);
             }
 
         } else if (id == R.id.nav_manage) {
-
+            if(login_Email.getText() == " 未登录"){
+                View view = findViewById( R.id.sack );
+                Snackbar.make( view, "当前没有登陆", Snackbar.LENGTH_LONG ).setAction( "登陆", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        LoginController.ActionStart( NoteParttionController.this );
+                    }
+                } ).show();
+            }else {
+                login_Email.setText( " 未登录" );
+                Toast.makeText( NoteParttionController.this, "成功注销！", Toast.LENGTH_SHORT ).show();
+            }
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

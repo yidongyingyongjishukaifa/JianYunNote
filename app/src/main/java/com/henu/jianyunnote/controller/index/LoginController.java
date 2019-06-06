@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ListPopupWindow;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -59,6 +60,9 @@ public class LoginController extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         AtyUtil.getInstance().addActivity(this);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled( true );
+
         Bmob.initialize(this, "bc95d28fa2c059530870d4dbb550b38f");//初始化Bmob  后面是服务器端应用ID
         Button login = findViewById(R.id.login);
         Email_local = findViewById(R.id.email);
@@ -178,6 +182,16 @@ public class LoginController extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case android.R.id.home:
+                finish();
+            default:
+                return true;
+        }
     }
 
     private void init() {
