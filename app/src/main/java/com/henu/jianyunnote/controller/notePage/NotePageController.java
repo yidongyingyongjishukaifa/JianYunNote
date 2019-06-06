@@ -42,9 +42,7 @@ public class NotePageController extends AppCompatActivity {
     private List<Map<String, Object>> listItems = new ArrayList<>();
     public static int[] local_notes_id;
     private int local_notebook_id;
-    private int local_count;
     private NoteAdapter myAdapter;
-    private String uid;
     private String notebookid;
     public static boolean flag = false;
     private IUserDao_LitePal userService = new IUserDaoImpl_LitePal();
@@ -55,10 +53,9 @@ public class NotePageController extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_page);
         AtyUtil.getInstance().addActivity(this);
-        getSupportActionBar().setDisplayHomeAsUpEnabled( true );
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         int p = Integer.parseInt(NotePageController.this.getIntent().getStringExtra("position"));
         local_notebook_id = NoteParttionController.local_notebooks_id[p];
-        uid = String.valueOf(NoteParttionController.local_user_id);
         notebookid = String.valueOf(local_notebook_id);
         initNotePage();
         final ListView mListView = findViewById(R.id.parttion_listview);
@@ -127,16 +124,12 @@ public class NotePageController extends AppCompatActivity {
                                 if (Notebook_Name.getText() != null) {
                                     s = Notebook_Name.getText().toString();
                                 }
-                                Note_LitePal note_litePal = noteService.insert2Note(s,null, local_notebook_id, NoteParttionController.local_user_id);
+                                Note_LitePal note_litePal = noteService.insert2Note(s, null, local_notebook_id, NoteParttionController.local_user_id);
                                 if (note_litePal != null) {
                                     flag = true;
                                     userService.updateUserByUser(NoteParttionController.current_user);
                                     local_notes_id = ArrayUtil.insert2Array(local_notes_id, note_litePal.getId());
-                                    Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
-                                    listItem.put("NOTE_MESSAGE", note_litePal.getTitle());
-                                    listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(note_litePal.getUpdateTime()));
-                                    listItems.add(0, listItem);
-                                    myAdapter.notifyDataSetChanged();
+                                    addListItem(0, note_litePal.getTitle(), TimeUtil.Date2String(note_litePal.getUpdateTime()));
                                 }
 //                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
                             }
@@ -157,15 +150,12 @@ public class NotePageController extends AppCompatActivity {
     private void initNotePage() {
         List<Note_LitePal> notes = LitePal.where("noteBookId = ? and isDelete = ?", notebookid, "0").order("updateTime desc").find(Note_LitePal.class);
         if (notes != null && notes.size() != 0) {
-            local_count = 0;
+            int local_count = 0;
             local_notes_id = new int[notes.size()];
             for (Note_LitePal note : notes) {
                 local_notes_id[local_count] = note.getId();
                 local_count++;
-                Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
-                listItem.put("NOTE_MESSAGE", note.getTitle());
-                listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(note.getUpdateTime()));
-                listItems.add(listItem);
+                addListItem(note.getTitle(), TimeUtil.Date2String(note.getUpdateTime()));
             }
         }
         myAdapter = new NoteAdapter(NotePageController.this, listItems);
@@ -194,7 +184,7 @@ public class NotePageController extends AppCompatActivity {
 
         MenuItem searchItem = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener( new SearchView.OnQueryTextListener() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //查询逻辑，确定
@@ -206,7 +196,7 @@ public class NotePageController extends AppCompatActivity {
                 //查询逻辑，查询中
                 return false;
             }
-        } );
+        });
 
         return true;
     }
@@ -215,7 +205,7 @@ public class NotePageController extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.search:
-                Toast.makeText( NotePageController.this, "work", Toast.LENGTH_SHORT ).show();
+                Toast.makeText(NotePageController.this, "work", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.syns:
                 //
@@ -224,5 +214,20 @@ public class NotePageController extends AppCompatActivity {
                 finish();
         }
         return true;
+    }
+
+    private void addListItem(String NOTE_MESSAGE, Object NOTE_UPDATE_TIME) {
+        Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
+        listItem.put("NOTE_MESSAGE", NOTE_MESSAGE);
+        listItem.put("NOTE_UPDATE_TIME", NOTE_UPDATE_TIME);
+        listItems.add(listItem);
+    }
+
+    private void addListItem(int index, String NOTE_MESSAGE, Object NOTE_UPDATE_TIME) {
+        Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
+        listItem.put("NOTE_MESSAGE", NOTE_MESSAGE);
+        listItem.put("NOTE_UPDATE_TIME", NOTE_UPDATE_TIME);
+        listItems.add(index, listItem);
+        myAdapter.notifyDataSetChanged();
     }
 }

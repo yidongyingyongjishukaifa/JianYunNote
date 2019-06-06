@@ -114,11 +114,8 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                                     userService.updateUserByUser(current_user);
                                     local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
                                     notebooks_count = local_notebooks_id.length;
-                                    Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
-                                    listItem.put("NOTE_MESSAGE", noteBook_litePal.getNoteBookName());
-                                    listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(noteBook_litePal.getUpdateTime()));
-                                    listItems.add(0, listItem);
-                                    myAdapter.notifyDataSetChanged();
+                                    addListItem(0, noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()));
+
                                 }
 //                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
                             }
@@ -156,11 +153,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                                 if (note_litePal != null) {
                                     userService.updateUserByUser(current_user);
                                     local_notes_id = ArrayUtil.insert2Array(local_notes_id, note_litePal.getId());
-                                    Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
-                                    listItem.put("NOTE_MESSAGE", note_litePal.getTitle());
-                                    listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(note_litePal.getUpdateTime()));
-                                    listItems.add(notebooks_count, listItem);
-                                    myAdapter.notifyDataSetChanged();
+                                    addListItem(notebooks_count, note_litePal.getTitle(), TimeUtil.Date2String(note_litePal.getUpdateTime()));
                                 }
 //                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
                             }
@@ -266,10 +259,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                     for (NoteBook_LitePal noteBook : noteBooks) {
                         local_notebooks_id[local_count] = noteBook.getId();
                         local_count++;
-                        Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
-                        listItem.put("NOTE_MESSAGE", noteBook.getNoteBookName());
-                        listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(noteBook.getUpdateTime()));
-                        listItems.add(listItem);
+                        addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()));
                     }
                     notebooks_count = local_count;
                 }
@@ -280,10 +270,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                     for (Note_LitePal note : notes) {
                         local_notes_id[local_count] = note.getId();
                         local_count++;
-                        Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
-                        listItem.put("NOTE_MESSAGE", note.getTitle());
-                        listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(note.getUpdateTime()));
-                        listItems.add(listItem);
+                        addListItem(note.getTitle(), TimeUtil.Date2String(note.getUpdateTime()));
                     }
                 }
             }
@@ -302,10 +289,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                     isAdd = true;
                     local_notebooks_id[local_count] = noteBook.getId();
                     local_count++;
-                    Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
-                    listItem.put("NOTE_MESSAGE", noteBook.getNoteBookName());
-                    listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(noteBook.getUpdateTime()));
-                    listItems.add(listItem);
+                    addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()));
                 }
                 notebooks_count = local_count;
             } else {
@@ -321,10 +305,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                     isAdd = true;
                     local_notes_id[local_count] = note.getId();
                     local_count++;
-                    Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
-                    listItem.put("NOTE_MESSAGE", note.getTitle());
-                    listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(note.getUpdateTime()));
-                    listItems.add(listItem);
+                    addListItem(note.getTitle(), TimeUtil.Date2String(note.getUpdateTime()));
                 }
             } else {
                 noteService.insert2Note("未命名笔记", "测试内容", noteBook_litePal.getId(), 0);
@@ -336,17 +317,26 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
             }
             if (!isAdd) {
                 listItems.clear();
-                Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
-                listItem.put("NOTE_MESSAGE", noteBook_litePal.getNoteBookName());
-                listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(noteBook_litePal.getUpdateTime()));
-                listItems.add(listItem);
-                listItem = new HashMap<>();
-                listItem.put("NOTE_MESSAGE", note_litePal.getTitle());
-                listItem.put("NOTE_UPDATE_TIME", TimeUtil.Date2String(note_litePal.getUpdateTime()));
-                listItems.add(listItem);
+                addListItem(noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()));
+                addListItem(note_litePal.getTitle(), TimeUtil.Date2String(note_litePal.getUpdateTime()));
             }
         }
         myAdapter = new NoteBookAdapter(NoteParttionController.this, listItems);
+    }
+
+    private void addListItem(String NOTE_MESSAGE, Object NOTE_UPDATE_TIME) {
+        Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
+        listItem.put("NOTE_MESSAGE", NOTE_MESSAGE);
+        listItem.put("NOTE_UPDATE_TIME", NOTE_UPDATE_TIME);
+        listItems.add(listItem);
+    }
+
+    private void addListItem(int index, String NOTE_MESSAGE, Object NOTE_UPDATE_TIME) {
+        Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
+        listItem.put("NOTE_MESSAGE", NOTE_MESSAGE);
+        listItem.put("NOTE_UPDATE_TIME", NOTE_UPDATE_TIME);
+        listItems.add(index, listItem);
+        myAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -391,7 +381,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
 
         MenuItem searchItem = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener( new SearchView.OnQueryTextListener() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //查询逻辑，确定
@@ -403,7 +393,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                 //查询逻辑，查询中
                 return false;
             }
-        } );
+        });
 
         return true;
     }
