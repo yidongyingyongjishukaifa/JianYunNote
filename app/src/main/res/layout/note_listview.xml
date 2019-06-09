@@ -2,20 +2,18 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/sack"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".controller.noteParttion.NoteParttionController"
-    tools:showIn="@layout/app_bar_main"
-    android:id="@+id/sack">
+    tools:context=".controller.notePage.NotePageController"
+    tools:showIn="@layout/app_bar_note">
 
     <ListView
-        android:id="@+id/parttion_listview"
+        android:id="@+id/note_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
-
-    </ListView>
+        tools:layout_editor_absoluteY="0dp"/>
 
 </android.support.constraint.ConstraintLayout>

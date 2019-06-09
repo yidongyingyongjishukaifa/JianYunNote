@@ -8,4 +8,5 @@
     <color name="lightBlue">#66ccff</color>
     <color name="black_semi_transparent">#B2000000</color>
     <color name="text">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
 </resources>

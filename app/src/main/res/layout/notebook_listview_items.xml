@@ -19,12 +19,13 @@
             android:layout_width="0dp"
             android:layout_height="20dp"
             android:layout_weight="5"
-            android:text="Delete Item?"
+            android:text="是否删除此笔记本?"
             android:textSize="17sp" />
 
         <Button
             android:id="@+id/delete"
             android:text="删除"
+            android:background="@color/colorPrimary"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="4"/>
@@ -32,20 +33,37 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <!-- 定义一个TextView，用于作为列表项的一部分。 -->
-        <TextView
-            android:id="@+id/note_message"
-            android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:weightSum="10">
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="20sp" />
-        <!-- 定义一个TextView，用于作为列表项的一部分。 -->
-        <TextView
-            android:id="@+id/note_update_time"
-            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_weight="8"
+            >
+            <!-- 定义一个TextView，用于作为列表项的一部分。 -->
+            <TextView
+                android:id="@+id/notebook_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="25sp"
+                />
+            <!-- 定义一个TextView，用于作为列表项的一部分。 -->
+            <TextView
+                android:id="@+id/notebook_update_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15sp" />
+        </LinearLayout>
+        <ImageView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="20sp" />
+            android:src="@drawable/notebook"
+            android:layout_weight="2"
+            />
+
     </LinearLayout>
 
 </com.daimajia.swipe.SwipeLayout>

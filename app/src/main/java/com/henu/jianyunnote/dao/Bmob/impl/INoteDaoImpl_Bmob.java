@@ -1,7 +1,7 @@
-package com.henu.jianyunnote.dao.impl;
+package com.henu.jianyunnote.dao.Bmob.impl;
 
 import com.henu.jianyunnote.model.Bmob.Note_Bmob;
-import com.henu.jianyunnote.dao.INoteDao_Bmob;
+import com.henu.jianyunnote.dao.Bmob.INoteDao_Bmob;
 
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;

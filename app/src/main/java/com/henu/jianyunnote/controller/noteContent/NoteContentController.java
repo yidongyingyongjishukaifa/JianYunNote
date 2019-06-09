@@ -33,32 +33,22 @@ public class NoteContentController extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_content);
         AtyUtil.getInstance().addActivity(this);
-
-
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled( true );
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         noteTitle = findViewById(R.id.note_title);
         noteContent = findViewById(R.id.note_content);//自动换行
         noteContent.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
         noteContent.setGravity(Gravity.TOP);
         noteContent.setSingleLine(false);
         noteContent.setHorizontallyScrolling(false);
-
         timeView = findViewById(R.id.time_info);
-
         initNoteContent();
     }
 
     private void initNoteContent() {
-        boolean flag = NoteContentController.this.getIntent().getBooleanExtra("is_note", false);
         int p = Integer.parseInt(NoteContentController.this.getIntent().getStringExtra("position"));
-        if (flag) {
-            local_note_id = NoteParttionController.local_notes_id[p];
-        } else {
-            local_note_id = NotePageController.local_notes_id[p];
-        }
+        local_note_id = NotePageController.local_notes_id[p];
         String noteid = String.valueOf((local_note_id));
-        List<Note_LitePal> noteList = LitePal.where("id=?", noteid).find(Note_LitePal.class);
+        List<Note_LitePal> noteList = LitePal.where("id = ?", noteid).find(Note_LitePal.class);
         if (noteList != null && noteList.size() != 0) {
             for (Note_LitePal note : noteList) {
                 noteTitle.setText(note.getTitle());

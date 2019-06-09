@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.dao;
+package com.henu.jianyunnote.dao.Bmob;
 
 import com.henu.jianyunnote.model.Bmob.NoteBook_Bmob;
 

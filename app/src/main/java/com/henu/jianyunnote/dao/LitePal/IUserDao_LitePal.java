@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.dao;
+package com.henu.jianyunnote.dao.LitePal;
 
 import com.henu.jianyunnote.model.LitePal.User_LitePal;
 

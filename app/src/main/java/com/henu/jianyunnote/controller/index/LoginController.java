@@ -19,6 +19,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.henu.jianyunnote.dao.LitePal.INoteBookDao_LitePal;
+import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
+import com.henu.jianyunnote.dao.LitePal.impl.INoteBookDaoImpl_LitePal;
+import com.henu.jianyunnote.dao.LitePal.impl.INoteDaoImpl_LitePal;
 import com.henu.jianyunnote.model.LitePal.NoteBook_LitePal;
 import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.model.LitePal.User_LitePal;
@@ -54,6 +58,8 @@ public class LoginController extends AppCompatActivity {
     private String password;
     private boolean is_Remember;
     private boolean autoLogin;
+    private INoteBookDao_LitePal noteBookService = new INoteBookDaoImpl_LitePal();
+    private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +67,7 @@ public class LoginController extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         AtyUtil.getInstance().addActivity(this);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled( true );
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Bmob.initialize(this, "bc95d28fa2c059530870d4dbb550b38f");//初始化Bmob  后面是服务器端应用ID
         Button login = findViewById(R.id.login);
@@ -87,10 +93,6 @@ public class LoginController extends AppCompatActivity {
                 }
             }
         }
-
-
-
-
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -185,8 +187,8 @@ public class LoginController extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
             default:
@@ -210,32 +212,10 @@ public class LoginController extends AppCompatActivity {
             }
             u.setAutoLogin(autoLogin);
             u.save();
-            NoteBook_LitePal notebook = new NoteBook_LitePal();
-            notebook.setUserId(u.getId());
-            notebook.setCreateTime(new Date());
-            notebook.setUpdateTime(new Date());
-            notebook.setNoteBookName("未命名笔记本");
-            notebook.setIsDelete(0);
-            notebook.save();
-            Note_LitePal note = new Note_LitePal();
-            note.setUserId(u.getId());
-            note.setNoteBookId(notebook.getId());
-            note.setTitle("未命名笔记");
-            note.setContent("测试内容");
-            note.setCreateTime(new Date());
-            note.setUpdateTime(new Date());
-            note.setIsDelete(0);
-            note.save();
-            notebook.setNoteNumber(1);
-            notebook.save();
-            Note_LitePal note2 = new Note_LitePal();
-            note2.setUserId(u.getId());
-            note2.setTitle("未命名笔记");
-            note2.setContent("测试内容");
-            note2.setCreateTime(new Date());
-            note2.setUpdateTime(new Date());
-            note2.setIsDelete(0);
-            note2.save();
+            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("无标题笔记本", u.getId());
+            noteService.insert2Note("无标题笔记","测试内容",noteBook_litePal.getId(),u.getId());
+            noteBook_litePal.setNoteNumber(1);
+            noteBook_litePal.save();
         } else {
             for (User_LitePal u : user) {
                 u.setPassword(d_password);
