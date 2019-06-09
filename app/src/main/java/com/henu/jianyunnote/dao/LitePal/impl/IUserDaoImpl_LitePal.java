@@ -1,7 +1,7 @@
-package com.henu.jianyunnote.dao.impl;
+package com.henu.jianyunnote.dao.LitePal.impl;
 
 import com.henu.jianyunnote.model.LitePal.User_LitePal;
-import com.henu.jianyunnote.dao.IUserDao_LitePal;
+import com.henu.jianyunnote.dao.LitePal.IUserDao_LitePal;
 
 import java.util.Date;
 

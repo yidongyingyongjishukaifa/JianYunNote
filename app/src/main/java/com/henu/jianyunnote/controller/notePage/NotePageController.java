@@ -16,13 +16,15 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.henu.jianyunnote.dao.LitePal.INoteBookDao_LitePal;
+import com.henu.jianyunnote.dao.LitePal.impl.INoteBookDaoImpl_LitePal;
 import com.henu.jianyunnote.model.LitePal.NoteBook_LitePal;
 import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.R;
-import com.henu.jianyunnote.dao.INoteDao_LitePal;
-import com.henu.jianyunnote.dao.IUserDao_LitePal;
-import com.henu.jianyunnote.dao.impl.INoteDaoImpl_LitePal;
-import com.henu.jianyunnote.dao.impl.IUserDaoImpl_LitePal;
+import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
+import com.henu.jianyunnote.dao.LitePal.IUserDao_LitePal;
+import com.henu.jianyunnote.dao.LitePal.impl.INoteDaoImpl_LitePal;
+import com.henu.jianyunnote.dao.LitePal.impl.IUserDaoImpl_LitePal;
 import com.henu.jianyunnote.util.ArrayUtil;
 import com.henu.jianyunnote.util.AtyUtil;
 import com.henu.jianyunnote.util.NoteAdapter;
@@ -38,6 +40,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.henu.jianyunnote.controller.noteParttion.NoteParttionController.local_notebooks_id;
+
 public class NotePageController extends AppCompatActivity {
     private List<Map<String, Object>> listItems = new ArrayList<>();
     public static int[] local_notes_id;
@@ -47,6 +51,7 @@ public class NotePageController extends AppCompatActivity {
     public static boolean flag = false;
     private IUserDao_LitePal userService = new IUserDaoImpl_LitePal();
     private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
+    private INoteBookDao_LitePal noteBookService = new INoteBookDaoImpl_LitePal();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +59,12 @@ public class NotePageController extends AppCompatActivity {
         setContentView(R.layout.activity_note_page);
         AtyUtil.getInstance().addActivity(this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        flag = false;
         int p = Integer.parseInt(NotePageController.this.getIntent().getStringExtra("position"));
         local_notebook_id = NoteParttionController.local_notebooks_id[p];
         notebookid = String.valueOf(local_notebook_id);
         initNotePage();
-        final ListView mListView = findViewById(R.id.parttion_listview);
+        final ListView mListView = findViewById(R.id.note_listview);
         final FloatingActionsMenu menu = findViewById(R.id.fab_menu);
         final com.getbase.floatingactionbutton.FloatingActionButton actionA = findViewById(R.id.fab_1);
         mListView.setAdapter(myAdapter);
@@ -75,33 +81,41 @@ public class NotePageController extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 menu.collapse();
-                //定义AlertDialog.Builder对象，当长按列表项的时候弹出确认删除对话框
-                AlertDialog.Builder builder = new AlertDialog.Builder(NotePageController.this);
-                builder.setMessage("确定删除?");
-                builder.setTitle("提示");
                 final int p = position;
-                //添加AlertDialog.Builder对象的setPositiveButton()方法
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        listItems.remove(p);
-                        flag = true;
-                        int id = local_notes_id[p];
-                        noteService.updateNoteById(id);
-                        userService.updateUserByUser(NoteParttionController.current_user);
-                        local_notes_id = ArrayUtil.deleteIdInArray(local_notes_id, p);
-                        myAdapter.notifyDataSetChanged();
-                        Toast.makeText(getBaseContext(), "删除列表项", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                //添加AlertDialog.Builder对象的setNegativeButton()方法
-                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(NotePageController.this);
+                final LayoutInflater layoutInflater = LayoutInflater.from(NotePageController.this);
+                final View myView = layoutInflater.inflate(R.layout.new_notebook, null);
+                builder.setTitle("修改笔记标题")
+                        .setIcon(R.drawable.note)
+                        .setView(myView)
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                flag = true;
+                                final EditText Notebook_Name = myView.findViewById(R.id.notebook_Name);
+                                String s = "";
+                                if (Notebook_Name.getText() != null) {
+                                    s = Notebook_Name.getText().toString();
+                                }
+                                Note_LitePal note_litePal = noteService.updateNoteTitleById(s, local_notes_id[p]);
+                                if (note_litePal != null) {
+                                    listItems.remove(p);
+                                    local_notes_id = ArrayUtil.deleteIdInArray(local_notes_id, p);
+                                    local_notes_id = ArrayUtil.insert2Array(local_notes_id, note_litePal.getId());
+                                    addListItem(note_litePal.getTitle(), TimeUtil.Date2String(note_litePal.getUpdateTime()));
+                                    myAdapter.notifyDataSetChanged();
+                                }
+//                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
+                            }
+                        })
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
 
-                    }
-                });
-                builder.create().show();
+                            }
+                        });
+                AlertDialog ad = builder.create();
+                ad.show();
                 return true;
             }
         });
@@ -112,24 +126,25 @@ public class NotePageController extends AppCompatActivity {
                 menu.collapse();
                 final AlertDialog.Builder builder = new AlertDialog.Builder(NotePageController.this);
                 final LayoutInflater layoutInflater = LayoutInflater.from(NotePageController.this);
-                final View myView = layoutInflater.inflate(R.layout.new_notebook, null);
+                final View myView = layoutInflater.inflate(R.layout.new_note, null);
                 builder.setTitle("新建笔记")
-                        .setIcon(R.mipmap.ic_launcher)
+                        .setIcon(R.drawable.note)
                         .setView(myView)
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                final EditText Notebook_Name = myView.findViewById(R.id.notebook_Name);
+                                flag = true;
+                                final EditText Note_Title = myView.findViewById(R.id.note_Title);
                                 String s = "";
-                                if (Notebook_Name.getText() != null) {
-                                    s = Notebook_Name.getText().toString();
+                                if (Note_Title.getText() != null) {
+                                    s = Note_Title.getText().toString();
                                 }
                                 Note_LitePal note_litePal = noteService.insert2Note(s, null, local_notebook_id, NoteParttionController.local_user_id);
                                 if (note_litePal != null) {
-                                    flag = true;
                                     userService.updateUserByUser(NoteParttionController.current_user);
                                     local_notes_id = ArrayUtil.insert2Array(local_notes_id, note_litePal.getId());
-                                    addListItem(0, note_litePal.getTitle(), TimeUtil.Date2String(note_litePal.getUpdateTime()));
+                                    addListItem(note_litePal.getTitle(), TimeUtil.Date2String(note_litePal.getUpdateTime()));
+                                    myAdapter.notifyDataSetChanged();
                                 }
 //                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
                             }
@@ -144,11 +159,10 @@ public class NotePageController extends AppCompatActivity {
                 ad.show();
             }
         });
-
     }
 
     private void initNotePage() {
-        List<Note_LitePal> notes = LitePal.where("noteBookId = ? and isDelete = ?", notebookid, "0").order("updateTime desc").find(Note_LitePal.class);
+        List<Note_LitePal> notes = LitePal.where("noteBookId = ? and isDelete = ?", notebookid, "0").order("updateTime asc").find(Note_LitePal.class);
         if (notes != null && notes.size() != 0) {
             int local_count = 0;
             local_notes_id = new int[notes.size()];
@@ -165,16 +179,12 @@ public class NotePageController extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if (flag) {
-            List<NoteBook_LitePal> noteBookList = LitePal.where("id = ?", notebookid).find(NoteBook_LitePal.class);
-            int num = 0;
-            if (local_notes_id != null) {
-                num = local_notes_id.length;
-            }
-            for (NoteBook_LitePal noteBook : noteBookList) {
-                noteBook.setUpdateTime(new Date());
-                noteBook.setNoteNumber(num);
-                noteBook.save();
-            }
+            noteBookService.updateNoteBookById(notebookid);
+            userService.updateUserByUser(NoteParttionController.current_user);
+            Intent result = new Intent(NotePageController.this, NoteParttionController.class);
+            setResult(RESULT_OK, result);
+            startActivity(result);
+            finish();
         }
     }
 
@@ -220,14 +230,6 @@ public class NotePageController extends AppCompatActivity {
         Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
         listItem.put("NOTE_MESSAGE", NOTE_MESSAGE);
         listItem.put("NOTE_UPDATE_TIME", NOTE_UPDATE_TIME);
-        listItems.add(listItem);
-    }
-
-    private void addListItem(int index, String NOTE_MESSAGE, Object NOTE_UPDATE_TIME) {
-        Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
-        listItem.put("NOTE_MESSAGE", NOTE_MESSAGE);
-        listItem.put("NOTE_UPDATE_TIME", NOTE_UPDATE_TIME);
-        listItems.add(index, listItem);
-        myAdapter.notifyDataSetChanged();
+        listItems.add(0, listItem);
     }
 }

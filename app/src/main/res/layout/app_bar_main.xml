@@ -21,7 +21,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_parttion" />
+    <include layout="@layout/notebook_listview" />
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/fab_menu"
@@ -37,16 +37,69 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/fab_1"
-            fab:fab_colorNormal="@color/colorAccent"
+            fab:fab_icon="@drawable/notebook"
+            fab:fab_colorNormal="@color/white"
             fab:fab_size="mini"
             fab:fab_title="新建笔记本"/>
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/fab_2"
-            fab:fab_colorNormal="@color/colorAccent"
+            fab:fab_colorNormal="@color/white"
+            fab:fab_icon="@drawable/note"
             fab:fab_size="mini"
             fab:fab_title="新建笔记"/>
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
+    <LinearLayout
+        android:id="@+id/lay"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:weightSum="4"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/operate_back"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="返回"
+            android:textSize="22sp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"/>
+        <TextView
+            android:id="@+id/operate_select"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="全选"
+            android:textSize="22sp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            />
+        <TextView
+            android:id="@+id/invert_select"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="反选"
+            android:textSize="22sp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"/>
+        <TextView
+            android:id="@+id/operate_delete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="刪除"
+            android:textSize="22sp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"/>
+    </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>

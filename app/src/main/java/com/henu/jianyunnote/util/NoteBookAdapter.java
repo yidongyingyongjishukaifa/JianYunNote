@@ -14,12 +14,10 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
-import com.henu.jianyunnote.dao.INoteBookDao_LitePal;
-import com.henu.jianyunnote.dao.INoteDao_LitePal;
-import com.henu.jianyunnote.dao.IUserDao_LitePal;
-import com.henu.jianyunnote.dao.impl.INoteBookDaoImpl_LitePal;
-import com.henu.jianyunnote.dao.impl.INoteDaoImpl_LitePal;
-import com.henu.jianyunnote.dao.impl.IUserDaoImpl_LitePal;
+import com.henu.jianyunnote.dao.LitePal.INoteBookDao_LitePal;
+import com.henu.jianyunnote.dao.LitePal.IUserDao_LitePal;
+import com.henu.jianyunnote.dao.LitePal.impl.INoteBookDaoImpl_LitePal;
+import com.henu.jianyunnote.dao.LitePal.impl.IUserDaoImpl_LitePal;
 import com.henu.jianyunnote.controller.noteParttion.NoteParttionController;
 import com.henu.jianyunnote.R;
 
@@ -29,10 +27,8 @@ import java.util.Map;
 public class NoteBookAdapter extends BaseSwipeAdapter {
     private List<Map<String, Object>> mDatas;
     private Context mContext;
-    private int pos;
     private IUserDao_LitePal userService = new IUserDaoImpl_LitePal();
     private INoteBookDao_LitePal noteBookService = new INoteBookDaoImpl_LitePal();
-    private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
 
     public NoteBookAdapter(Context context, List<Map<String, Object>> data) {
         this.mContext = context;
@@ -61,12 +57,11 @@ public class NoteBookAdapter extends BaseSwipeAdapter {
         delete.setTag(position);
         ViewHolder viewHolder = new ViewHolder();
         //对viewHolder的属性进行赋值
-        viewHolder.NOTE_MESSAGE = convertView.findViewById(R.id.note_message);
-        viewHolder.NOTE_UPDATE_TIME = convertView.findViewById(R.id.note_update_time);
+        viewHolder.NOTEBOOK_MESSAGE = convertView.findViewById(R.id.notebook_message);
+        viewHolder.NOTEBOOK_UPDATE_TIME = convertView.findViewById(R.id.notebook_update_time);
         //设置控件的数据
-        viewHolder.NOTE_MESSAGE.setText(mDatas.get(position).get("NOTE_MESSAGE").toString());
-        viewHolder.NOTE_UPDATE_TIME.setTextSize(13);
-        viewHolder.NOTE_UPDATE_TIME.setText(mDatas.get(position).get("NOTE_UPDATE_TIME").toString());
+        viewHolder.NOTEBOOK_MESSAGE.setText(mDatas.get(position).get("NOTEBOOK_MESSAGE").toString());
+        viewHolder.NOTEBOOK_UPDATE_TIME.setText(mDatas.get(position).get("NOTEBOOK_UPDATE_TIME").toString());
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,24 +73,16 @@ public class NoteBookAdapter extends BaseSwipeAdapter {
                     public void onClick(DialogInterface dialog, int which) {
                         int p = (Integer) delete.getTag();
                         mDatas.remove(p);
-                        int id;
-                        if (p < NoteParttionController.notebooks_count) {
-                            id = NoteParttionController.local_notebooks_id[p];
-                            noteBookService.updateNoteBookById(id);
-                            NoteParttionController.local_notebooks_id = ArrayUtil.deleteIdInArray(NoteParttionController.local_notebooks_id, p);
-                            NoteParttionController.notebooks_count = NoteParttionController.local_notebooks_id.length;
-                        } else {
-                            id = NoteParttionController.local_notes_id[p - NoteParttionController.notebooks_count];
-                            noteService.updateNoteById(id);
-                            NoteParttionController.local_notes_id = ArrayUtil.deleteIdInArray(NoteParttionController.local_notes_id, p- NoteParttionController.notebooks_count);
-                        }
+                        int id = NoteParttionController.local_notebooks_id[p];
+                        noteBookService.setNoteBookIsDeleteById(id);
+                        NoteParttionController.local_notebooks_id = ArrayUtil.deleteIdInArray(NoteParttionController.local_notebooks_id, p);
                         userService.updateUserByUser(NoteParttionController.current_user);
                         notifyDataSetChanged();
                         Toast.makeText(MyApplication.getContext(), "删除成功", Toast.LENGTH_SHORT).show();
                         sl.close();
                     }
                 });
-                builder.setNegativeButton("否",null);
+                builder.setNegativeButton("否", null);
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
             }
@@ -104,8 +91,7 @@ public class NoteBookAdapter extends BaseSwipeAdapter {
 
     @Override
     public View generateView(int position, ViewGroup arg1) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.listview_items, null);
-        pos = position;
+        View v = LayoutInflater.from(mContext).inflate(R.layout.notebook_listview_items, null);
         final SwipeLayout swipeLayout = v.findViewById(R.id.swipe);
 
         swipeLayout.addSwipeListener(new SimpleSwipeListener() {
@@ -132,7 +118,7 @@ public class NoteBookAdapter extends BaseSwipeAdapter {
     }
 
     private class ViewHolder {
-        private TextView NOTE_MESSAGE;
-        private TextView NOTE_UPDATE_TIME;
+        private TextView NOTEBOOK_MESSAGE;
+        private TextView NOTEBOOK_UPDATE_TIME;
     }
 }

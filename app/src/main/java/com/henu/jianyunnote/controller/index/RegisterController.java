@@ -11,8 +11,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.henu.jianyunnote.dao.INoteBookDao_Bmob;
-import com.henu.jianyunnote.dao.impl.INoteBookDaoImpl_Bmob;
+import com.henu.jianyunnote.dao.Bmob.INoteBookDao_Bmob;
+import com.henu.jianyunnote.dao.Bmob.impl.INoteBookDaoImpl_Bmob;
 import com.henu.jianyunnote.model.Bmob.NoteBook_Bmob;
 import com.henu.jianyunnote.model.Bmob.Note_Bmob;
 import com.henu.jianyunnote.model.Bmob.Users_Bmob;
