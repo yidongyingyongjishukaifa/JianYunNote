@@ -42,5 +42,5 @@ dependencies {
     implementation "com.daimajia.swipelayout:library:1.1.7@aar"
     implementation 'com.daimajia.easing:library:2.0@aar'
     implementation 'com.daimajia.androidanimations:library:2.3@aar'
-
+    implementation 'jp.wasabeef:richeditor-android:1.2.2'
 }
