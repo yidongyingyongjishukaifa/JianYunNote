@@ -52,6 +52,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+import cn.sharesdk.onekeyshare.OnekeyShare;
+
 import static com.henu.jianyunnote.controller.notePage.NotePageController.local_notes_id;
 
 public class NoteParttionController extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -432,7 +435,24 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                 Toast.makeText(NoteParttionController.this, "成功注销！", Toast.LENGTH_SHORT).show();
             }
         } else if (id == R.id.nav_share) {
+            OnekeyShare oks = new OnekeyShare();
+            //关闭sso授权
+            oks.disableSSOWhenAuthorize();
 
+            // title标题，微信、QQ和QQ空间等平台使用
+            oks.setTitle("简云笔记");
+            // titleUrl QQ和QQ空间跳转链接
+            oks.setTitleUrl("http://www.baixdu.com");
+            // text是分享文本，所有平台都需要这个字段
+            oks.setText("我是分享文本");
+            // imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
+            oks.setImagePath("/sdcard/test.jpg");//确保SDcard下面存在此张图片
+            // url在微信、微博，Facebook等平台中使用
+            oks.setUrl("http://sharesdk.cn");
+            // comment是我对这条分享的评论，仅在人人网使用
+            oks.setComment("我是测试评论文本");
+            // 启动分享GUI
+            oks.show(this);
         } else if (id == R.id.nav_send) {
 
         }
