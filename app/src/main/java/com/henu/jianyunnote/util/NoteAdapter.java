@@ -60,6 +60,11 @@ public class NoteAdapter extends BaseSwipeAdapter {
         //对viewHolder的属性进行赋值
         viewHolder.NOTE_MESSAGE = convertView.findViewById(R.id.note_message);
         viewHolder.NOTE_UPDATE_TIME = convertView.findViewById(R.id.note_update_time);
+        viewHolder.IS_NOTE_SYNC = convertView.findViewById(R.id.is_note_sync);
+        if (mDatas.get(position).get("IS_NOTE_SYNC") != null) {
+            viewHolder.IS_NOTE_SYNC.setVisibility(View.VISIBLE);
+            viewHolder.IS_NOTE_SYNC.setText("未同步");
+        }
         //设置控件的数据
         viewHolder.NOTE_MESSAGE.setText(mDatas.get(position).get("NOTE_MESSAGE").toString());
         viewHolder.NOTE_UPDATE_TIME.setText(mDatas.get(position).get("NOTE_UPDATE_TIME").toString());
@@ -84,7 +89,7 @@ public class NoteAdapter extends BaseSwipeAdapter {
                         sl.close();
                     }
                 });
-                builder.setNegativeButton("否",null);
+                builder.setNegativeButton("否", null);
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
             }
@@ -119,5 +124,6 @@ public class NoteAdapter extends BaseSwipeAdapter {
     private class ViewHolder {
         private TextView NOTE_MESSAGE;
         private TextView NOTE_UPDATE_TIME;
+        private TextView IS_NOTE_SYNC;
     }
 }
