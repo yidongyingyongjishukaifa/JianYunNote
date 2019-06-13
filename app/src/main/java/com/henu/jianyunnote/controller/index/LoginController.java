@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.henu.jianyunnote.controller.notePage.NotePageController;
 import com.henu.jianyunnote.dao.LitePal.INoteBookDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.INoteBookDaoImpl_LitePal;
@@ -32,6 +33,7 @@ import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.util.AESUtil;
 import com.henu.jianyunnote.util.AtyUtil;
 import com.henu.jianyunnote.util.MD5Util;
+import com.henu.jianyunnote.util.NetWorkUtil;
 
 import org.litepal.LitePal;
 
@@ -203,6 +205,8 @@ public class LoginController extends AppCompatActivity {
             User_LitePal u = new User_LitePal();
             u.setUsername(email);
             u.setPassword(d_password);
+//            此处设置user的bmobID
+//            u.setBmob_user_id();
             u.setIsLogin(1);
             u.setLoginTime(new Date());
             if (is_Remember) {
@@ -212,10 +216,14 @@ public class LoginController extends AppCompatActivity {
             }
             u.setAutoLogin(autoLogin);
             u.save();
-            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("无标题笔记本", u.getId());
-            noteService.insert2Note("无标题笔记","测试内容",noteBook_litePal.getId(),u.getId());
+            boolean flag = canAccessNetWork();
+            // 此处将bmob全部同步下来，设置笔记本和笔记的bmobID
+//          ------------------------------------------------
+            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("无标题笔记本", u.getId(), flag);
+            noteService.insert2Note("无标题笔记", "测试内容", noteBook_litePal.getId(), u.getId(), flag);
             noteBook_litePal.setNoteNumber(1);
             noteBook_litePal.save();
+//          -------------------------------------------------
         } else {
             for (User_LitePal u : user) {
                 u.setPassword(d_password);
@@ -230,6 +238,15 @@ public class LoginController extends AppCompatActivity {
                 u.save();
             }
         }
+    }
+
+    private boolean canAccessNetWork() {
+        boolean isSync = false;
+        if (!NetWorkUtil.isNetworkConnected(LoginController.this)) {
+            isSync = true;
+            Toast.makeText(LoginController.this, "未联网", Toast.LENGTH_LONG).show();
+        }
+        return isSync;
     }
 
     public void showListPopulWindow() {//用来显示下拉框     

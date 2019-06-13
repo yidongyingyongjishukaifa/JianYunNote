@@ -1,7 +1,10 @@
 package com.henu.jianyunnote.controller.noteContent;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.Gravity;
@@ -12,8 +15,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
+import com.henu.jianyunnote.dao.LitePal.impl.INoteDaoImpl_LitePal;
+import com.henu.jianyunnote.model.LitePal.NoteBook_LitePal;
 import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.R;
+import com.henu.jianyunnote.util.ArrayUtil;
 import com.henu.jianyunnote.util.AtyUtil;
 import com.henu.jianyunnote.util.TimeUtil;
 import com.henu.jianyunnote.controller.notePage.NotePageController;
@@ -30,9 +37,33 @@ import jp.wasabeef.richeditor.RichEditor;
 
 public class NoteContentController extends AppCompatActivity {
     private int local_note_id;
-    private EditText noteContent;
     private RichEditor mEditor;
     private TextView mPreview;
+    private int isChange = 0;
+    private INoteDao_LitePal noteDao_litePal = new INoteDaoImpl_LitePal();
+    private List<Note_LitePal> noteList;
+    private Thread mThread;
+    private Handler hander = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            switch (msg.what) {
+                case 0:
+                    if (noteList != null && noteList.size() != 0) {
+                        for (Note_LitePal note : noteList) {
+                            if (note.getContent() != null) {
+                                mEditor.setHtml(note.getContent());
+                                mPreview.setText(mEditor.getHtml());
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    //do something
+                    break;
+            }
+            return false;
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,12 +82,13 @@ public class NoteContentController extends AppCompatActivity {
         //mEditor.setBackground("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg");
         mEditor.setPlaceholder("Insert text here...");
         //mEditor.setInputEnabled(false);
-
+        isChange = 0;
         mPreview = findViewById(R.id.preview);
         mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
             @Override
             public void onTextChange(String text) {
                 mPreview.setText(text);
+                isChange = 1;
                 saveNote();
             }
         });
@@ -237,7 +269,7 @@ public class NoteContentController extends AppCompatActivity {
         });
 
         findViewById(R.id.action_insert_image).setOnClickListener(new View.OnClickListener() {
-//            拍照或打开相册
+            //            拍照或打开相册
             @Override
             public void onClick(View v) {
                 mEditor.insertImage("http://www.1honeywan.com/dachshund/image/7.21/7.21_3_thumb.JPG",
@@ -251,52 +283,57 @@ public class NoteContentController extends AppCompatActivity {
                 mEditor.insertLink("https://github.com/wasabeef", "wasabeef");
             }
         });
+
         findViewById(R.id.action_insert_checkbox).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mEditor.insertTodo();
             }
         });
-//        noteTitle = findViewById(R.id.note_title);
-//        noteContent = findViewById(R.id.note_content);//自动换行
-//        noteContent.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-//        noteContent.setGravity(Gravity.TOP);
-//        noteContent.setSingleLine(false);
-//        noteContent.setHorizontallyScrolling(false);
+
         initNoteContent();
     }
 
     private void initNoteContent() {
-        int p = Integer.parseInt(NoteContentController.this.getIntent().getStringExtra("position"));
-        local_note_id = NotePageController.local_notes_id[p];
-        String noteid = String.valueOf((local_note_id));
-        List<Note_LitePal> noteList = LitePal.where("id = ?", noteid).find(Note_LitePal.class);
-        if (noteList != null && noteList.size() != 0) {
-            for (Note_LitePal note : noteList) {
-                if (note.getContent() != null) {
-                    mEditor.setHtml(note.getContent());
-                    mPreview.setText(mEditor.getHtml());
-                }
+        mThread = new Thread() {
+            @Override
+            public void run() {
+                local_note_id = Integer.parseInt(NoteContentController.this.getIntent().getStringExtra("note_id"));
+                String noteid = String.valueOf((local_note_id));
+                noteList = LitePal.where("id = ?", noteid).find(Note_LitePal.class);
+                hander.sendEmptyMessage(0);
             }
-        }
+        };
+        mThread.start();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         saveNote();
+        setResult();
     }
 
     private void saveNote() {
-        String noteid = String.valueOf((local_note_id));
-        List<Note_LitePal> noteList = LitePal.where("id = ?", noteid).find(Note_LitePal.class);
-        if (noteList != null && noteList.size() != 0) {
-            for (Note_LitePal note : noteList) {
-                note.setUpdateTime(new Date());
-                note.setContent(mPreview.getText().toString());
-                note.save();
+        mThread = new Thread(){
+            @Override
+            public void run() {
+                String noteid = String.valueOf((local_note_id));
+                List<Note_LitePal> noteList = LitePal.where("id = ?", noteid).find(Note_LitePal.class);
+                if (noteList != null && noteList.size() != 0) {
+                    for (Note_LitePal note : noteList) {
+                        if (isChange == 1) {
+                            note.setIsChange(1);
+                            note.setUpdateTime(new Date());
+                        }
+                        note.setContent(mPreview.getText().toString());
+                        note.save();
+                        noteDao_litePal.updateNoteBookByNote(note);
+                    }
+                }
             }
-        }
+        };
+        mThread.start();
     }
 
     @Override
@@ -315,8 +352,21 @@ public class NoteContentController extends AppCompatActivity {
                 //
                 break;
             case android.R.id.home:
-                finish();
+                setResult();
+                break;
         }
         return true;
+    }
+
+    private void setResult() {
+        Intent result = new Intent(NoteContentController.this, NotePageController.class);
+        result.putExtra("note_id",local_note_id);
+        if (isChange == 1) {
+            setResult(RESULT_OK, result);
+        } else {
+            setResult(RESULT_CANCELED, result);
+        }
+        startActivity(result);
+        finish();
     }
 }

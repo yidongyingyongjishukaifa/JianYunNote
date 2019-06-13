@@ -59,9 +59,15 @@ public class NoteBookAdapter extends BaseSwipeAdapter {
         //对viewHolder的属性进行赋值
         viewHolder.NOTEBOOK_MESSAGE = convertView.findViewById(R.id.notebook_message);
         viewHolder.NOTEBOOK_UPDATE_TIME = convertView.findViewById(R.id.notebook_update_time);
+        viewHolder.IS_NOTEBOOK_SYNC = convertView.findViewById(R.id.is_notebook_sync);
+        if (mDatas.get(position).get("IS_NOTEBOOK_SYNC") != null) {
+            viewHolder.IS_NOTEBOOK_SYNC.setVisibility(View.VISIBLE);
+            viewHolder.IS_NOTEBOOK_SYNC.setText("未同步");
+        }
         //设置控件的数据
         viewHolder.NOTEBOOK_MESSAGE.setText(mDatas.get(position).get("NOTEBOOK_MESSAGE").toString());
         viewHolder.NOTEBOOK_UPDATE_TIME.setText(mDatas.get(position).get("NOTEBOOK_UPDATE_TIME").toString());
+
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,5 +126,6 @@ public class NoteBookAdapter extends BaseSwipeAdapter {
     private class ViewHolder {
         private TextView NOTEBOOK_MESSAGE;
         private TextView NOTEBOOK_UPDATE_TIME;
+        private TextView IS_NOTEBOOK_SYNC;
     }
 }
