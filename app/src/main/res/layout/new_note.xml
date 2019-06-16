@@ -11,7 +11,7 @@
         android:textSize="20sp" />
 
     <EditText
-        android:id="@+id/note_Name"
+        android:id="@+id/note_Title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp" />

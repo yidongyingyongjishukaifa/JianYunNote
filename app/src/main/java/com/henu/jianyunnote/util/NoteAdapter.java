@@ -14,10 +14,10 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
-import com.henu.jianyunnote.dao.INoteDao_LitePal;
-import com.henu.jianyunnote.dao.IUserDao_LitePal;
-import com.henu.jianyunnote.dao.impl.INoteDaoImpl_LitePal;
-import com.henu.jianyunnote.dao.impl.IUserDaoImpl_LitePal;
+import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
+import com.henu.jianyunnote.dao.LitePal.IUserDao_LitePal;
+import com.henu.jianyunnote.dao.LitePal.impl.INoteDaoImpl_LitePal;
+import com.henu.jianyunnote.dao.LitePal.impl.IUserDaoImpl_LitePal;
 import com.henu.jianyunnote.controller.notePage.NotePageController;
 import com.henu.jianyunnote.controller.noteParttion.NoteParttionController;
 import com.henu.jianyunnote.R;
@@ -28,7 +28,6 @@ import java.util.Map;
 public class NoteAdapter extends BaseSwipeAdapter {
     private List<Map<String, Object>> mDatas;
     private Context mContext;
-    private int pos;
     private IUserDao_LitePal userService = new IUserDaoImpl_LitePal();
     private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
 
@@ -61,9 +60,13 @@ public class NoteAdapter extends BaseSwipeAdapter {
         //对viewHolder的属性进行赋值
         viewHolder.NOTE_MESSAGE = convertView.findViewById(R.id.note_message);
         viewHolder.NOTE_UPDATE_TIME = convertView.findViewById(R.id.note_update_time);
+        viewHolder.IS_NOTE_SYNC = convertView.findViewById(R.id.is_note_sync);
+        if (mDatas.get(position).get("IS_NOTE_SYNC") != null) {
+            viewHolder.IS_NOTE_SYNC.setVisibility(View.VISIBLE);
+            viewHolder.IS_NOTE_SYNC.setText("未同步");
+        }
         //设置控件的数据
         viewHolder.NOTE_MESSAGE.setText(mDatas.get(position).get("NOTE_MESSAGE").toString());
-        viewHolder.NOTE_UPDATE_TIME.setTextSize(13);
         viewHolder.NOTE_UPDATE_TIME.setText(mDatas.get(position).get("NOTE_UPDATE_TIME").toString());
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,7 +81,7 @@ public class NoteAdapter extends BaseSwipeAdapter {
                         mDatas.remove(p);
                         NotePageController.flag = true;
                         int id = NotePageController.local_notes_id[p];
-                        noteService.updateNoteById(id);
+                        noteService.setNoteIsDeleteById(id);
                         userService.updateUserByUser(NoteParttionController.current_user);
                         NotePageController.local_notes_id = ArrayUtil.deleteIdInArray(NotePageController.local_notes_id, p);
                         notifyDataSetChanged();
@@ -86,7 +89,7 @@ public class NoteAdapter extends BaseSwipeAdapter {
                         sl.close();
                     }
                 });
-                builder.setNegativeButton("否",null);
+                builder.setNegativeButton("否", null);
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
             }
@@ -95,17 +98,14 @@ public class NoteAdapter extends BaseSwipeAdapter {
 
     @Override
     public View generateView(int position, ViewGroup arg1) {
-        View v = LayoutInflater.from(mContext).inflate(R.layout.listview_items, null);
-        pos = position;
+        View v = LayoutInflater.from(mContext).inflate(R.layout.note_listview_items, null);
         final SwipeLayout swipeLayout = v.findViewById(R.id.swipe);
-
         swipeLayout.addSwipeListener(new SimpleSwipeListener() {
             @Override
             public void onOpen(SwipeLayout layout) {//当隐藏的删除menu被打开的时候的回调函数
                 YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));
             }
         });
-
         swipeLayout.setOnDoubleClickListener(new SwipeLayout.DoubleClickListener() {
             @Override
             public void onDoubleClick(SwipeLayout layout,
@@ -113,7 +113,6 @@ public class NoteAdapter extends BaseSwipeAdapter {
                 Toast.makeText(mContext, "DoubleClick", Toast.LENGTH_SHORT).show();
             }
         });
-
         return v;
     }
 
@@ -125,5 +124,6 @@ public class NoteAdapter extends BaseSwipeAdapter {
     private class ViewHolder {
         private TextView NOTE_MESSAGE;
         private TextView NOTE_UPDATE_TIME;
+        private TextView IS_NOTE_SYNC;
     }
 }
