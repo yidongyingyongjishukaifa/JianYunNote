@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ListPopupWindow;
@@ -24,6 +26,8 @@ import com.henu.jianyunnote.dao.LitePal.INoteBookDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.INoteBookDaoImpl_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.INoteDaoImpl_LitePal;
+import com.henu.jianyunnote.model.Bmob.NoteBook_Bmob;
+import com.henu.jianyunnote.model.Bmob.Note_Bmob;
 import com.henu.jianyunnote.model.LitePal.NoteBook_LitePal;
 import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.model.LitePal.User_LitePal;
@@ -44,13 +48,15 @@ import java.util.regex.Pattern;
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.datatype.BmobQueryResult;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SQLQueryListener;
 
 import static android.widget.Toast.LENGTH_LONG;
 
 public class LoginController extends AppCompatActivity {
-
+    public static User_LitePal login_user;
     private CheckBox remember_password;
     private CheckBox auto_login;
     private ListPopupWindow listPopupWindow;
@@ -62,6 +68,8 @@ public class LoginController extends AppCompatActivity {
     private boolean autoLogin;
     private INoteBookDao_LitePal noteBookService = new INoteBookDaoImpl_LitePal();
     private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
+    private Thread mThread;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +129,38 @@ public class LoginController extends AppCompatActivity {
 //                                            Toast.makeText(LoginController.this, info, LENGTH_LONG).show();
                                             is_Remember = remember_password.isChecked();
                                             autoLogin = auto_login.isChecked();
-                                            init();
+                                            List<User_LitePal> user = LitePal.where("username= ?", email).find(User_LitePal.class);
+                                            String d_password = AESUtil.encrypt(password);
+                                            if (user == null || user.size() == 0) {
+                                                final User_LitePal user_litePal = new User_LitePal();
+                                                user_litePal.setUsername(email);
+                                                user_litePal.setPassword(d_password);
+                                                user_litePal.setBmob_user_id(u.getObjectId());
+                                                user_litePal.setIsLogin(1);
+                                                user_litePal.setLoginTime(new Date());
+                                                if (is_Remember) {
+                                                    user_litePal.setIsRemember(1);
+                                                } else {
+                                                    user_litePal.setIsRemember(0);
+                                                }
+                                                user_litePal.setAutoLogin(autoLogin);
+                                                user_litePal.save();
+                                                login_user = user_litePal;
+
+                                            } else {
+                                                for (User_LitePal user_litePal : user) {
+                                                    user_litePal.setPassword(d_password);
+                                                    user_litePal.setIsLogin(1);
+                                                    if (is_Remember) {
+                                                        user_litePal.setIsRemember(1);
+                                                    } else {
+                                                        user_litePal.setIsRemember(0);
+                                                    }
+                                                    user_litePal.setAutoLogin(autoLogin);
+                                                    user_litePal.setLoginTime(new Date());
+                                                    user_litePal.save();
+                                                }
+                                            }
                                             gotoNote();
                                         } else if (Password_local.getText().length() == 0) {
                                             String info = "请输入密码";
@@ -198,46 +237,9 @@ public class LoginController extends AppCompatActivity {
         }
     }
 
-    private void init() {
-        List<User_LitePal> user = LitePal.where("username= ?", email).find(User_LitePal.class);
-        String d_password = AESUtil.encrypt(password);
-        if (user == null || user.size() == 0) {
-            User_LitePal u = new User_LitePal();
-            u.setUsername(email);
-            u.setPassword(d_password);
-//            此处设置user的bmobID
-//            u.setBmob_user_id();
-            u.setIsLogin(1);
-            u.setLoginTime(new Date());
-            if (is_Remember) {
-                u.setIsRemember(1);
-            } else {
-                u.setIsRemember(0);
-            }
-            u.setAutoLogin(autoLogin);
-            u.save();
-            boolean flag = canAccessNetWork();
-            // 此处将bmob全部同步下来，设置笔记本和笔记的bmobID
-//          ------------------------------------------------
-            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("无标题笔记本", u.getId(), flag);
-            noteService.insert2Note("无标题笔记", "测试内容", noteBook_litePal.getId(), u.getId(), flag);
-            noteBook_litePal.setNoteNumber(1);
-            noteBook_litePal.save();
-//          -------------------------------------------------
-        } else {
-            for (User_LitePal u : user) {
-                u.setPassword(d_password);
-                u.setIsLogin(1);
-                if (is_Remember) {
-                    u.setIsRemember(1);
-                } else {
-                    u.setIsRemember(0);
-                }
-                u.setAutoLogin(autoLogin);
-                u.setLoginTime(new Date());
-                u.save();
-            }
-        }
+    private void init(final Users_Bmob users_bmob) {
+
+
     }
 
     private boolean canAccessNetWork() {

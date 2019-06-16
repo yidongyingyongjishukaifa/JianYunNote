@@ -15,12 +15,14 @@ public class INoteBookDaoImpl_LitePal implements INoteBookDao_LitePal {
         List<Note_LitePal> noteList = LitePal.where("noteBookId = ?", String.valueOf(notebook_id)).find(Note_LitePal.class);
         for (Note_LitePal note : noteList) {
             note.setUpdateTime(new Date());
+            note.setIsChange(1);
             note.setIsDelete(1);
             note.save();
         }
         List<NoteBook_LitePal> noteBookList = LitePal.where("id = ?", String.valueOf(notebook_id)).find(NoteBook_LitePal.class);
         for (NoteBook_LitePal noteBook : noteBookList) {
             noteBook.setIsDelete(1);
+            noteBook.setIsChange(1);
             noteBook.setUpdateTime(new Date());
             noteBook.save();
         }
@@ -40,6 +42,7 @@ public class INoteBookDaoImpl_LitePal implements INoteBookDao_LitePal {
         if (isSync) {
             notebook.setIsSync(1);
         }
+        notebook.setIsChange(1);
         notebook.setCreateTime(new Date());
         notebook.setUpdateTime(new Date());
         notebook.setIsDelete(0);
@@ -64,6 +67,7 @@ public class INoteBookDaoImpl_LitePal implements INoteBookDao_LitePal {
             if (isSync) {
                 notebook.setIsSync(1);
             }
+            notebook.setIsChange(1);
             notebook.setUpdateTime(new Date());
             noteBook.save();
         }
@@ -89,6 +93,7 @@ public class INoteBookDaoImpl_LitePal implements INoteBookDao_LitePal {
             if (isSync) {
                 notebook.setIsSync(1);
             }
+            notebook.setIsChange(1);
             noteBook.save();
         }
         return notebook;
@@ -99,6 +104,7 @@ public class INoteBookDaoImpl_LitePal implements INoteBookDao_LitePal {
         List<Note_LitePal> noteList = LitePal.where("noteBookId = ? and isDelete = ?", String.valueOf(notebook.getId()), "0").find(Note_LitePal.class);
         for (Note_LitePal note : noteList) {
             note.setUpdateTime(notebook.getUpdateTime());
+            note.setIsChange(1);
             note.save();
         }
     }

@@ -30,6 +30,8 @@ import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.henu.jianyunnote.controller.index.LoginController;
+import com.henu.jianyunnote.model.Bmob.NoteBook_Bmob;
+import com.henu.jianyunnote.model.Bmob.Note_Bmob;
 import com.henu.jianyunnote.model.LitePal.NoteBook_LitePal;
 import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.model.LitePal.User_LitePal;
@@ -51,11 +53,17 @@ import com.henu.jianyunnote.controller.notePage.NotePageController;
 import org.litepal.LitePal;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.datatype.BmobQueryResult;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SQLQueryListener;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 
 import static com.henu.jianyunnote.controller.notePage.NotePageController.local_notes_id;
@@ -275,7 +283,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
     }
 
     private void init() {
-        mThread = new Thread(){
+        mThread = new Thread() {
             @Override
             public void run() {
                 List<NoteBook_LitePal> noteBooks;
@@ -288,6 +296,35 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                     for (User_LitePal u : user) {
                         login_Email.setText(u.getUsername());
                         current_user = u;
+
+                        BmobQuery<NoteBook_Bmob> query1 = new BmobQuery<>();
+                        query1.addWhereEqualTo("userId", current_user.getBmob_user_id());
+                        query1.setLimit(999);
+                        //执行查询方法
+                        query1.findObjects(new FindListener<NoteBook_Bmob>() {
+                            @Override
+                            public void done(List<NoteBook_Bmob> object, BmobException e) {
+                                if (e == null) {
+                                    for (NoteBook_Bmob noteBook_bmob : object) {
+                                        NoteBook_LitePal noteBook_litePal = new NoteBook_LitePal();
+                                        noteBook_litePal.setBmob_notebook_id(noteBook_bmob.getObjectId());
+                                        noteBook_litePal.setBmob_user_id(current_user.getBmob_user_id());
+                                        noteBook_litePal.setUserId(current_user.getId());
+                                        noteBook_litePal.setIsDelete(noteBook_bmob.getIsDelete());
+                                        noteBook_litePal.setNoteBookName(noteBook_bmob.getNoteBookName());
+                                        noteBook_litePal.setNoteNumber(noteBook_bmob.getNoteNumber());
+                                        boolean flag = canAccessNetWork();
+                                        if (flag) {
+                                            noteBook_litePal.setIsSync(1);
+                                        }
+                                        noteBook_litePal.setCreateTime(new Date());
+                                        noteBook_litePal.setUpdateTime(new Date());
+                                        noteBook_litePal.save();
+                                    }
+                                }
+                            }
+                        });
+
                         local_user_id = u.getId();
                         String uid = String.valueOf(local_user_id);
                         noteBooks = LitePal.where("userId= ? and isDelete = ?", uid, "0").order("updateTime asc").find(NoteBook_LitePal.class);
@@ -331,7 +368,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                         noteBook_litePal = noteBookService.insert2NoteBook("无标题笔记本", local_user_id, true);
                         local_notebooks_id = new int[1];
                         local_notebooks_id[0] = noteBook_litePal.getId();
-                        noteService.insert2Note("无标题笔记", "测试内容", noteBook_litePal.getId(), local_user_id, true);
+                        noteService.insert2Note("无标题笔记", "海内存知己，天涯若比邻！", noteBook_litePal.getId(), local_user_id, true);
                         noteBook_litePal.setNoteNumber(1);
                         noteBook_litePal.save();
                     }

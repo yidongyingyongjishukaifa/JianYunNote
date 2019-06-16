@@ -66,7 +66,8 @@ public class RegisterController extends AppCompatActivity {
 //                                noteDao_bmob.insert2Note("test_title","test",noteBook_bmob.getNotebook_id(),users.getObjectId());
                                 final NoteBook_Bmob noteBook_bmob = new NoteBook_Bmob();
                                 noteBook_bmob.setIsDelete(0);
-                                noteBook_bmob.setNoteBookName("未命名筆記本");
+                                noteBook_bmob.setNoteNumber(1);
+                                noteBook_bmob.setNoteBookName("无标题笔记本");
                                 noteBook_bmob.setUserId(users.getObjectId());
                                 noteBook_bmob.save(new SaveListener<String>() {
                                     @Override
@@ -74,10 +75,11 @@ public class RegisterController extends AppCompatActivity {
                                         if(e==null)
                                         {
                                             Note_Bmob note_bmob = new Note_Bmob();
-                                            note_bmob.setTitle("test");
-                                            note_bmob.setContent("222");
+                                            note_bmob.setTitle("无标题笔记");
+                                            note_bmob.setContent("海内存知己，天涯若比邻！");
                                             note_bmob.setNoteBookId(noteBook_bmob.getObjectId());
                                             note_bmob.setUserId(users.getObjectId());
+                                            note_bmob.setIsDelete(0);
                                             note_bmob.save(new SaveListener<String>() {
                                                 @Override
                                                 public void done(String s, BmobException e) {

@@ -33,15 +33,6 @@ public class INoteDaoImpl_Bmob implements INoteDao_Bmob{
                 note.setTitle(note_title);
             }
         }
-        BmobQuery<Note_Bmob> query = new BmobQuery<>();
-        query.count(Note_Bmob.class, new CountListener() {
-            @Override
-            public void done(Integer count, BmobException e) {
-                if (e == null) {
-                    note.setNote_id(String.valueOf(count + 1));
-                }
-            }
-        });
         if (note_content != null) {
             note.setContent(note_content);
         }
