@@ -352,11 +352,7 @@ public class NoteContentController extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.toolbar_forcontent, menu);
         return true;
     }
-    String[] mPermissionList1 = new String[]{
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-    };
-    String[] mPermissionList2 = new String[]{
+    String[] mPermissionList = new String[]{
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE
     };
@@ -368,11 +364,11 @@ public class NoteContentController extends AppCompatActivity {
                 break;
             case R.id.photo:
                 mEditor.focusEditor();
-                ActivityCompat.requestPermissions(NoteContentController.this, mPermissionList1, 101);
+                ActivityCompat.requestPermissions(NoteContentController.this, mPermissionList, 101);
                 break;
             case R.id.up_pic:
                 mEditor.focusEditor();
-                ActivityCompat.requestPermissions(NoteContentController.this, mPermissionList2, 100);
+                ActivityCompat.requestPermissions(NoteContentController.this, mPermissionList, 100);
                 break;
             case android.R.id.home:
                 setResult();
@@ -387,30 +383,27 @@ public class NoteContentController extends AppCompatActivity {
                 boolean writeExternalStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 boolean readExternalStorage = grantResults[1] == PackageManager.PERMISSION_GRANTED;
                 if (grantResults.length > 0 && writeExternalStorage && readExternalStorage) {
-                    getImage();
+                    getImagealbum();
                 } else {
                     Toast.makeText(this, "请设置必要权限", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case 101:
-                Log.d("101:","这里是101，你启动的是这个");
                 boolean photo1 = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 boolean photo2 = grantResults[1] == PackageManager.PERMISSION_GRANTED;
                 if (grantResults.length > 0 && photo1 && photo2) {
-                    getImage1();
+                    getImagephoto();
                 } else {
                     Toast.makeText(this, "请设置必要权限", Toast.LENGTH_SHORT).show();
-                    Log.d("-------------","-----------这里是101----------");
                 }
                 break;
         }
     }
-    private void getImage() {
+    private void getImagealbum() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             startActivityForResult(new Intent(Intent.ACTION_GET_CONTENT).setType("image/*"),
                     100);
         } else {
-            Log.d("101:","这里是101，你启动的是getImage");
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("image/*");
@@ -418,8 +411,7 @@ public class NoteContentController extends AppCompatActivity {
         }
     }
     Uri photoUri;
-    private void getImage1() {
-        Log.d("101","这是101,你启动的是getImage1");
+    private void getImagephoto() {
         Intent intent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         ContentValues values = new ContentValues();
         photoUri = this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
@@ -433,7 +425,6 @@ public class NoteContentController extends AppCompatActivity {
             switch (requestCode) {
                 case 1:
                     if (data != null) {
-                        Log.d("101:","这里是101，你启动的是onActivityResult");
                         String realPathFromUri = RealPathFromUriUtils.getRealPathFromUri(this, data.getData());
 //                        mEditor.insertImage("https://unsplash.it/2000/2000?random&58",
 //                                "huangxiaoguo\" style=\"max-width:100%");
