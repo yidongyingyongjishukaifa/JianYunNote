@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".controller.notePage.NotePageController">
+    tools:context=".activity.notePage.NotePageActivity">
 
     <include layout="@layout/note_listview" />
 

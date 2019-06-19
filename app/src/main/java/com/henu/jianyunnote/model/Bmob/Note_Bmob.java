@@ -8,15 +8,6 @@ public class Note_Bmob extends BmobObject {
     private String title;
     private String content;
     private Integer isDelete;
-    private String note_id;
-
-    public String getNote_id() {
-        return note_id;
-    }
-
-    public void setNote_id(String note_id) {
-        this.note_id = note_id;
-    }
 
     public void setIsDelete(Integer isDelete) {
         this.isDelete = isDelete;

@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.controller.index;
+package com.henu.jianyunnote.activity.index;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,7 +24,7 @@ import cn.bmob.v3.Bmob;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.SaveListener;
 
-public class RegisterController extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity {
     private Button Return;
     private INoteBookDao_Bmob noteBookDao_bmob = new INoteBookDaoImpl_Bmob();
     @Override
@@ -43,10 +43,10 @@ public class RegisterController extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(LoginController.isEmail(Email.getText().toString())==false)
+                if(LoginActivity.isEmail(Email.getText().toString())==false)
                 {
                     String info = "请输入正确的邮箱";
-                    Toast.makeText(RegisterController.this, info, Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this, info, Toast.LENGTH_LONG).show();
                 }
                 else if((password.getText().toString()).equals(repassword.getText().toString())&&(password.getText().length()!=0)&&(safepassword.getText().length()!=0))
                 {
@@ -66,7 +66,8 @@ public class RegisterController extends AppCompatActivity {
 //                                noteDao_bmob.insert2Note("test_title","test",noteBook_bmob.getNotebook_id(),users.getObjectId());
                                 final NoteBook_Bmob noteBook_bmob = new NoteBook_Bmob();
                                 noteBook_bmob.setIsDelete(0);
-                                noteBook_bmob.setNoteBookName("未命名筆記本");
+                                noteBook_bmob.setNoteNumber(1);
+                                noteBook_bmob.setNoteBookName("无标题笔记本");
                                 noteBook_bmob.setUserId(users.getObjectId());
                                 noteBook_bmob.save(new SaveListener<String>() {
                                     @Override
@@ -74,10 +75,11 @@ public class RegisterController extends AppCompatActivity {
                                         if(e==null)
                                         {
                                             Note_Bmob note_bmob = new Note_Bmob();
-                                            note_bmob.setTitle("test");
-                                            note_bmob.setContent("222");
+                                            note_bmob.setTitle("无标题笔记");
+                                            note_bmob.setContent("海内存知己，天涯若比邻！");
                                             note_bmob.setNoteBookId(noteBook_bmob.getObjectId());
                                             note_bmob.setUserId(users.getObjectId());
+                                            note_bmob.setIsDelete(0);
                                             note_bmob.save(new SaveListener<String>() {
                                                 @Override
                                                 public void done(String s, BmobException e) {
@@ -87,7 +89,7 @@ public class RegisterController extends AppCompatActivity {
                                         }
                                     }
                                 });
-                                AlertDialog.Builder builder = new AlertDialog.Builder(RegisterController.this);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
                                 builder.setMessage("注册成功，请返回登录");
                                 builder.setPositiveButton("确定", new DialogInterface.OnClickListener()
                                 {
@@ -102,7 +104,7 @@ public class RegisterController extends AppCompatActivity {
                             else
                             {
                                 String info = "注册失败"+e.getErrorCode();
-                                Toast.makeText(RegisterController.this, info, Toast.LENGTH_LONG).show();
+                                Toast.makeText(RegisterActivity.this, info, Toast.LENGTH_LONG).show();
                             }
                         }
                     });
@@ -111,22 +113,22 @@ public class RegisterController extends AppCompatActivity {
                 else if(password.getText().length()==0)
                 {
                     String info = "请输入密码";
-                    Toast.makeText(RegisterController.this, info, Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this, info, Toast.LENGTH_LONG).show();
                 }
                 else if(repassword.getText().length()==0)
                 {
                     String info = "请确认密码";
-                    Toast.makeText(RegisterController.this, info, Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this, info, Toast.LENGTH_LONG).show();
                 }
                 else if(safepassword.getText().length()==0)
                 {
                     String info = "请输入密保密码";
-                    Toast.makeText(RegisterController.this, info, Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this, info, Toast.LENGTH_LONG).show();
                 }
                 else if(password.getText().toString()!=repassword.getText().toString())
                 {
                     String info = "输入的两次密码不一致，请重试";
-                    Toast.makeText(RegisterController.this, info, Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this, info, Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -135,7 +137,7 @@ public class RegisterController extends AppCompatActivity {
         return_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(RegisterController.this, LoginController.class);
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
             }

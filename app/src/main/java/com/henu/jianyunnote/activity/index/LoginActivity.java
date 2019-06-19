@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.controller.index;
+package com.henu.jianyunnote.activity.index;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,21 +19,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.henu.jianyunnote.controller.notePage.NotePageController;
 import com.henu.jianyunnote.dao.LitePal.INoteBookDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.INoteBookDaoImpl_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.INoteDaoImpl_LitePal;
-import com.henu.jianyunnote.model.LitePal.NoteBook_LitePal;
-import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.model.LitePal.User_LitePal;
 import com.henu.jianyunnote.model.Bmob.Users_Bmob;
-import com.henu.jianyunnote.controller.noteParttion.NoteParttionController;
+import com.henu.jianyunnote.activity.noteParttion.NoteParttionActivity;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.util.AESUtil;
 import com.henu.jianyunnote.util.AtyUtil;
 import com.henu.jianyunnote.util.MD5Util;
-import com.henu.jianyunnote.util.NetWorkUtil;
 
 import org.litepal.LitePal;
 
@@ -49,8 +45,8 @@ import cn.bmob.v3.listener.FindListener;
 
 import static android.widget.Toast.LENGTH_LONG;
 
-public class LoginController extends AppCompatActivity {
-
+public class LoginActivity extends AppCompatActivity {
+    public static User_LitePal login_user;
     private CheckBox remember_password;
     private CheckBox auto_login;
     private ListPopupWindow listPopupWindow;
@@ -60,8 +56,10 @@ public class LoginController extends AppCompatActivity {
     private String password;
     private boolean is_Remember;
     private boolean autoLogin;
+    public static boolean is_login;
     private INoteBookDao_LitePal noteBookService = new INoteBookDaoImpl_LitePal();
     private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
+    private Thread mThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +100,7 @@ public class LoginController extends AppCompatActivity {
                 password = Password_local.getText().toString();
                 if (!isEmail(email)) {
                     String info = "请输入正确的邮箱";
-                    Toast.makeText(LoginController.this, info, LENGTH_LONG).show();
+                    Toast.makeText(LoginActivity.this, info, LENGTH_LONG).show();
                 } else {
                     BmobQuery<Users_Bmob> query = new BmobQuery<>();
                     //查询Email的数据
@@ -118,14 +116,15 @@ public class LoginController extends AppCompatActivity {
                                     for (Users_Bmob u : object)
                                         if (u.getPassword().equals(MD5Util.Encode(password))) {
 //                                            String info = "登录成功";
-//                                            Toast.makeText(LoginController.this, info, LENGTH_LONG).show();
+//                                            Toast.makeText(LoginActivity.this, info, LENGTH_LONG).show();
+                                            is_login = true;
                                             is_Remember = remember_password.isChecked();
                                             autoLogin = auto_login.isChecked();
-                                            init();
+                                            initUser(u);
                                             gotoNote();
                                         } else if (Password_local.getText().length() == 0) {
                                             String info = "请输入密码";
-                                            Toast.makeText(LoginController.this, info, LENGTH_LONG).show();
+                                            Toast.makeText(LoginActivity.this, info, LENGTH_LONG).show();
                                         } else {
                                             MyAlertDialog("邮箱或密码错误", "确定");
                                         }
@@ -145,7 +144,7 @@ public class LoginController extends AppCompatActivity {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginController.this, RegisterController.class);
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
 //                finish();
             }
@@ -154,7 +153,7 @@ public class LoginController extends AppCompatActivity {
         forgotpassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(LoginController.this, FindPasswordController.class);
+                Intent intent = new Intent(LoginActivity.this, FindPasswordActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -186,6 +185,7 @@ public class LoginController extends AppCompatActivity {
                 return false;
             }
         });
+
     }
 
     @Override
@@ -198,55 +198,38 @@ public class LoginController extends AppCompatActivity {
         }
     }
 
-    private void init() {
+    private void initUser(final Users_Bmob users_bmob) {
         List<User_LitePal> user = LitePal.where("username= ?", email).find(User_LitePal.class);
         String d_password = AESUtil.encrypt(password);
         if (user == null || user.size() == 0) {
-            User_LitePal u = new User_LitePal();
-            u.setUsername(email);
-            u.setPassword(d_password);
-//            此处设置user的bmobID
-//            u.setBmob_user_id();
-            u.setIsLogin(1);
-            u.setLoginTime(new Date());
+            final User_LitePal user_litePal = new User_LitePal();
+            user_litePal.setUsername(email);
+            user_litePal.setPassword(d_password);
+            user_litePal.setBmob_user_id(users_bmob.getObjectId());
+            user_litePal.setIsLogin(1);
+            user_litePal.setLoginTime(new Date());
             if (is_Remember) {
-                u.setIsRemember(1);
+                user_litePal.setIsRemember(1);
             } else {
-                u.setIsRemember(0);
+                user_litePal.setIsRemember(0);
             }
-            u.setAutoLogin(autoLogin);
-            u.save();
-            boolean flag = canAccessNetWork();
-            // 此处将bmob全部同步下来，设置笔记本和笔记的bmobID
-//          ------------------------------------------------
-            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("无标题笔记本", u.getId(), flag);
-            noteService.insert2Note("无标题笔记", "测试内容", noteBook_litePal.getId(), u.getId(), flag);
-            noteBook_litePal.setNoteNumber(1);
-            noteBook_litePal.save();
-//          -------------------------------------------------
+            user_litePal.setAutoLogin(autoLogin);
+            user_litePal.save();
+            login_user = user_litePal;
         } else {
-            for (User_LitePal u : user) {
-                u.setPassword(d_password);
-                u.setIsLogin(1);
+            for (User_LitePal user_litePal : user) {
+                user_litePal.setPassword(d_password);
+                user_litePal.setIsLogin(1);
                 if (is_Remember) {
-                    u.setIsRemember(1);
+                    user_litePal.setIsRemember(1);
                 } else {
-                    u.setIsRemember(0);
+                    user_litePal.setIsRemember(0);
                 }
-                u.setAutoLogin(autoLogin);
-                u.setLoginTime(new Date());
-                u.save();
+                user_litePal.setAutoLogin(autoLogin);
+                user_litePal.setLoginTime(new Date());
+                user_litePal.save();
             }
         }
-    }
-
-    private boolean canAccessNetWork() {
-        boolean isSync = false;
-        if (!NetWorkUtil.isNetworkConnected(LoginController.this)) {
-            isSync = true;
-            Toast.makeText(LoginController.this, "未联网", Toast.LENGTH_LONG).show();
-        }
-        return isSync;
     }
 
     public void showListPopulWindow() {//用来显示下拉框     
@@ -260,7 +243,7 @@ public class LoginController extends AppCompatActivity {
                 pas[i] = AESUtil.decrypt(userList.get(i).getPassword());//初始化密码数组，把已保存的密码放到数组里面去   
             }
         }
-        listPopupWindow = new ListPopupWindow(LoginController.this);
+        listPopupWindow = new ListPopupWindow(LoginActivity.this);
         listPopupWindow.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, acc));//把账号的数据显示到下拉列表里面去       
         listPopupWindow.setAnchorView(Email_local);
         listPopupWindow.setModal(true);
@@ -276,7 +259,7 @@ public class LoginController extends AppCompatActivity {
     }
 
     private void gotoNote() {
-        Intent intent = new Intent(LoginController.this, NoteParttionController.class);
+        Intent intent = new Intent(LoginActivity.this, NoteParttionActivity.class);
         startActivity(intent);
         finish();
     }
@@ -289,7 +272,7 @@ public class LoginController extends AppCompatActivity {
     }
 
     public void MyAlertDialog(String message, String button) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(LoginController.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
         builder.setMessage(message);
         builder.setPositiveButton(button, new DialogInterface.OnClickListener() {
             @Override
@@ -300,7 +283,7 @@ public class LoginController extends AppCompatActivity {
     }
 
     public static void ActionStart(Context context) {
-        Intent intent = new Intent(context, LoginController.class);
+        Intent intent = new Intent(context, LoginActivity.class);
         context.startActivity(intent);
     }
 }

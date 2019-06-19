@@ -15,6 +15,7 @@ public class INoteDaoImpl_LitePal implements INoteDao_LitePal {
         List<Note_LitePal> noteList = LitePal.where("id = ?", String.valueOf(id)).find(Note_LitePal.class);
         for (Note_LitePal note : noteList) {
             note.setIsDelete(1);
+            note.setIsChange(1);
             note.setUpdateTime(new Date());
             note.save();
         }
@@ -42,6 +43,7 @@ public class INoteDaoImpl_LitePal implements INoteDao_LitePal {
         if (isSync) {
             note.setIsSync(1);
         }
+        note.setIsChange(1);
         note.setCreateTime(new Date());
         note.setUpdateTime(new Date());
         note.setIsDelete(0);
@@ -65,8 +67,9 @@ public class INoteDaoImpl_LitePal implements INoteDao_LitePal {
             if (isSync) {
                 note.setIsSync(1);
             }
-            _note.setUpdateTime(new Date());
-            _note.save();
+            note.setIsChange(1);
+            note.setUpdateTime(new Date());
+            note.save();
         }
         updateNoteBookByNote(note);
         return note;
@@ -77,6 +80,7 @@ public class INoteDaoImpl_LitePal implements INoteDao_LitePal {
         List<NoteBook_LitePal> noteBookList = LitePal.where("id = ?", String.valueOf(note.getNoteBookId())).find(NoteBook_LitePal.class);
         for(NoteBook_LitePal noteBook_litePal : noteBookList){
             noteBook_litePal.setUpdateTime(note.getUpdateTime());
+            noteBook_litePal.setIsChange(1);
             noteBook_litePal.save();
         }
     }

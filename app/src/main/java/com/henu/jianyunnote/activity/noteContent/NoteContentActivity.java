@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.controller.noteContent;
+package com.henu.jianyunnote.activity.noteContent;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -6,36 +6,27 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.henu.jianyunnote.activity.notePage.NotePageActivity;
 import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.INoteDaoImpl_LitePal;
-import com.henu.jianyunnote.model.LitePal.NoteBook_LitePal;
 import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.R;
-import com.henu.jianyunnote.util.ArrayUtil;
 import com.henu.jianyunnote.util.AtyUtil;
-import com.henu.jianyunnote.util.TimeUtil;
-import com.henu.jianyunnote.controller.notePage.NotePageController;
-import com.henu.jianyunnote.controller.noteParttion.NoteParttionController;
 
 
 import org.litepal.LitePal;
 
-import java.io.Console;
 import java.util.Date;
 import java.util.List;
 
 import jp.wasabeef.richeditor.RichEditor;
 
-public class NoteContentController extends AppCompatActivity {
+public class NoteContentActivity extends AppCompatActivity {
     private int local_note_id;
     private RichEditor mEditor;
     private TextView mPreview;
@@ -277,13 +268,6 @@ public class NoteContentController extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.action_insert_link).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditor.insertLink("https://github.com/wasabeef", "wasabeef");
-            }
-        });
-
         findViewById(R.id.action_insert_checkbox).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -298,7 +282,7 @@ public class NoteContentController extends AppCompatActivity {
         mThread = new Thread() {
             @Override
             public void run() {
-                local_note_id = Integer.parseInt(NoteContentController.this.getIntent().getStringExtra("note_id"));
+                local_note_id = Integer.parseInt(NoteContentActivity.this.getIntent().getStringExtra("note_id"));
                 String noteid = String.valueOf((local_note_id));
                 noteList = LitePal.where("id = ?", noteid).find(Note_LitePal.class);
                 hander.sendEmptyMessage(0);
@@ -359,7 +343,7 @@ public class NoteContentController extends AppCompatActivity {
     }
 
     private void setResult() {
-        Intent result = new Intent(NoteContentController.this, NotePageController.class);
+        Intent result = new Intent(NoteContentActivity.this, NotePageActivity.class);
         result.putExtra("note_id",local_note_id);
         if (isChange == 1) {
             setResult(RESULT_OK, result);

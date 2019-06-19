@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.controller.index;
+package com.henu.jianyunnote.activity.index;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,7 +23,7 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.UpdateListener;
 
-public class FindPasswordController extends AppCompatActivity {
+public class FindPasswordActivity extends AppCompatActivity {
 
     public static boolean isEmail(String email){   //判断邮箱是否合法
         if (null==email || "".equals(email)) return false;
@@ -34,7 +34,7 @@ public class FindPasswordController extends AppCompatActivity {
     }
 
     public void MyAlertDialog(String message, String button) {  //AlertDialog 两个参数
-        AlertDialog.Builder builder = new AlertDialog.Builder(FindPasswordController.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(FindPasswordActivity.this);
         builder.setMessage(message);
         builder.setPositiveButton(button, new DialogInterface.OnClickListener() {
             @Override
@@ -126,7 +126,7 @@ public class FindPasswordController extends AppCompatActivity {
         Return.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(FindPasswordController.this, LoginController.class);
+                Intent intent = new Intent(FindPasswordActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
             }

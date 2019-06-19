@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.controller.notePage;
+package com.henu.jianyunnote.activity.notePage;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -19,8 +19,10 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.henu.jianyunnote.activity.noteParttion.NoteParttionActivity;
 import com.henu.jianyunnote.dao.LitePal.INoteBookDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.INoteBookDaoImpl_LitePal;
+import com.henu.jianyunnote.model.Bmob.Note_Bmob;
 import com.henu.jianyunnote.model.LitePal.NoteBook_LitePal;
 import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.R;
@@ -30,20 +32,26 @@ import com.henu.jianyunnote.dao.LitePal.impl.INoteDaoImpl_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.IUserDaoImpl_LitePal;
 import com.henu.jianyunnote.util.ArrayUtil;
 import com.henu.jianyunnote.util.AtyUtil;
+import com.henu.jianyunnote.util.Const;
 import com.henu.jianyunnote.util.NetWorkUtil;
 import com.henu.jianyunnote.util.NoteAdapter;
 import com.henu.jianyunnote.util.TimeUtil;
-import com.henu.jianyunnote.controller.noteContent.NoteContentController;
-import com.henu.jianyunnote.controller.noteParttion.NoteParttionController;
+import com.henu.jianyunnote.activity.noteContent.NoteContentActivity;
 
 import org.litepal.LitePal;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NotePageController extends AppCompatActivity {
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+
+public class NotePageActivity extends AppCompatActivity {
     private List<Map<String, Object>> listItems = new ArrayList<>();
     private static final int NOTECONTENT_ACTIVITY = 1;
     public static int[] local_notes_id;
@@ -66,7 +74,18 @@ public class NotePageController extends AppCompatActivity {
                     myAdapter.notifyDataSetChanged();
                     break;
                 case 1:
-                    myAdapter = new NoteAdapter(NotePageController.this, listItems);
+                    List<Note_LitePal> notes = LitePal.where("noteBookId = ? and isDelete = ?", notebookid, "0").order("updateTime asc").find(Note_LitePal.class);
+                    if (notes != null && notes.size() != 0) {
+                        int local_count = notes.size() - 1;
+                        local_notes_id = new int[notes.size()];
+                        for (Note_LitePal note : notes) {
+                            local_notes_id[local_count] = note.getId();
+                            local_count--;
+                            boolean isSync = canAccessNetWork();
+                            addListItem(note.getTitle(), TimeUtil.Date2String(note.getUpdateTime()), isSync);
+                        }
+                    }
+                    myAdapter = new NoteAdapter(NotePageActivity.this, listItems);
                     mListView.setAdapter(myAdapter);
                     break;
                 default:
@@ -81,6 +100,8 @@ public class NotePageController extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_page);
+        Bmob.initialize(this, "bc95d28fa2c059530870d4dbb550b38f");//初始化Bmob  后面是服务器端应用ID
+
         AtyUtil.getInstance().addActivity(this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         flag = false;
@@ -93,7 +114,7 @@ public class NotePageController extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 menu.collapse();
                 click_position = position;
-                Intent intent = new Intent(NotePageController.this, NoteContentController.class);
+                Intent intent = new Intent(NotePageActivity.this, NoteContentActivity.class);
                 intent.putExtra("note_id", local_notes_id[position] + "");
                 note_id = String.valueOf(local_notes_id[position]);
                 startActivityForResult(intent, NOTECONTENT_ACTIVITY);
@@ -104,8 +125,8 @@ public class NotePageController extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 menu.collapse();
                 final int p = position;
-                final AlertDialog.Builder builder = new AlertDialog.Builder(NotePageController.this);
-                final LayoutInflater layoutInflater = LayoutInflater.from(NotePageController.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(NotePageActivity.this);
+                final LayoutInflater layoutInflater = LayoutInflater.from(NotePageActivity.this);
                 final View myView = layoutInflater.inflate(R.layout.new_notebook, null);
                 builder.setTitle("修改笔记标题")
                         .setIcon(R.drawable.note)
@@ -147,8 +168,8 @@ public class NotePageController extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 menu.collapse();
-                final AlertDialog.Builder builder = new AlertDialog.Builder(NotePageController.this);
-                final LayoutInflater layoutInflater = LayoutInflater.from(NotePageController.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(NotePageActivity.this);
+                final LayoutInflater layoutInflater = LayoutInflater.from(NotePageActivity.this);
                 final View myView = layoutInflater.inflate(R.layout.new_note, null);
                 builder.setTitle("新建笔记")
                         .setIcon(R.drawable.note)
@@ -157,7 +178,7 @@ public class NotePageController extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 flag = true;
-                                mThread = new Thread(){
+                                mThread = new Thread() {
                                     @Override
                                     public void run() {
                                         final EditText Note_Title = myView.findViewById(R.id.note_Title);
@@ -166,9 +187,9 @@ public class NotePageController extends AppCompatActivity {
                                             s = Note_Title.getText().toString();
                                         }
                                         boolean isSync = canAccessNetWork();
-                                        Note_LitePal note_litePal = noteService.insert2Note(s, null, local_notebook_id, NoteParttionController.local_user_id, isSync);
+                                        Note_LitePal note_litePal = noteService.insert2Note(s, null, local_notebook_id, NoteParttionActivity.local_user_id, isSync);
                                         if (note_litePal != null) {
-                                            userService.updateUserByUser(NoteParttionController.current_user);
+                                            userService.updateUserByUser(NoteParttionActivity.current_user);
                                             local_notes_id = ArrayUtil.insert2Array(local_notes_id, note_litePal.getId());
                                             addListItem(note_litePal.getTitle(), TimeUtil.Date2String(note_litePal.getUpdateTime()), isSync);
                                             hander.sendEmptyMessage(0);
@@ -195,8 +216,9 @@ public class NotePageController extends AppCompatActivity {
         mThread = new Thread() {
             @Override
             public void run() {
-                if (NotePageController.this.getIntent().getStringExtra("notebook_id") != null) {
-                    local_notebook_id = Integer.parseInt(NotePageController.this.getIntent().getStringExtra("notebook_id"));
+                String Bmob_notebook_id = "";
+                if (NotePageActivity.this.getIntent().getStringExtra("notebook_id") != null) {
+                    local_notebook_id = Integer.parseInt(NotePageActivity.this.getIntent().getStringExtra("notebook_id"));
                 } else {
                     List<Note_LitePal> notes = LitePal.where("id = ?", note_id).find(Note_LitePal.class);
                     for (Note_LitePal note_litePal : notes) {
@@ -204,18 +226,47 @@ public class NotePageController extends AppCompatActivity {
                     }
                 }
                 notebookid = String.valueOf(local_notebook_id);
-                List<Note_LitePal> notes = LitePal.where("noteBookId = ? and isDelete = ?", notebookid, "0").order("updateTime asc").find(Note_LitePal.class);
-                if (notes != null && notes.size() != 0) {
-                    int local_count = notes.size() - 1;
-                    local_notes_id = new int[notes.size()];
-                    for (Note_LitePal note : notes) {
-                        local_notes_id[local_count] = note.getId();
-                        local_count--;
-                        boolean isSync = canAccessNetWork();
-                        addListItem(note.getTitle(), TimeUtil.Date2String(note.getUpdateTime()), isSync);
-                    }
+                List<NoteBook_LitePal> noteBooks = LitePal.where("id= ?", notebookid).order("updateTime asc").find(NoteBook_LitePal.class);
+                for (NoteBook_LitePal noteBook_litePal : noteBooks) {
+                    Bmob_notebook_id = noteBook_litePal.getBmob_notebook_id();
                 }
-                hander.sendEmptyMessage(1);
+
+                BmobQuery<Note_Bmob> query2 = new BmobQuery<>();
+                //查询Email的数据
+                query2.addWhereEqualTo("userId", NoteParttionActivity.current_user.getBmob_user_id());
+                query2.addWhereEqualTo("noteBookId", Bmob_notebook_id);
+                //返回50条数据，如果不加上这条语句，默认返回10条数据
+                query2.setLimit(999);
+                //执行查询方法
+                query2.findObjects(new FindListener<Note_Bmob>() {
+                    @Override
+                    public void done(List<Note_Bmob> object, BmobException e) {
+                        if (e == null) {
+                            for (Note_Bmob note_bmob : object) {
+                                List<Note_LitePal> notes = LitePal.where("bmob_note_id = ? and isDownload = ?", note_bmob.getObjectId(), Const.isDownload).find(Note_LitePal.class);
+                                if (notes == null || notes.size() == 0) {
+                                    Note_LitePal note_litePal = new Note_LitePal();
+                                    note_litePal.setBmob_note_id(note_bmob.getObjectId());
+                                    note_litePal.setBmob_user_id(NoteParttionActivity.current_user.getBmob_user_id());
+                                    note_litePal.setUserId(NoteParttionActivity.current_user.getId());
+                                    note_litePal.setIsDelete(note_bmob.getIsDelete());
+                                    note_litePal.setTitle(note_bmob.getTitle());
+                                    note_litePal.setContent(note_bmob.getContent());
+                                    note_litePal.setNoteBookId(Integer.parseInt(notebookid));
+                                    boolean flag = canAccessNetWork();
+                                    if (flag) {
+                                        note_litePal.setIsSync(1);
+                                    }
+                                    note_litePal.setIsDownload(Integer.parseInt(Const.isDownload));
+                                    note_litePal.setCreateTime(new Date());
+                                    note_litePal.setUpdateTime(new Date());
+                                    note_litePal.save();
+                                }
+                            }
+                            hander.sendEmptyMessage(1);
+                        }
+                    }
+                });
             }
         };
         mThread.start();
@@ -227,7 +278,7 @@ public class NotePageController extends AppCompatActivity {
         if (flag) {
             boolean isSync = canAccessNetWork();
             noteBookService.updateNoteBookById(notebookid, isSync);
-            userService.updateUserByUser(NoteParttionController.current_user);
+            userService.updateUserByUser(NoteParttionActivity.current_user);
             setResult();
         }
     }
@@ -247,7 +298,7 @@ public class NotePageController extends AppCompatActivity {
         mThread = new Thread() {
             @Override
             public void run() {
-                userService.updateUserByUser(NoteParttionController.current_user);
+                userService.updateUserByUser(NoteParttionActivity.current_user);
                 listItems.remove(click_position);
                 local_notes_id = ArrayUtil.deleteIdInArray(local_notes_id, click_position);
                 boolean isSync = canAccessNetWork();
@@ -264,11 +315,11 @@ public class NotePageController extends AppCompatActivity {
 
     private boolean canAccessNetWork() {
         boolean isSync = false;
-        if (!NetWorkUtil.isNetworkConnected(NotePageController.this)) {
+        if (!NetWorkUtil.isNetworkConnected(NotePageActivity.this)) {
             isSync = true;
-            Toast.makeText(NotePageController.this, "未联网", Toast.LENGTH_LONG).show();
+            Toast.makeText(NotePageActivity.this, "未联网", Toast.LENGTH_LONG).show();
         }
-        if (NoteParttionController.local_user_id == 0) {
+        if (NoteParttionActivity.local_user_id == 0) {
             isSync = true;
         }
         return isSync;
@@ -301,7 +352,7 @@ public class NotePageController extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.search:
-                Toast.makeText(NotePageController.this, "work", Toast.LENGTH_SHORT).show();
+                Toast.makeText(NotePageActivity.this, "work", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.syns:
                 //
@@ -314,7 +365,7 @@ public class NotePageController extends AppCompatActivity {
     }
 
     private void setResult() {
-        Intent result = new Intent(NotePageController.this, NoteParttionController.class);
+        Intent result = new Intent(NotePageActivity.this, NoteParttionActivity.class);
         if (flag) {
             setResult(RESULT_OK, result);
         } else {
