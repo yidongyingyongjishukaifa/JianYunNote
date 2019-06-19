@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.controller.setting;
+package com.henu.jianyunnote.activity.setting;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -31,7 +31,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class SettingController extends AppCompatActivity {
+public class SettingActivity extends AppCompatActivity {
 
     public static final int TAKE_PHONE = 1;
     public static final int CHOOSE_PHOTO = 2;
@@ -51,7 +51,7 @@ public class SettingController extends AppCompatActivity {
         about.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent =  new Intent(SettingController.this, About_Setting.class);
+                Intent intent =  new Intent(SettingActivity.this, AboutSettingActivity.class);
                 startActivity( intent );
             }
         } );
@@ -74,7 +74,7 @@ public class SettingController extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 if(Build.VERSION.SDK_INT >= 24){   //SDK版本>24需要使用provider
-                    uri = FileProvider.getUriForFile( SettingController.this,
+                    uri = FileProvider.getUriForFile( SettingActivity.this,
                             "com.henu.jianyunnote.fileprovider",
                             outputImage);
                 }
@@ -89,10 +89,10 @@ public class SettingController extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //首先检查访问权限，如果没有权限就提示用户allow一下
-                if(ContextCompat.checkSelfPermission( SettingController.this,
+                if(ContextCompat.checkSelfPermission( SettingActivity.this,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE ) !=
                         PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions( SettingController.this,
+                    ActivityCompat.requestPermissions( SettingActivity.this,
                             new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                 }
                 //允许后打开相册

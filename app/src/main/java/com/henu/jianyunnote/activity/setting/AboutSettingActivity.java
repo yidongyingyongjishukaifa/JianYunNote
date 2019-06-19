@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.controller.setting;
+package com.henu.jianyunnote.activity.setting;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,7 +9,7 @@ import android.webkit.WebViewClient;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.util.AtyUtil;
 
-public class About_Setting extends AppCompatActivity {
+public class AboutSettingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

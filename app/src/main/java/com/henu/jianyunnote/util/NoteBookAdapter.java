@@ -14,11 +14,11 @@ import com.daimajia.androidanimations.library.YoYo;
 import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 import com.daimajia.swipe.adapters.BaseSwipeAdapter;
+import com.henu.jianyunnote.activity.noteParttion.NoteParttionActivity;
 import com.henu.jianyunnote.dao.LitePal.INoteBookDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.IUserDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.INoteBookDaoImpl_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.IUserDaoImpl_LitePal;
-import com.henu.jianyunnote.controller.noteParttion.NoteParttionController;
 import com.henu.jianyunnote.R;
 
 import java.util.List;
@@ -79,10 +79,10 @@ public class NoteBookAdapter extends BaseSwipeAdapter {
                     public void onClick(DialogInterface dialog, int which) {
                         int p = (Integer) delete.getTag();
                         mDatas.remove(p);
-                        int id = NoteParttionController.local_notebooks_id[p];
+                        int id = NoteParttionActivity.local_notebooks_id[p];
                         noteBookService.setNoteBookIsDeleteById(id);
-                        NoteParttionController.local_notebooks_id = ArrayUtil.deleteIdInArray(NoteParttionController.local_notebooks_id, p);
-                        userService.updateUserByUser(NoteParttionController.current_user);
+                        NoteParttionActivity.local_notebooks_id = ArrayUtil.deleteIdInArray(NoteParttionActivity.local_notebooks_id, p);
+                        userService.updateUserByUser(NoteParttionActivity.current_user);
                         notifyDataSetChanged();
                         Toast.makeText(MyApplication.getContext(), "删除成功", Toast.LENGTH_SHORT).show();
                         sl.close();

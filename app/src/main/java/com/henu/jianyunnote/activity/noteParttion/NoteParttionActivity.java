@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.controller.noteParttion;
+package com.henu.jianyunnote.activity.noteParttion;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -29,11 +29,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.henu.jianyunnote.controller.index.LoginController;
+import com.henu.jianyunnote.activity.index.LoginActivity;
+import com.henu.jianyunnote.activity.notePage.NotePageActivity;
 import com.henu.jianyunnote.model.Bmob.NoteBook_Bmob;
-import com.henu.jianyunnote.model.Bmob.Note_Bmob;
 import com.henu.jianyunnote.model.LitePal.NoteBook_LitePal;
-import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.model.LitePal.User_LitePal;
 import com.henu.jianyunnote.dao.LitePal.INoteBookDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
@@ -42,13 +41,13 @@ import com.henu.jianyunnote.dao.LitePal.impl.INoteBookDaoImpl_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.INoteDaoImpl_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.IUserDaoImpl_LitePal;
 import com.henu.jianyunnote.R;
-import com.henu.jianyunnote.controller.setting.SettingController;
+import com.henu.jianyunnote.activity.setting.SettingActivity;
 import com.henu.jianyunnote.util.ArrayUtil;
 import com.henu.jianyunnote.util.AtyUtil;
+import com.henu.jianyunnote.util.Const;
 import com.henu.jianyunnote.util.NetWorkUtil;
 import com.henu.jianyunnote.util.NoteBookAdapter;
 import com.henu.jianyunnote.util.TimeUtil;
-import com.henu.jianyunnote.controller.notePage.NotePageController;
 
 import org.litepal.LitePal;
 
@@ -59,16 +58,13 @@ import java.util.List;
 import java.util.Map;
 
 
+import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
-import cn.bmob.v3.datatype.BmobQueryResult;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
-import cn.bmob.v3.listener.SQLQueryListener;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 
-import static com.henu.jianyunnote.controller.notePage.NotePageController.local_notes_id;
-
-public class NoteParttionController extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class NoteParttionActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     public static int[] local_notebooks_id;
     private static final int NOTEPAGE_ACTIVITY = 1;
     private int p;
@@ -92,7 +88,28 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                     myAdapter.notifyDataSetChanged();
                     break;
                 case 1:
-                    myAdapter = new NoteBookAdapter(NoteParttionController.this, listItems);
+                    myAdapter = new NoteBookAdapter(NoteParttionActivity.this, listItems);
+                    // 为ListView设置Adapter
+                    mListView.setAdapter(myAdapter);
+                    break;
+                case 2:
+                    String uid = String.valueOf(local_user_id);
+                    List<NoteBook_LitePal> noteBooks = LitePal.where("userId= ? and isDelete = ?", uid, "0").order("updateTime asc").find(NoteBook_LitePal.class);
+                    if (noteBooks != null && noteBooks.size() != 0) {
+                        int local_count = noteBooks.size() - 1;
+                        local_notebooks_id = new int[noteBooks.size()];
+                        listItems.clear();
+                        for (NoteBook_LitePal noteBook : noteBooks) {
+                            local_notebooks_id[local_count] = noteBook.getId();
+                            local_count--;
+                            boolean isSync = false;
+                            if (noteBook.getIsSync() == 1) {
+                                isSync = true;
+                            }
+                            addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()), isSync);
+                        }
+                    }
+                    myAdapter = new NoteBookAdapter(NoteParttionActivity.this, listItems);
                     // 为ListView设置Adapter
                     mListView.setAdapter(myAdapter);
                     break;
@@ -109,6 +126,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_parttion);
         // 添加Activity到堆栈
+        Bmob.initialize(this, "bc95d28fa2c059530870d4dbb550b38f");//初始化Bmob  后面是服务器端应用ID
 
         AtyUtil.getInstance().addActivity(this);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -122,11 +140,11 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
             @Override
             public void onClick(View v) {
                 if (login_Email.getText() == " 未登录") {
-                    LoginController.ActionStart(NoteParttionController.this);
-                    Log.d("NoteParttionController", login_Email.getText().toString() + "///////////////////////");
+                    LoginActivity.ActionStart(NoteParttionActivity.this);
+                    Log.d("NoteParttionActivity", login_Email.getText().toString() + "///////////////////////");
                 } else {
-                    Log.d("NoteParttionController", login_Email.getText().toString() + "///////////////////////");
-                    Intent intent = new Intent(NoteParttionController.this, SettingController.class);
+                    Log.d("NoteParttionActivity", login_Email.getText().toString() + "///////////////////////");
+                    Intent intent = new Intent(NoteParttionActivity.this, SettingActivity.class);
                     startActivity(intent);
                 }
             }
@@ -139,7 +157,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 menu.collapse();
                 p = position;
-                Intent intent = new Intent(NoteParttionController.this, NotePageController.class);
+                Intent intent = new Intent(NoteParttionActivity.this, NotePageActivity.class);
                 intent.putExtra("notebook_id", local_notebooks_id[position] + "");
                 startActivityForResult(intent, NOTEPAGE_ACTIVITY);
             }
@@ -150,8 +168,8 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 menu.collapse();
                 p = position;
-                final AlertDialog.Builder builder = new AlertDialog.Builder(NoteParttionController.this);
-                final LayoutInflater layoutInflater = LayoutInflater.from(NoteParttionController.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(NoteParttionActivity.this);
+                final LayoutInflater layoutInflater = LayoutInflater.from(NoteParttionActivity.this);
                 final View myView = layoutInflater.inflate(R.layout.new_notebook, null);
                 builder.setTitle("修改笔记本名")
                         .setIcon(R.drawable.notebook)
@@ -186,8 +204,8 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
             @Override
             public void onClick(View view) {
                 menu.collapse();
-                final AlertDialog.Builder builder = new AlertDialog.Builder(NoteParttionController.this);
-                final LayoutInflater layoutInflater = LayoutInflater.from(NoteParttionController.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(NoteParttionActivity.this);
+                final LayoutInflater layoutInflater = LayoutInflater.from(NoteParttionActivity.this);
                 final View myView = layoutInflater.inflate(R.layout.new_notebook, null);
                 builder.setTitle("新建笔记本")
                         .setIcon(R.drawable.notebook)
@@ -231,8 +249,8 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
             @Override
             public void onClick(View view) {
                 menu.collapse();
-                final AlertDialog.Builder builder = new AlertDialog.Builder(NoteParttionController.this);
-                final LayoutInflater layoutInflater = LayoutInflater.from(NoteParttionController.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(NoteParttionActivity.this);
+                final LayoutInflater layoutInflater = LayoutInflater.from(NoteParttionActivity.this);
                 final View myView = layoutInflater.inflate(R.layout.new_note, null);
                 builder.setTitle("新建笔记")
                         .setIcon(R.drawable.note)
@@ -251,11 +269,11 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                                         boolean isSync = canAccessNetWork();
                                         NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("无标题笔记本", local_user_id, isSync);
                                         noteService.insert2Note(s, null, noteBook_litePal.getId(), local_user_id, isSync);
-                                        userService.updateUserByUser(NoteParttionController.current_user);
+                                        userService.updateUserByUser(NoteParttionActivity.current_user);
                                         local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
                                         addListItem(noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()), isSync);
                                         hander.sendEmptyMessage(0);
-                                        Intent intent = new Intent(NoteParttionController.this, NotePageController.class);
+                                        Intent intent = new Intent(NoteParttionActivity.this, NotePageActivity.class);
                                         intent.putExtra("notebook_id", local_notebooks_id[0] + "");
                                         startActivityForResult(intent, NOTEPAGE_ACTIVITY);
                                     }
@@ -296,9 +314,9 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                     for (User_LitePal u : user) {
                         login_Email.setText(u.getUsername());
                         current_user = u;
-
+                        local_user_id = u.getId();
                         BmobQuery<NoteBook_Bmob> query1 = new BmobQuery<>();
-                        query1.addWhereEqualTo("userId", current_user.getBmob_user_id());
+                        query1.addWhereEqualTo("userId", u.getBmob_user_id());
                         query1.setLimit(999);
                         //执行查询方法
                         query1.findObjects(new FindListener<NoteBook_Bmob>() {
@@ -306,42 +324,29 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                             public void done(List<NoteBook_Bmob> object, BmobException e) {
                                 if (e == null) {
                                     for (NoteBook_Bmob noteBook_bmob : object) {
-                                        NoteBook_LitePal noteBook_litePal = new NoteBook_LitePal();
-                                        noteBook_litePal.setBmob_notebook_id(noteBook_bmob.getObjectId());
-                                        noteBook_litePal.setBmob_user_id(current_user.getBmob_user_id());
-                                        noteBook_litePal.setUserId(current_user.getId());
-                                        noteBook_litePal.setIsDelete(noteBook_bmob.getIsDelete());
-                                        noteBook_litePal.setNoteBookName(noteBook_bmob.getNoteBookName());
-                                        noteBook_litePal.setNoteNumber(noteBook_bmob.getNoteNumber());
-                                        boolean flag = canAccessNetWork();
-                                        if (flag) {
-                                            noteBook_litePal.setIsSync(1);
+                                        List<NoteBook_LitePal> noteBookList = LitePal.where("bmob_notebook_id = ? and isDownload = ?", noteBook_bmob.getObjectId(), Const.isDownload).find(NoteBook_LitePal.class);
+                                        if (noteBookList == null || noteBookList.size() == 0) {
+                                            NoteBook_LitePal noteBook_litePal = new NoteBook_LitePal();
+                                            noteBook_litePal.setBmob_notebook_id(noteBook_bmob.getObjectId());
+                                            noteBook_litePal.setBmob_user_id(current_user.getBmob_user_id());
+                                            noteBook_litePal.setUserId(current_user.getId());
+                                            noteBook_litePal.setIsDelete(noteBook_bmob.getIsDelete());
+                                            noteBook_litePal.setNoteBookName(noteBook_bmob.getNoteBookName());
+                                            noteBook_litePal.setNoteNumber(noteBook_bmob.getNoteNumber());
+                                            boolean flag = canAccessNetWork();
+                                            if (flag) {
+                                                noteBook_litePal.setIsSync(1);
+                                            }
+                                            noteBook_litePal.setIsDownload(Integer.parseInt(Const.isDownload));
+                                            noteBook_litePal.setCreateTime(new Date());
+                                            noteBook_litePal.setUpdateTime(new Date());
+                                            noteBook_litePal.save();
                                         }
-                                        noteBook_litePal.setCreateTime(new Date());
-                                        noteBook_litePal.setUpdateTime(new Date());
-                                        noteBook_litePal.save();
                                     }
+                                    hander.sendEmptyMessage(2);
                                 }
                             }
                         });
-
-                        local_user_id = u.getId();
-                        String uid = String.valueOf(local_user_id);
-                        noteBooks = LitePal.where("userId= ? and isDelete = ?", uid, "0").order("updateTime asc").find(NoteBook_LitePal.class);
-                        if (noteBooks != null && noteBooks.size() != 0) {
-                            int local_count = noteBooks.size() - 1;
-                            local_notebooks_id = new int[noteBooks.size()];
-                            listItems.clear();
-                            for (NoteBook_LitePal noteBook : noteBooks) {
-                                local_notebooks_id[local_count] = noteBook.getId();
-                                local_count--;
-                                boolean isSync = false;
-                                if (noteBook.getIsSync() == 1) {
-                                    isSync = true;
-                                }
-                                addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()), isSync);
-                            }
-                        }
                     }
                 } else {
                     login_Email.setText("未登录");
@@ -376,8 +381,8 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                         listItems.clear();
                         addListItem(noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()), true);
                     }
+                    hander.sendEmptyMessage(1);
                 }
-                hander.sendEmptyMessage(1);
             }
         };
         mThread.start();
@@ -385,9 +390,9 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
 
     private boolean canAccessNetWork() {
         boolean isSync = false;
-        if (!NetWorkUtil.isNetworkConnected(NoteParttionController.this)) {
+        if (!NetWorkUtil.isNetworkConnected(NoteParttionActivity.this)) {
             isSync = true;
-            Toast.makeText(NoteParttionController.this, "未联网", Toast.LENGTH_LONG).show();
+            Toast.makeText(NoteParttionActivity.this, "未联网", Toast.LENGTH_LONG).show();
         }
         if (local_user_id == 0) {
             isSync = true;
@@ -461,7 +466,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
     //退出方法
     private void exit() {
         if ((System.currentTimeMillis() - mExitTime) > 2000) {
-            Toast.makeText(NoteParttionController.this, "再按一次退出应用", Toast.LENGTH_SHORT).show();
+            Toast.makeText(NoteParttionActivity.this, "再按一次退出应用", Toast.LENGTH_SHORT).show();
             mExitTime = System.currentTimeMillis();
         } else {
             //用户退出处理
@@ -517,16 +522,16 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            LoginController.ActionStart(NoteParttionController.this);
+            LoginActivity.ActionStart(NoteParttionActivity.this);
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
             if (login_Email.getText() == " 未登录") {
-                LoginController.ActionStart(NoteParttionController.this);
-                Log.d("NoteParttionController", login_Email.getText().toString() + "///////////////////////");
+                LoginActivity.ActionStart(NoteParttionActivity.this);
+                Log.d("NoteParttionActivity", login_Email.getText().toString() + "///////////////////////");
             } else {
-                Log.d("NoteParttionController", login_Email.getText().toString() + "///////////////////////");
-                Intent intent = new Intent(NoteParttionController.this, SettingController.class);
+                Log.d("NoteParttionActivity", login_Email.getText().toString() + "///////////////////////");
+                Intent intent = new Intent(NoteParttionActivity.this, SettingActivity.class);
                 startActivity(intent);
             }
 
@@ -536,7 +541,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                 Snackbar.make(view, "当前没有登陆", Snackbar.LENGTH_LONG).setAction("登陆", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        LoginController.ActionStart(NoteParttionController.this);
+                        LoginActivity.ActionStart(NoteParttionActivity.this);
                     }
                 }).show();
             } else {
@@ -545,7 +550,7 @@ public class NoteParttionController extends AppCompatActivity implements Navigat
                     current_user.setIsLogin(0);
                     current_user.save();
                 }
-                Toast.makeText(NoteParttionController.this, "成功注销！", Toast.LENGTH_SHORT).show();
+                Toast.makeText(NoteParttionActivity.this, "成功注销！", Toast.LENGTH_SHORT).show();
             }
         } else if (id == R.id.nav_share) {
             if (canAccessNetWork()) {

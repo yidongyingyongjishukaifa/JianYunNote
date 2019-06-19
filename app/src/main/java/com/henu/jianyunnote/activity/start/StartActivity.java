@@ -1,4 +1,4 @@
-package com.henu.jianyunnote.controller.start;
+package com.henu.jianyunnote.activity.start;
 
 
 import android.content.Intent;
@@ -6,13 +6,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.WindowManager;
 
-import com.henu.jianyunnote.controller.noteParttion.NoteParttionController;
+import com.henu.jianyunnote.activity.noteParttion.NoteParttionActivity;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.util.AtyUtil;
 
 import org.litepal.tablemanager.Connector;
 
-public class StartController extends AppCompatActivity {
+public class StartActivity extends AppCompatActivity {
 
     private  final int SPLASH_DISPLAY_LENGHT = 500;//两秒后进入系统，时间可自行调整
 
@@ -31,9 +31,9 @@ public class StartController extends AppCompatActivity {
         new android.os.Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent mainIntent = new Intent(StartController.this, NoteParttionController.class);
-                StartController.this.startActivity(mainIntent);
-                StartController.this.finish();
+                Intent mainIntent = new Intent(StartActivity.this, NoteParttionActivity.class);
+                StartActivity.this.startActivity(mainIntent);
+                StartActivity.this.finish();
             }
         },SPLASH_DISPLAY_LENGHT);
         Connector.getDatabase();

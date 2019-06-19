@@ -30,10 +30,10 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".controller.setting.About_Setting" />
-        <activity android:name=".controller.setting.SettingController" />
+        <activity android:name=".activity.setting.AboutSettingActivity" />
+        <activity android:name=".activity.setting.SettingActivity" />
         <activity
-            android:name=".controller.start.StartController"
+            android:name=".activity.start.StartActivity"
             android:theme="@style/AppTheme.NoActionBarAndTitle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,20 +43,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".controller.noteParttion.NoteParttionController"
+            android:name=".activity.noteParttion.NoteParttionActivity"
             android:label="笔记分区"
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
-        <activity android:name=".controller.index.FindPasswordController" />
-        <activity android:name=".controller.index.LoginController" />
+        <activity android:name=".activity.index.FindPasswordActivity" />
+        <activity android:name=".activity.index.LoginActivity" />
         <activity
-            android:name=".controller.noteContent.NoteContentController"
+            android:name=".activity.noteContent.NoteContentActivity"
             android:label="笔记" />
         <activity
-            android:name=".controller.notePage.NotePageController"
+            android:name=".activity.notePage.NotePageActivity"
             android:label="笔记列表" />
-        <activity android:name=".controller.index.RegisterController" />
+        <activity android:name=".activity.index.RegisterActivity" />
     </application>
 
 </manifest>

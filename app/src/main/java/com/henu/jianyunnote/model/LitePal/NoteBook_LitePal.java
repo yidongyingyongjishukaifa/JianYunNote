@@ -15,6 +15,7 @@ public class NoteBook_LitePal extends LitePalSupport implements Serializable {
     private int isDelete;
     private int isChange;
     private int isSync;
+    private int isDownload;
     private Date createTime;
     private Date updateTime;
 
@@ -34,21 +35,12 @@ public class NoteBook_LitePal extends LitePalSupport implements Serializable {
         this.isChange = isChange;
     }
 
-    @Override
-    public String toString() {
-        return "NoteBook_LitePal{" +
-                "id=" + id +
-                ", bmob_notebook_id='" + bmob_notebook_id + '\'' +
-                ", bmob_user_id='" + bmob_user_id + '\'' +
-                ", userId=" + userId +
-                ", noteBookName='" + noteBookName + '\'' +
-                ", noteNumber=" + noteNumber +
-                ", isDelete=" + isDelete +
-                ", isChange=" + isChange +
-                ", isSync=" + isSync +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+    public int getIsDownload() {
+        return isDownload;
+    }
+
+    public void setIsDownload(int isDownload) {
+        this.isDownload = isDownload;
     }
 
     public int getIsSync() {
@@ -124,4 +116,22 @@ public class NoteBook_LitePal extends LitePalSupport implements Serializable {
         this.updateTime = updateTime;
     }
 
+
+    @Override
+    public String toString() {
+        return "NoteBook_LitePal{" +
+                "id=" + id +
+                ", bmob_notebook_id='" + bmob_notebook_id + '\'' +
+                ", bmob_user_id='" + bmob_user_id + '\'' +
+                ", userId=" + userId +
+                ", noteBookName='" + noteBookName + '\'' +
+                ", noteNumber=" + noteNumber +
+                ", isDelete=" + isDelete +
+                ", isChange=" + isChange +
+                ", isSync=" + isSync +
+                ", isDownload=" + isDownload +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
+    }
 }
