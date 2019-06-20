@@ -18,6 +18,7 @@ import com.henu.jianyunnote.model.Bmob.Note_Bmob;
 import com.henu.jianyunnote.model.Bmob.Users_Bmob;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.util.AtyUtil;
+import com.henu.jianyunnote.util.Const;
 import com.henu.jianyunnote.util.MD5Util;
 
 import cn.bmob.v3.Bmob;
@@ -62,10 +63,8 @@ public class RegisterActivity extends AppCompatActivity {
                         public void done(String s, BmobException e) {
                             if(e==null)
                             {
-//                                NoteBook_Bmob noteBook_bmob = noteBookDao_bmob.insert2NoteBook("未命名筆記本", users.getObjectId());
-//                                noteDao_bmob.insert2Note("test_title","test",noteBook_bmob.getNotebook_id(),users.getObjectId());
                                 final NoteBook_Bmob noteBook_bmob = new NoteBook_Bmob();
-                                noteBook_bmob.setIsDelete(0);
+                                noteBook_bmob.setIsDelete(Integer.parseInt(Const.NOTDELETE));
                                 noteBook_bmob.setNoteNumber(1);
                                 noteBook_bmob.setNoteBookName("无标题笔记本");
                                 noteBook_bmob.setUserId(users.getObjectId());
@@ -79,7 +78,7 @@ public class RegisterActivity extends AppCompatActivity {
                                             note_bmob.setContent("海内存知己，天涯若比邻！");
                                             note_bmob.setNoteBookId(noteBook_bmob.getObjectId());
                                             note_bmob.setUserId(users.getObjectId());
-                                            note_bmob.setIsDelete(0);
+                                            note_bmob.setIsDelete(Integer.parseInt(Const.NOTDELETE));
                                             note_bmob.save(new SaveListener<String>() {
                                                 @Override
                                                 public void done(String s, BmobException e) {

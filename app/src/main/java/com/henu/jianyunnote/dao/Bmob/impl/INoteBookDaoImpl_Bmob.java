@@ -15,17 +15,9 @@ public class INoteBookDaoImpl_Bmob implements INoteBookDao_Bmob {
     @Override
     public NoteBook_Bmob insert2NoteBook(String notebook_name, String user_id) {
         final NoteBook_Bmob notebook = new NoteBook_Bmob();
-        BmobQuery<NoteBook_Bmob> query = new BmobQuery<>();
-        query.addWhereEqualTo("isDelete", "0");
-        query.findObjects(new FindListener<NoteBook_Bmob>() {
-            @Override
-            public void done(List<NoteBook_Bmob> object, BmobException e) {
-                notebook.setNotebook_id(String.valueOf(object.size()+1));
-            }
-        });
         if (notebook_name != null) {
             if ("".equals(notebook_name)) {
-                notebook.setNoteBookName("未命名笔记本");
+                notebook.setNoteBookName("无标题笔记本");
             } else {
                 notebook.setNoteBookName(notebook_name);
             }

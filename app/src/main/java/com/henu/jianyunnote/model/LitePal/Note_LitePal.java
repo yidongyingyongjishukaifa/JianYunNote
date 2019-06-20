@@ -8,6 +8,7 @@ import java.util.Date;
 public class Note_LitePal extends LitePalSupport implements Serializable {
     private int id;
     private String bmob_note_id;
+    private String bmob_notebook_id;
     private String bmob_user_id;
     private int userId;
     private int noteBookId;
@@ -26,6 +27,14 @@ public class Note_LitePal extends LitePalSupport implements Serializable {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getBmob_notebook_id() {
+        return bmob_notebook_id;
+    }
+
+    public void setBmob_notebook_id(String bmob_notebook_id) {
+        this.bmob_notebook_id = bmob_notebook_id;
     }
 
     public int getIsChange() {
@@ -129,6 +138,7 @@ public class Note_LitePal extends LitePalSupport implements Serializable {
         return "Note_LitePal{" +
                 "id=" + id +
                 ", bmob_note_id='" + bmob_note_id + '\'' +
+                ", bmob_notebook_id='" + bmob_notebook_id + '\'' +
                 ", bmob_user_id='" + bmob_user_id + '\'' +
                 ", userId=" + userId +
                 ", noteBookId=" + noteBookId +

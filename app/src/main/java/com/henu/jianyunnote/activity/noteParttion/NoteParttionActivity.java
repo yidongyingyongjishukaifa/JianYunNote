@@ -31,8 +31,14 @@ import android.widget.Toast;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.henu.jianyunnote.activity.index.LoginActivity;
 import com.henu.jianyunnote.activity.notePage.NotePageActivity;
+import com.henu.jianyunnote.dao.Bmob.INoteBookDao_Bmob;
+import com.henu.jianyunnote.dao.Bmob.INoteDao_Bmob;
+import com.henu.jianyunnote.dao.Bmob.impl.INoteBookDaoImpl_Bmob;
+import com.henu.jianyunnote.dao.Bmob.impl.INoteDaoImpl_Bmob;
 import com.henu.jianyunnote.model.Bmob.NoteBook_Bmob;
+import com.henu.jianyunnote.model.Bmob.Note_Bmob;
 import com.henu.jianyunnote.model.LitePal.NoteBook_LitePal;
+import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.model.LitePal.User_LitePal;
 import com.henu.jianyunnote.dao.LitePal.INoteBookDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
@@ -62,6 +68,8 @@ import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 
 public class NoteParttionActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -73,6 +81,9 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
     private ImageView imageView;
     private ListView mListView;
     public static int local_user_id;
+    public static String login_email;
+    public static String note_title;
+    public static String notebook_objectid;
     private List<Map<String, Object>> listItems = new ArrayList<>();
     public static User_LitePal current_user;
     private long mExitTime;
@@ -94,7 +105,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                     break;
                 case 2:
                     String uid = String.valueOf(local_user_id);
-                    List<NoteBook_LitePal> noteBooks = LitePal.where("userId= ? and isDelete = ?", uid, "0").order("updateTime asc").find(NoteBook_LitePal.class);
+                    List<NoteBook_LitePal> noteBooks = LitePal.where("userId= ? and isDelete = ?", uid, Const.NOTDELETE).order("updateTime asc").find(NoteBook_LitePal.class);
                     if (noteBooks != null && noteBooks.size() != 0) {
                         int local_count = noteBooks.size() - 1;
                         local_notebooks_id = new int[noteBooks.size()];
@@ -103,7 +114,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                             local_notebooks_id[local_count] = noteBook.getId();
                             local_count--;
                             boolean isSync = false;
-                            if (noteBook.getIsSync() == 1) {
+                            if (noteBook.getIsSync() == Integer.parseInt(Const.NEEDSYNC)) {
                                 isSync = true;
                             }
                             addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()), isSync);
@@ -112,6 +123,31 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                     myAdapter = new NoteBookAdapter(NoteParttionActivity.this, listItems);
                     // 为ListView设置Adapter
                     mListView.setAdapter(myAdapter);
+                    break;
+                case 3:
+                    String user_id = String.valueOf(local_user_id);
+                    List<NoteBook_LitePal> noteBookList = LitePal.where("userId= ? and isDelete = ?", user_id, Const.NOTDELETE).order("updateTime asc").find(NoteBook_LitePal.class);
+                    if (noteBookList != null && noteBookList.size() != 0) {
+                        int local_count = noteBookList.size() - 1;
+                        local_notebooks_id = new int[noteBookList.size()];
+                        listItems.clear();
+                        for (NoteBook_LitePal noteBook : noteBookList) {
+                            local_notebooks_id[local_count] = noteBook.getId();
+                            local_count--;
+                            boolean isSync = false;
+                            if (noteBook.getIsSync() == Integer.parseInt(Const.NEEDSYNC)) {
+                                isSync = true;
+                            }
+                            addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()), isSync);
+                        }
+                    }
+                    myAdapter = new NoteBookAdapter(NoteParttionActivity.this, listItems);
+                    // 为ListView设置Adapter
+                    mListView.setAdapter(myAdapter);
+                    Intent intent = new Intent(NoteParttionActivity.this, NotePageActivity.class);
+                    intent.putExtra("notebook_id", local_notebooks_id[0] + "");
+                    intent.putExtra("new_note", "NEWNOTE");
+                    startActivityForResult(intent, NOTEPAGE_ACTIVITY);
                     break;
                 default:
                     //do something
@@ -139,11 +175,11 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (login_Email.getText() == " 未登录") {
+                if ("未登录".equals(login_email)) {
                     LoginActivity.ActionStart(NoteParttionActivity.this);
-                    Log.d("NoteParttionActivity", login_Email.getText().toString() + "///////////////////////");
+                    Log.d("NoteParttionActivity", login_email + "///////////////////////");
                 } else {
-                    Log.d("NoteParttionActivity", login_Email.getText().toString() + "///////////////////////");
+                    Log.d("NoteParttionActivity", login_email + "///////////////////////");
                     Intent intent = new Intent(NoteParttionActivity.this, SettingActivity.class);
                     startActivity(intent);
                 }
@@ -182,7 +218,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                 if (Notebook_Name.getText() != null) {
                                     s = Notebook_Name.getText().toString();
                                 }
-                                boolean isSync = canAccessNetWork();
+                                boolean isSync = needSync();
                                 noteBookService.updateNoteBookNameById(s, local_notebooks_id[p], isSync);
                                 updateItem();
 //                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
@@ -217,21 +253,48 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                     @Override
                                     public void run() {
                                         final EditText Notebook_Name = myView.findViewById(R.id.notebook_Name);
-                                        String s = "";
-                                        if (Notebook_Name.getText() != null) {
-                                            s = Notebook_Name.getText().toString();
+                                        if (!needSync()) {
+                                            final boolean isSync = false;
+                                            if (!"未登录".equals(login_email)) {
+                                                NoteBook_Bmob notebook = new NoteBook_Bmob();
+                                                if ("".equals(Notebook_Name.getText().toString())) {
+                                                    notebook.setNoteBookName("无标题笔记本");
+                                                } else {
+                                                    notebook.setNoteBookName(Notebook_Name.getText().toString());
+                                                }
+                                                notebook.setNoteNumber(0);
+                                                notebook.setUserId(current_user.getBmob_user_id());
+                                                notebook.setIsDelete(Integer.parseInt(Const.NOTDELETE));
+                                                notebook.save(new SaveListener<String>() {
+                                                    @Override
+                                                    public void done(String s, BmobException e) {
+                                                        if (e == null) {
+                                                            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook(Notebook_Name.getText().toString(), s, local_user_id, isSync);
+                                                            userService.updateUserByUser(current_user);
+                                                            local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
+                                                            hander.sendEmptyMessage(2);
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook(Notebook_Name.getText().toString(), null, local_user_id, true);
+                                                userService.updateUserByUser(current_user);
+                                                local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
+                                                hander.sendEmptyMessage(2);
+                                            }
+                                        } else {
+                                            final boolean isSync = true;
+                                            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook(Notebook_Name.getText().toString(), null, local_user_id, isSync);
+                                            userService.updateUserByUser(current_user);
+                                            local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
+                                            hander.sendEmptyMessage(2);
                                         }
-                                        boolean isSync = canAccessNetWork();
-                                        NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook(s, local_user_id, isSync);
-                                        userService.updateUserByUser(current_user);
-                                        local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
-                                        addListItem(noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()), isSync);
-                                        hander.sendEmptyMessage(0);
+
                                     }
                                 };
-                                mThread.start();
-//                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
+                                mThread.run();
                             }
+//                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
                         })
                         .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                             @Override
@@ -262,20 +325,40 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                     @Override
                                     public void run() {
                                         final EditText Note_Title = myView.findViewById(R.id.note_Title);
-                                        String s = "";
-                                        if (Note_Title.getText() != null) {
-                                            s = Note_Title.getText().toString();
+                                        note_title = Note_Title.getText().toString();
+                                        if (!needSync()) {
+                                            final boolean isSync = false;
+                                            if (!"未登录".equals(login_email)) {
+                                                final NoteBook_Bmob notebook = new NoteBook_Bmob();
+                                                notebook.setNoteBookName("无标题笔记本");
+                                                notebook.setNoteNumber(1);
+                                                notebook.setUserId(current_user.getBmob_user_id());
+                                                notebook.setIsDelete(Integer.parseInt(Const.NOTDELETE));
+                                                notebook.save(new SaveListener<String>() {
+                                                    @Override
+                                                    public void done(String s, BmobException e) {
+                                                        if (e == null) {
+                                                            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("", s, local_user_id, isSync);
+                                                            userService.updateUserByUser(current_user);
+                                                            local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
+                                                            notebook_objectid = s;
+                                                            hander.sendEmptyMessage(3);
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("", null, local_user_id, true);
+                                                userService.updateUserByUser(current_user);
+                                                local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
+                                                hander.sendEmptyMessage(3);
+                                            }
+                                        } else {
+                                            final boolean isSync = true;
+                                            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("", null, local_user_id, isSync);
+                                            userService.updateUserByUser(current_user);
+                                            local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
+                                            hander.sendEmptyMessage(3);
                                         }
-                                        boolean isSync = canAccessNetWork();
-                                        NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("无标题笔记本", local_user_id, isSync);
-                                        noteService.insert2Note(s, null, noteBook_litePal.getId(), local_user_id, isSync);
-                                        userService.updateUserByUser(NoteParttionActivity.current_user);
-                                        local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
-                                        addListItem(noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()), isSync);
-                                        hander.sendEmptyMessage(0);
-                                        Intent intent = new Intent(NoteParttionActivity.this, NotePageActivity.class);
-                                        intent.putExtra("notebook_id", local_notebooks_id[0] + "");
-                                        startActivityForResult(intent, NOTEPAGE_ACTIVITY);
                                     }
                                 };
                                 mThread.start();
@@ -306,13 +389,14 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
             public void run() {
                 List<NoteBook_LitePal> noteBooks;
                 List<User_LitePal> user;
-                user = LitePal.where("isRemember = ?", "1").order("loginTime desc").limit(1).find(User_LitePal.class);
+                user = LitePal.where("isRemember = ?", Const.ISREMEMBER).order("loginTime desc").limit(1).find(User_LitePal.class);
                 if (user == null || user.size() == 0) {
-                    user = LitePal.where("isLogin = ?", "1").find(User_LitePal.class);
+                    user = LitePal.where("isLogin = ?", Const.ISLOGIN).find(User_LitePal.class);
                 }
                 if (user != null && user.size() != 0) {
                     for (User_LitePal u : user) {
                         login_Email.setText(u.getUsername());
+                        login_email = login_Email.getText().toString();
                         current_user = u;
                         local_user_id = u.getId();
                         BmobQuery<NoteBook_Bmob> query1 = new BmobQuery<>();
@@ -324,7 +408,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                             public void done(List<NoteBook_Bmob> object, BmobException e) {
                                 if (e == null) {
                                     for (NoteBook_Bmob noteBook_bmob : object) {
-                                        List<NoteBook_LitePal> noteBookList = LitePal.where("bmob_notebook_id = ? and isDownload = ?", noteBook_bmob.getObjectId(), Const.isDownload).find(NoteBook_LitePal.class);
+                                        List<NoteBook_LitePal> noteBookList = LitePal.where("bmob_notebook_id = ? and isDownload = ?", noteBook_bmob.getObjectId(), Const.ISDOWNLOAD).find(NoteBook_LitePal.class);
                                         if (noteBookList == null || noteBookList.size() == 0) {
                                             NoteBook_LitePal noteBook_litePal = new NoteBook_LitePal();
                                             noteBook_litePal.setBmob_notebook_id(noteBook_bmob.getObjectId());
@@ -333,11 +417,11 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                             noteBook_litePal.setIsDelete(noteBook_bmob.getIsDelete());
                                             noteBook_litePal.setNoteBookName(noteBook_bmob.getNoteBookName());
                                             noteBook_litePal.setNoteNumber(noteBook_bmob.getNoteNumber());
-                                            boolean flag = canAccessNetWork();
+                                            boolean flag = needSync();
                                             if (flag) {
-                                                noteBook_litePal.setIsSync(1);
+                                                noteBook_litePal.setIsSync(Integer.parseInt(Const.NEEDSYNC));
                                             }
-                                            noteBook_litePal.setIsDownload(Integer.parseInt(Const.isDownload));
+                                            noteBook_litePal.setIsDownload(Integer.parseInt(Const.ISDOWNLOAD));
                                             noteBook_litePal.setCreateTime(new Date());
                                             noteBook_litePal.setUpdateTime(new Date());
                                             noteBook_litePal.save();
@@ -350,11 +434,12 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                     }
                 } else {
                     login_Email.setText("未登录");
+                    login_email = login_Email.getText().toString();
                     local_user_id = 0;
-                    noteBooks = LitePal.where("userId=? and isDelete = ?", String.valueOf(local_user_id), "0").order("updateTime asc").find(NoteBook_LitePal.class);
+                    noteBooks = LitePal.where("userId = ? and isDelete = ?", String.valueOf(local_user_id), Const.NOTDELETE).order("updateTime asc").find(NoteBook_LitePal.class);
                     NoteBook_LitePal noteBook_litePal = new NoteBook_LitePal();
                     boolean isAdd = false;//用于判断是否将存入数据库中的notebook添加了
-                    canAccessNetWork();
+                    needSync();
                     if (noteBooks != null && noteBooks.size() != 0) {
                         listItems.clear();
                         isAdd = true;
@@ -364,13 +449,13 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                             local_notebooks_id[local_count] = noteBook.getId();
                             local_count--;
                             boolean isSync = false;
-                            if (noteBook.getIsSync() == 1) {
+                            if (noteBook.getIsSync() == Integer.parseInt(Const.NEEDSYNC)) {
                                 isSync = true;
                             }
                             addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()), isSync);
                         }
                     } else {
-                        noteBook_litePal = noteBookService.insert2NoteBook("无标题笔记本", local_user_id, true);
+                        noteBook_litePal = noteBookService.insert2NoteBook("无标题笔记本", null, local_user_id, true);
                         local_notebooks_id = new int[1];
                         local_notebooks_id[0] = noteBook_litePal.getId();
                         noteService.insert2Note("无标题笔记", "海内存知己，天涯若比邻！", noteBook_litePal.getId(), local_user_id, true);
@@ -388,7 +473,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
         mThread.start();
     }
 
-    private boolean canAccessNetWork() {
+    private boolean needSync() {
         boolean isSync = false;
         if (!NetWorkUtil.isNetworkConnected(NoteParttionActivity.this)) {
             isSync = true;
@@ -421,7 +506,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                 List<NoteBook_LitePal> noteBookList = LitePal.where("id = ?", String.valueOf(notebook_id)).find(NoteBook_LitePal.class);
                 for (NoteBook_LitePal noteBook_litePal : noteBookList) {
                     boolean isSync = false;
-                    if (noteBook_litePal.getIsSync() == 1) {
+                    if (noteBook_litePal.getIsSync() == Integer.parseInt(Const.NEEDSYNC)) {
                         isSync = true;
                     }
                     local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
@@ -510,6 +595,73 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                 break;
             case R.id.syns:
                 //
+                if (needSync()) {
+                    mThread = new Thread() {
+                        @Override
+                        public void run() {
+                            List<NoteBook_LitePal> noteBookList = LitePal.where("isSync = ? and isDelete = ?", Const.NEEDSYNC, Const.NOTDELETE).find(NoteBook_LitePal.class);
+                            for (final NoteBook_LitePal noteBook_litePal : noteBookList) {
+                                noteBook_litePal.setIsSync(Integer.parseInt(Const.NOTNEEDSYNC));
+                                noteBook_litePal.setIsChange(Integer.parseInt(Const.NOTCHANGE));
+                                noteBook_litePal.save();
+                                if (noteBook_litePal.getBmob_notebook_id() == null) {
+                                    NoteBook_Bmob noteBook_bmob = new NoteBook_Bmob();
+                                    noteBook_bmob.setUserId(current_user.getBmob_user_id());
+                                    noteBook_bmob.setNoteBookName(noteBook_litePal.getNoteBookName());
+                                    noteBook_bmob.setNoteNumber(noteBook_litePal.getNoteNumber());
+                                    noteBook_bmob.save(new SaveListener<String>() {
+                                        @Override
+                                        public void done(String objectId, BmobException e) {
+                                            noteBook_litePal.setBmob_notebook_id(objectId);
+                                            noteBook_litePal.save();
+                                        }
+                                    });
+                                } else {
+                                    NoteBook_Bmob noteBook_bmob = new NoteBook_Bmob();
+                                    noteBook_bmob.setNoteBookName(noteBook_litePal.getNoteBookName());
+                                    noteBook_bmob.setNoteNumber(noteBook_litePal.getNoteNumber());
+                                    noteBook_bmob.update(noteBook_litePal.getBmob_notebook_id(), new UpdateListener() {
+                                        @Override
+                                        public void done(BmobException e) {
+                                        }
+                                    });
+                                }
+                            }
+                            List<Note_LitePal> noteList = LitePal.where("isSync = ? and isDelete = ?", Const.NEEDSYNC, Const.NOTDELETE).find(Note_LitePal.class);
+                            for (final Note_LitePal note_litePal : noteList) {
+                                note_litePal.setIsChange(Integer.parseInt(Const.ISCHANGE));
+                                note_litePal.setIsSync(Integer.parseInt(Const.NOTNEEDSYNC));
+                                note_litePal.save();
+                                if (note_litePal.getBmob_note_id() == null) {
+                                    Note_Bmob note_bmob = new Note_Bmob();
+                                    note_bmob.setUserId(current_user.getBmob_user_id());
+                                    note_bmob.setNoteBookId(String.valueOf(note_litePal.getNoteBookId()));
+                                    note_bmob.setContent(note_litePal.getContent());
+                                    note_bmob.setTitle(note_litePal.getTitle());
+                                    note_bmob.save(new SaveListener<String>() {
+                                        @Override
+                                        public void done(String objectId, BmobException e) {
+                                            note_litePal.setBmob_note_id(objectId);
+                                            note_litePal.save();
+                                        }
+                                    });
+                                } else {
+                                    Note_Bmob note_bmob = new Note_Bmob();
+                                    note_bmob.setUserId(current_user.getBmob_user_id());
+                                    note_bmob.setContent(note_litePal.getContent());
+                                    note_bmob.setTitle(note_litePal.getTitle());
+                                    note_bmob.setNoteBookId(String.valueOf(note_litePal.getBmob_notebook_id()));
+                                    note_bmob.update(note_litePal.getBmob_note_id(), new UpdateListener() {
+                                        @Override
+                                        public void done(BmobException e) {
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    };
+                    mThread.start();
+                }
                 break;
         }
         return true;
@@ -526,17 +678,16 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
-            if (login_Email.getText() == " 未登录") {
+            if ("未登录".equals(login_email)) {
                 LoginActivity.ActionStart(NoteParttionActivity.this);
-                Log.d("NoteParttionActivity", login_Email.getText().toString() + "///////////////////////");
+                Log.d("NoteParttionActivity", login_email + "///////////////////////");
             } else {
-                Log.d("NoteParttionActivity", login_Email.getText().toString() + "///////////////////////");
+                Log.d("NoteParttionActivity", login_email + "///////////////////////");
                 Intent intent = new Intent(NoteParttionActivity.this, SettingActivity.class);
                 startActivity(intent);
             }
-
         } else if (id == R.id.nav_manage) {
-            if (login_Email.getText() == " 未登录") {
+            if ("未登录".equals(login_email)) {
                 View view = findViewById(R.id.sack);
                 Snackbar.make(view, "当前没有登陆", Snackbar.LENGTH_LONG).setAction("登陆", new View.OnClickListener() {
                     @Override
@@ -545,20 +696,22 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                     }
                 }).show();
             } else {
-                login_Email.setText(" 未登录");
+                login_Email.setText("未登录");
                 if (current_user != null) {
-                    current_user.setIsLogin(0);
+                    current_user.setIsLogin(Integer.parseInt(Const.NOTLOGIN));
+                    current_user.setAutoLogin(false);
+                    current_user.setIsRemember(Integer.parseInt(Const.NOTREMEMBER));
                     current_user.save();
                 }
                 Toast.makeText(NoteParttionActivity.this, "成功注销！", Toast.LENGTH_SHORT).show();
             }
         } else if (id == R.id.nav_share) {
-            if (canAccessNetWork()) {
+            if (needSync()) {
                 OnekeyShare oks = new OnekeyShare();
                 //关闭sso授权
                 oks.disableSSOWhenAuthorize();
 
-                // title标题，微信、QQ和QQ空间等平台使用
+                // title标题，微信、QQ和QQ空间等平台使用8
                 oks.setTitle("简云笔记");
                 // titleUrl QQ和QQ空间跳转链接
                 oks.setTitleUrl("http://www.baixdu.com");
@@ -576,7 +729,6 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
         } else if (id == R.id.nav_send) {
 
         }
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

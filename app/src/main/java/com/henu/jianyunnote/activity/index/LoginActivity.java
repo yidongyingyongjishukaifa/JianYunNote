@@ -29,6 +29,7 @@ import com.henu.jianyunnote.activity.noteParttion.NoteParttionActivity;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.util.AESUtil;
 import com.henu.jianyunnote.util.AtyUtil;
+import com.henu.jianyunnote.util.Const;
 import com.henu.jianyunnote.util.MD5Util;
 
 import org.litepal.LitePal;
@@ -57,9 +58,6 @@ public class LoginActivity extends AppCompatActivity {
     private boolean is_Remember;
     private boolean autoLogin;
     public static boolean is_login;
-    private INoteBookDao_LitePal noteBookService = new INoteBookDaoImpl_LitePal();
-    private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
-    private Thread mThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         Button register = findViewById(R.id.register);
         remember_password = findViewById(R.id.remember_password);
         auto_login = findViewById(R.id.auto_login);
-        List<User_LitePal> userList = LitePal.where("isRemember = ?", "1").order("loginTime desc").limit(1).find(User_LitePal.class);
+        List<User_LitePal> userList = LitePal.where("isRemember = ?", Const.ISREMEMBER).order("loginTime desc").limit(1).find(User_LitePal.class);
         if (userList != null && userList.size() != 0) {
             for (User_LitePal u : userList) {
                 String email = u.getUsername();
@@ -111,29 +109,31 @@ public class LoginActivity extends AppCompatActivity {
                     query.findObjects(new FindListener<Users_Bmob>() {
                         @Override
                         public void done(List<Users_Bmob> object, BmobException e) {
-                            if (object.size() == 1) {
-                                if (e == null) {
-                                    for (Users_Bmob u : object)
-                                        if (u.getPassword().equals(MD5Util.Encode(password))) {
+                            if (e == null) {
+                                if (object != null) {
+                                    if (object.size() == 1) {
+                                        for (Users_Bmob u : object)
+                                            if (u.getPassword().equals(MD5Util.Encode(password))) {
 //                                            String info = "登录成功";
 //                                            Toast.makeText(LoginActivity.this, info, LENGTH_LONG).show();
-                                            is_login = true;
-                                            is_Remember = remember_password.isChecked();
-                                            autoLogin = auto_login.isChecked();
-                                            initUser(u);
-                                            gotoNote();
-                                        } else if (Password_local.getText().length() == 0) {
-                                            String info = "请输入密码";
-                                            Toast.makeText(LoginActivity.this, info, LENGTH_LONG).show();
-                                        } else {
-                                            MyAlertDialog("邮箱或密码错误", "确定");
-                                        }
+                                                is_login = true;
+                                                is_Remember = remember_password.isChecked();
+                                                autoLogin = auto_login.isChecked();
+                                                initUser(u);
+                                                gotoNote();
+                                            } else if (Password_local.getText().length() == 0) {
+                                                String info = "请输入密码";
+                                                Toast.makeText(LoginActivity.this, info, LENGTH_LONG).show();
+                                            } else {
+                                                MyAlertDialog("邮箱或密码错误", "确定");
+                                            }
+                                    } else {
+                                        String Error = "异常" + e.getErrorCode();
+                                        MyAlertDialog(Error, "确定");
+                                    }
                                 } else {
-                                    String Error = "异常" + e.getErrorCode();
-                                    MyAlertDialog(Error, "确定");
+                                    MyAlertDialog("此邮箱未注册", "确定");
                                 }
-                            } else {
-                                MyAlertDialog("此邮箱未注册", "确定");
                             }
                         }
                     });
@@ -206,12 +206,12 @@ public class LoginActivity extends AppCompatActivity {
             user_litePal.setUsername(email);
             user_litePal.setPassword(d_password);
             user_litePal.setBmob_user_id(users_bmob.getObjectId());
-            user_litePal.setIsLogin(1);
+            user_litePal.setIsLogin(Integer.parseInt(Const.ISLOGIN));
             user_litePal.setLoginTime(new Date());
             if (is_Remember) {
-                user_litePal.setIsRemember(1);
+                user_litePal.setIsRemember(Integer.parseInt(Const.ISREMEMBER));
             } else {
-                user_litePal.setIsRemember(0);
+                user_litePal.setIsRemember(Integer.parseInt(Const.NOTREMEMBER));
             }
             user_litePal.setAutoLogin(autoLogin);
             user_litePal.save();
@@ -219,11 +219,11 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             for (User_LitePal user_litePal : user) {
                 user_litePal.setPassword(d_password);
-                user_litePal.setIsLogin(1);
+                user_litePal.setIsLogin(Integer.parseInt(Const.ISLOGIN));
                 if (is_Remember) {
-                    user_litePal.setIsRemember(1);
+                    user_litePal.setIsRemember(Integer.parseInt(Const.ISREMEMBER));
                 } else {
-                    user_litePal.setIsRemember(0);
+                    user_litePal.setIsRemember(Integer.parseInt(Const.NOTREMEMBER));
                 }
                 user_litePal.setAutoLogin(autoLogin);
                 user_litePal.setLoginTime(new Date());
