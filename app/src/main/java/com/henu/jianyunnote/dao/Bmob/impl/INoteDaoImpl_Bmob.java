@@ -22,34 +22,5 @@ public class INoteDaoImpl_Bmob implements INoteDao_Bmob{
             }
         });
     }
-
-    @Override
-    public Note_Bmob insert2Note(String note_title, String note_content, String notebook_id, String user_id) {
-        final Note_Bmob note = new Note_Bmob();
-        if (note_title != null) {
-            if ("".equals(note_title)) {
-                note.setTitle("未命名笔记");
-            } else {
-                note.setTitle(note_title);
-            }
-        }
-        if (note_content != null) {
-            note.setContent(note_content);
-        }
-        if (user_id != null) {
-            note.setUserId(user_id);
-        }
-        if (notebook_id != null) {
-            note.setNoteBookId(notebook_id);
-        }
-        note.setIsDelete(0);
-        note.save(new SaveListener<String>() {
-            @Override
-            public void done(String s, BmobException e) {
-
-            }
-        });
-        return  note;
-    }
 }
 

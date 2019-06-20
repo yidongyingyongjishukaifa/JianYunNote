@@ -3,6 +3,7 @@ package com.henu.jianyunnote.dao.LitePal.impl;
 import com.henu.jianyunnote.model.LitePal.NoteBook_LitePal;
 import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
+import com.henu.jianyunnote.util.Const;
 
 import org.litepal.LitePal;
 
@@ -14,8 +15,8 @@ public class INoteDaoImpl_LitePal implements INoteDao_LitePal {
     public void setNoteIsDeleteById(Integer id) {
         List<Note_LitePal> noteList = LitePal.where("id = ?", String.valueOf(id)).find(Note_LitePal.class);
         for (Note_LitePal note : noteList) {
-            note.setIsDelete(1);
-            note.setIsChange(1);
+            note.setIsDelete(Integer.parseInt(Const.ISDELETE));
+            note.setIsChange(Integer.parseInt(Const.ISCHANGE));
             note.setUpdateTime(new Date());
             note.save();
         }
@@ -41,12 +42,13 @@ public class INoteDaoImpl_LitePal implements INoteDao_LitePal {
             note.setNoteBookId(notebook_id);
         }
         if (isSync) {
-            note.setIsSync(1);
+            note.setIsSync(Integer.parseInt(Const.NEEDSYNC));
         }
-        note.setIsChange(1);
+        note.setIsDownload(Integer.parseInt(Const.ISDOWNLOAD));
+        note.setIsChange(Integer.parseInt(Const.ISCHANGE));
         note.setCreateTime(new Date());
         note.setUpdateTime(new Date());
-        note.setIsDelete(0);
+        note.setIsDelete(Integer.parseInt(Const.NOTDELETE));
         note.save();
         return note;
     }
@@ -65,9 +67,9 @@ public class INoteDaoImpl_LitePal implements INoteDao_LitePal {
                 }
             }
             if (isSync) {
-                note.setIsSync(1);
+                note.setIsSync(Integer.parseInt(Const.NEEDSYNC));
             }
-            note.setIsChange(1);
+            note.setIsChange(Integer.parseInt(Const.ISCHANGE));
             note.setUpdateTime(new Date());
             note.save();
         }
@@ -78,9 +80,9 @@ public class INoteDaoImpl_LitePal implements INoteDao_LitePal {
     @Override
     public void updateNoteBookByNote(Note_LitePal note) {
         List<NoteBook_LitePal> noteBookList = LitePal.where("id = ?", String.valueOf(note.getNoteBookId())).find(NoteBook_LitePal.class);
-        for(NoteBook_LitePal noteBook_litePal : noteBookList){
+        for (NoteBook_LitePal noteBook_litePal : noteBookList) {
             noteBook_litePal.setUpdateTime(note.getUpdateTime());
-            noteBook_litePal.setIsChange(1);
+            noteBook_litePal.setIsChange(Integer.parseInt(Const.ISCHANGE));
             noteBook_litePal.save();
         }
     }

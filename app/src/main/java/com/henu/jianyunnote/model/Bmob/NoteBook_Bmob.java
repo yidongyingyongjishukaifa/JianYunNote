@@ -7,15 +7,6 @@ public class NoteBook_Bmob extends BmobObject {
     private String noteBookName;
     private Integer noteNumber;
     private Integer isDelete;
-    private String notebook_id;
-
-    public String getNotebook_id() {
-        return notebook_id;
-    }
-
-    public void setNotebook_id(String notebook_id) {
-        this.notebook_id = notebook_id;
-    }
 
     public Integer getNoteNumber() {
         return noteNumber;
