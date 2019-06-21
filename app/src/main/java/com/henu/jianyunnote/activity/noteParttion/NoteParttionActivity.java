@@ -105,14 +105,14 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                     break;
                 case 2:
                     String uid = String.valueOf(local_user_id);
-                    List<NoteBook_LitePal> noteBooks = LitePal.where("userId= ? and isDelete = ?", uid, Const.NOTDELETE).order("updateTime asc").find(NoteBook_LitePal.class);
+                    List<NoteBook_LitePal> noteBooks = LitePal.where("userId= ? and isDelete = ?", uid, Const.NOTDELETE).order("updateTime desc").find(NoteBook_LitePal.class);
                     if (noteBooks != null && noteBooks.size() != 0) {
-                        int local_count = noteBooks.size() - 1;
+                        int local_count = 0;
                         local_notebooks_id = new int[noteBooks.size()];
                         listItems.clear();
                         for (NoteBook_LitePal noteBook : noteBooks) {
                             local_notebooks_id[local_count] = noteBook.getId();
-                            local_count--;
+                            local_count++;
                             addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()));
                         }
                     }
@@ -122,14 +122,14 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                     break;
                 case 3:
                     String user_id = String.valueOf(local_user_id);
-                    List<NoteBook_LitePal> noteBookList = LitePal.where("userId= ? and isDelete = ?", user_id, Const.NOTDELETE).order("updateTime asc").find(NoteBook_LitePal.class);
+                    List<NoteBook_LitePal> noteBookList = LitePal.where("userId= ? and isDelete = ?", user_id, Const.NOTDELETE).order("updateTime desc").find(NoteBook_LitePal.class);
                     if (noteBookList != null && noteBookList.size() != 0) {
-                        int local_count = noteBookList.size() - 1;
+                        int local_count = 0;
                         local_notebooks_id = new int[noteBookList.size()];
                         listItems.clear();
                         for (NoteBook_LitePal noteBook : noteBookList) {
                             local_notebooks_id[local_count] = noteBook.getId();
-                            local_count--;
+                            local_count++;
                             addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()));
                         }
                     }
@@ -419,18 +419,18 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                     login_Email.setText("未登录");
                     login_email = login_Email.getText().toString();
                     local_user_id = 0;
-                    noteBooks = LitePal.where("userId = ? and isDelete = ?", String.valueOf(local_user_id), Const.NOTDELETE).order("updateTime asc").find(NoteBook_LitePal.class);
+                    noteBooks = LitePal.where("userId = ? and isDelete = ?", String.valueOf(local_user_id), Const.NOTDELETE).order("updateTime desc").find(NoteBook_LitePal.class);
                     NoteBook_LitePal noteBook_litePal = new NoteBook_LitePal();
                     boolean isAdd = false;//用于判断是否将存入数据库中的notebook添加了
                     needSync();
                     if (noteBooks != null && noteBooks.size() != 0) {
                         listItems.clear();
                         isAdd = true;
-                        int local_count = noteBooks.size() - 1;
+                        int local_count = 0;
                         local_notebooks_id = new int[noteBooks.size()];
                         for (NoteBook_LitePal noteBook : noteBooks) {
                             local_notebooks_id[local_count] = noteBook.getId();
-                            local_count--;
+                            local_count++;
                             addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()));
                         }
                     } else {
@@ -445,7 +445,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                         listItems.clear();
                         addListItem(noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()));
                         hander.sendEmptyMessage(1);
-                    }else{
+                    } else {
                         hander.sendEmptyMessage(2);
                     }
                 }
