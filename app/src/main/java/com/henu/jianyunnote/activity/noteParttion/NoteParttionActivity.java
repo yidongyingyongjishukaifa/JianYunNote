@@ -113,11 +113,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                         for (NoteBook_LitePal noteBook : noteBooks) {
                             local_notebooks_id[local_count] = noteBook.getId();
                             local_count--;
-                            boolean isSync = false;
-                            if (noteBook.getIsSync() == Integer.parseInt(Const.NEEDSYNC)) {
-                                isSync = true;
-                            }
-                            addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()), isSync);
+                            addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()));
                         }
                     }
                     myAdapter = new NoteBookAdapter(NoteParttionActivity.this, listItems);
@@ -134,11 +130,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                         for (NoteBook_LitePal noteBook : noteBookList) {
                             local_notebooks_id[local_count] = noteBook.getId();
                             local_count--;
-                            boolean isSync = false;
-                            if (noteBook.getIsSync() == Integer.parseInt(Const.NEEDSYNC)) {
-                                isSync = true;
-                            }
-                            addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()), isSync);
+                            addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()));
                         }
                     }
                     myAdapter = new NoteBookAdapter(NoteParttionActivity.this, listItems);
@@ -218,8 +210,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                 if (Notebook_Name.getText() != null) {
                                     s = Notebook_Name.getText().toString();
                                 }
-                                boolean isSync = needSync();
-                                noteBookService.updateNoteBookNameById(s, local_notebooks_id[p], isSync);
+                                noteBookService.updateNoteBookNameById(s, local_notebooks_id[p]);
                                 updateItem();
 //                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
                             }
@@ -254,7 +245,6 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                     public void run() {
                                         final EditText Notebook_Name = myView.findViewById(R.id.notebook_Name);
                                         if (!needSync()) {
-                                            final boolean isSync = false;
                                             if (!"未登录".equals(login_email)) {
                                                 NoteBook_Bmob notebook = new NoteBook_Bmob();
                                                 if ("".equals(Notebook_Name.getText().toString())) {
@@ -269,7 +259,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                                     @Override
                                                     public void done(String s, BmobException e) {
                                                         if (e == null) {
-                                                            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook(Notebook_Name.getText().toString(), s, local_user_id, isSync);
+                                                            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook(Notebook_Name.getText().toString(), s, local_user_id);
                                                             userService.updateUserByUser(current_user);
                                                             local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
                                                             hander.sendEmptyMessage(2);
@@ -277,14 +267,13 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                                     }
                                                 });
                                             } else {
-                                                NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook(Notebook_Name.getText().toString(), null, local_user_id, true);
+                                                NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook(Notebook_Name.getText().toString(), null, local_user_id);
                                                 userService.updateUserByUser(current_user);
                                                 local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
                                                 hander.sendEmptyMessage(2);
                                             }
                                         } else {
-                                            final boolean isSync = true;
-                                            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook(Notebook_Name.getText().toString(), null, local_user_id, isSync);
+                                            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook(Notebook_Name.getText().toString(), null, local_user_id);
                                             userService.updateUserByUser(current_user);
                                             local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
                                             hander.sendEmptyMessage(2);
@@ -327,7 +316,6 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                         final EditText Note_Title = myView.findViewById(R.id.note_Title);
                                         note_title = Note_Title.getText().toString();
                                         if (!needSync()) {
-                                            final boolean isSync = false;
                                             if (!"未登录".equals(login_email)) {
                                                 final NoteBook_Bmob notebook = new NoteBook_Bmob();
                                                 notebook.setNoteBookName("无标题笔记本");
@@ -338,7 +326,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                                     @Override
                                                     public void done(String s, BmobException e) {
                                                         if (e == null) {
-                                                            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("", s, local_user_id, isSync);
+                                                            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("", s, local_user_id);
                                                             userService.updateUserByUser(current_user);
                                                             local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
                                                             notebook_objectid = s;
@@ -347,14 +335,13 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                                     }
                                                 });
                                             } else {
-                                                NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("", null, local_user_id, true);
+                                                NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("", null, local_user_id);
                                                 userService.updateUserByUser(current_user);
                                                 local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
                                                 hander.sendEmptyMessage(3);
                                             }
                                         } else {
-                                            final boolean isSync = true;
-                                            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("", null, local_user_id, isSync);
+                                            NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("", null, local_user_id);
                                             userService.updateUserByUser(current_user);
                                             local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
                                             hander.sendEmptyMessage(3);
@@ -417,10 +404,6 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                             noteBook_litePal.setIsDelete(noteBook_bmob.getIsDelete());
                                             noteBook_litePal.setNoteBookName(noteBook_bmob.getNoteBookName());
                                             noteBook_litePal.setNoteNumber(noteBook_bmob.getNoteNumber());
-                                            boolean flag = needSync();
-                                            if (flag) {
-                                                noteBook_litePal.setIsSync(Integer.parseInt(Const.NEEDSYNC));
-                                            }
                                             noteBook_litePal.setIsDownload(Integer.parseInt(Const.ISDOWNLOAD));
                                             noteBook_litePal.setCreateTime(new Date());
                                             noteBook_litePal.setUpdateTime(new Date());
@@ -448,14 +431,10 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                         for (NoteBook_LitePal noteBook : noteBooks) {
                             local_notebooks_id[local_count] = noteBook.getId();
                             local_count--;
-                            boolean isSync = false;
-                            if (noteBook.getIsSync() == Integer.parseInt(Const.NEEDSYNC)) {
-                                isSync = true;
-                            }
-                            addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()), isSync);
+                            addListItem(noteBook.getNoteBookName(), TimeUtil.Date2String(noteBook.getUpdateTime()));
                         }
                     } else {
-                        noteBook_litePal = noteBookService.insert2NoteBook("无标题笔记本", null, local_user_id, true);
+                        noteBook_litePal = noteBookService.insert2NoteBook("无标题笔记本", null, local_user_id);
                         local_notebooks_id = new int[1];
                         local_notebooks_id[0] = noteBook_litePal.getId();
                         noteService.insert2Note("无标题笔记", "海内存知己，天涯若比邻！", noteBook_litePal.getId(), local_user_id, true);
@@ -464,9 +443,11 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                     }
                     if (!isAdd) {
                         listItems.clear();
-                        addListItem(noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()), true);
+                        addListItem(noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()));
+                        hander.sendEmptyMessage(1);
+                    }else{
+                        hander.sendEmptyMessage(2);
                     }
-                    hander.sendEmptyMessage(1);
                 }
             }
         };
@@ -485,14 +466,11 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
         return isSync;
     }
 
-    private void addListItem(String NOTEBOOK_MESSAGE, Object NOTEBOOK_UPDATE_TIME, boolean isSync) {
+    private void addListItem(String NOTEBOOK_MESSAGE, Object NOTEBOOK_UPDATE_TIME) {
         Map<String, Object> listItem = new HashMap<>();////创建一个键值对的Map集合，用来存笔记描述和更新时间
         listItem.put("NOTEBOOK_MESSAGE", NOTEBOOK_MESSAGE);
         listItem.put("NOTEBOOK_UPDATE_TIME", NOTEBOOK_UPDATE_TIME);
-        if (isSync) {
-            listItem.put("IS_NOTEBOOK_SYNC", "未同步");
-        }
-        listItems.add(0, listItem);
+        listItems.add(listItem);
     }
 
     private void updateItem() {
@@ -505,12 +483,8 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                 local_notebooks_id = ArrayUtil.deleteIdInArray(local_notebooks_id, p);
                 List<NoteBook_LitePal> noteBookList = LitePal.where("id = ?", String.valueOf(notebook_id)).find(NoteBook_LitePal.class);
                 for (NoteBook_LitePal noteBook_litePal : noteBookList) {
-                    boolean isSync = false;
-                    if (noteBook_litePal.getIsSync() == Integer.parseInt(Const.NEEDSYNC)) {
-                        isSync = true;
-                    }
                     local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
-                    addListItem(noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()), isSync);
+                    addListItem(noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()));
                 }
                 hander.sendEmptyMessage(0);
             }
@@ -599,34 +573,6 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                     mThread = new Thread() {
                         @Override
                         public void run() {
-                            List<NoteBook_LitePal> noteBookList = LitePal.where("isSync = ? and isDelete = ?", Const.NEEDSYNC, Const.NOTDELETE).find(NoteBook_LitePal.class);
-                            for (final NoteBook_LitePal noteBook_litePal : noteBookList) {
-                                noteBook_litePal.setIsSync(Integer.parseInt(Const.NOTNEEDSYNC));
-                                noteBook_litePal.setIsChange(Integer.parseInt(Const.NOTCHANGE));
-                                noteBook_litePal.save();
-                                if (noteBook_litePal.getBmob_notebook_id() == null) {
-                                    NoteBook_Bmob noteBook_bmob = new NoteBook_Bmob();
-                                    noteBook_bmob.setUserId(current_user.getBmob_user_id());
-                                    noteBook_bmob.setNoteBookName(noteBook_litePal.getNoteBookName());
-                                    noteBook_bmob.setNoteNumber(noteBook_litePal.getNoteNumber());
-                                    noteBook_bmob.save(new SaveListener<String>() {
-                                        @Override
-                                        public void done(String objectId, BmobException e) {
-                                            noteBook_litePal.setBmob_notebook_id(objectId);
-                                            noteBook_litePal.save();
-                                        }
-                                    });
-                                } else {
-                                    NoteBook_Bmob noteBook_bmob = new NoteBook_Bmob();
-                                    noteBook_bmob.setNoteBookName(noteBook_litePal.getNoteBookName());
-                                    noteBook_bmob.setNoteNumber(noteBook_litePal.getNoteNumber());
-                                    noteBook_bmob.update(noteBook_litePal.getBmob_notebook_id(), new UpdateListener() {
-                                        @Override
-                                        public void done(BmobException e) {
-                                        }
-                                    });
-                                }
-                            }
                             List<Note_LitePal> noteList = LitePal.where("isSync = ? and isDelete = ?", Const.NEEDSYNC, Const.NOTDELETE).find(Note_LitePal.class);
                             for (final Note_LitePal note_litePal : noteList) {
                                 note_litePal.setIsChange(Integer.parseInt(Const.ISCHANGE));

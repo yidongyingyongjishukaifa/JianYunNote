@@ -30,7 +30,7 @@ public class INoteBookDaoImpl_LitePal implements INoteBookDao_LitePal {
     }
 
     @Override
-    public NoteBook_LitePal insert2NoteBook(String notebook_name, String bmob_objectid, Integer user_id, boolean isSync) {
+    public NoteBook_LitePal insert2NoteBook(String notebook_name, String bmob_objectid, Integer user_id) {
         NoteBook_LitePal notebook = new NoteBook_LitePal();
         if (notebook_name != null) {
             notebook.setUserId(user_id);
@@ -39,9 +39,6 @@ public class INoteBookDaoImpl_LitePal implements INoteBookDao_LitePal {
             } else {
                 notebook.setNoteBookName(notebook_name);
             }
-        }
-        if (isSync) {
-            notebook.setIsSync(Integer.parseInt(Const.NEEDSYNC));
         }
         if (bmob_objectid != null) {
             notebook.setBmob_notebook_id(bmob_objectid);
@@ -57,7 +54,7 @@ public class INoteBookDaoImpl_LitePal implements INoteBookDao_LitePal {
     }
 
     @Override
-    public NoteBook_LitePal updateNoteBookNameById(String notebook_name, Integer notebook_id, boolean isSync) {
+    public NoteBook_LitePal updateNoteBookNameById(String notebook_name, Integer notebook_id) {
         List<NoteBook_LitePal> noteBookList = LitePal.where("id = ?", String.valueOf(notebook_id)).find(NoteBook_LitePal.class);
         NoteBook_LitePal notebook = new NoteBook_LitePal();
         for (NoteBook_LitePal noteBook : noteBookList) {
@@ -69,9 +66,6 @@ public class INoteBookDaoImpl_LitePal implements INoteBookDao_LitePal {
                     notebook.setNoteBookName(notebook_name);
                 }
             }
-            if (isSync) {
-                notebook.setIsSync(Integer.parseInt(Const.NEEDSYNC));
-            }
             notebook.setIsChange(Integer.parseInt(Const.ISCHANGE));
             notebook.setUpdateTime(new Date());
             noteBook.save();
@@ -81,7 +75,7 @@ public class INoteBookDaoImpl_LitePal implements INoteBookDao_LitePal {
     }
 
     @Override
-    public NoteBook_LitePal updateNoteBookById(String notebook_id, boolean isSync) {
+    public NoteBook_LitePal updateNoteBookById(String notebook_id) {
         List<NoteBook_LitePal> noteBookList = LitePal.where("id = ?", notebook_id).find(NoteBook_LitePal.class);
         List<Note_LitePal> noteList = LitePal.where("noteBookId = ? and isDelete = ?", notebook_id, "0").find(Note_LitePal.class);
         int num = noteList.size();
@@ -95,9 +89,6 @@ public class INoteBookDaoImpl_LitePal implements INoteBookDao_LitePal {
             notebook = noteBook;
             noteBook.setUpdateTime(note_litePal.getUpdateTime());
             noteBook.setNoteNumber(num);
-            if (isSync) {
-                notebook.setIsSync(Integer.parseInt(Const.NEEDSYNC));
-            }
             notebook.setIsChange(Integer.parseInt(Const.ISCHANGE));
             noteBook.save();
         }

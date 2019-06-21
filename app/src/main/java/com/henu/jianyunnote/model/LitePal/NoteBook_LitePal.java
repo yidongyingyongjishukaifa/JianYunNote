@@ -14,7 +14,6 @@ public class NoteBook_LitePal extends LitePalSupport implements Serializable {
     private int noteNumber;
     private int isDelete;
     private int isChange;
-    private int isSync;
     private int isDownload;
     private Date createTime;
     private Date updateTime;
@@ -41,14 +40,6 @@ public class NoteBook_LitePal extends LitePalSupport implements Serializable {
 
     public void setIsDownload(int isDownload) {
         this.isDownload = isDownload;
-    }
-
-    public int getIsSync() {
-        return isSync;
-    }
-
-    public void setIsSync(int isSync) {
-        this.isSync = isSync;
     }
 
     public String getBmob_user_id() {
@@ -128,7 +119,6 @@ public class NoteBook_LitePal extends LitePalSupport implements Serializable {
                 ", noteNumber=" + noteNumber +
                 ", isDelete=" + isDelete +
                 ", isChange=" + isChange +
-                ", isSync=" + isSync +
                 ", isDownload=" + isDownload +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
