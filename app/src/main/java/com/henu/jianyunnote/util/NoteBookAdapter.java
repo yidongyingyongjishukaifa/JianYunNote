@@ -2,6 +2,8 @@ package com.henu.jianyunnote.util;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,15 +22,36 @@ import com.henu.jianyunnote.dao.LitePal.IUserDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.INoteBookDaoImpl_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.IUserDaoImpl_LitePal;
 import com.henu.jianyunnote.R;
+import com.henu.jianyunnote.model.Bmob.NoteBook_Bmob;
+import com.henu.jianyunnote.model.LitePal.NoteBook_LitePal;
+
+import org.litepal.LitePal;
 
 import java.util.List;
 import java.util.Map;
+
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.UpdateListener;
 
 public class NoteBookAdapter extends BaseSwipeAdapter {
     private List<Map<String, Object>> mDatas;
     private Context mContext;
     private IUserDao_LitePal userService = new IUserDaoImpl_LitePal();
     private INoteBookDao_LitePal noteBookService = new INoteBookDaoImpl_LitePal();
+    public Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            switch (msg.what) {
+                case 0:
+                    notifyDataSetChanged();
+                    break;
+                default:
+                    //do something
+                    break;
+            }
+            return false;
+        }
+    });
 
     public NoteBookAdapter(Context context, List<Map<String, Object>> data) {
         this.mContext = context;
@@ -76,9 +99,22 @@ public class NoteBookAdapter extends BaseSwipeAdapter {
                         mDatas.remove(p);
                         int id = NoteParttionActivity.local_notebooks_id[p];
                         noteBookService.setNoteBookIsDeleteById(id);
+                        String notebook_id = String.valueOf(NoteParttionActivity.local_notebooks_id[p]);
                         NoteParttionActivity.local_notebooks_id = ArrayUtil.deleteIdInArray(NoteParttionActivity.local_notebooks_id, p);
                         userService.updateUserByUser(NoteParttionActivity.current_user);
-                        notifyDataSetChanged();
+                        List<NoteBook_LitePal> noteBookList = LitePal.where("id = ?", notebook_id).find(NoteBook_LitePal.class);
+                        for (NoteBook_LitePal noteBook_litePal : noteBookList) {
+                            String bmob_notebookid = noteBook_litePal.getBmob_notebook_id();
+                            NoteBook_Bmob noteBook_bmob = new NoteBook_Bmob();
+                            noteBook_bmob.setIsDelete(Integer.valueOf(Const.ISDELETE));
+                            noteBook_bmob.update(bmob_notebookid, new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+                                    handler.sendEmptyMessage(0);
+                                }
+                            });
+                        }
+
                         Toast.makeText(MyApplication.getContext(), "删除成功", Toast.LENGTH_SHORT).show();
                         sl.close();
                     }

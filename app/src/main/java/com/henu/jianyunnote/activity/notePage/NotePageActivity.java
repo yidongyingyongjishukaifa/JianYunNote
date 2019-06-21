@@ -54,6 +54,7 @@ import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 
 public class NotePageActivity extends AppCompatActivity {
     private List<Map<String, Object>> listItems = new ArrayList<>();
@@ -69,9 +70,8 @@ public class NotePageActivity extends AppCompatActivity {
     private IUserDao_LitePal userService = new IUserDaoImpl_LitePal();
     private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
     private INoteBookDao_LitePal noteBookService = new INoteBookDaoImpl_LitePal();
-    private INoteDao_Bmob noteDao_bmob = new INoteDaoImpl_Bmob();
     private Thread mThread;
-    private Handler hander = new Handler(new Handler.Callback() {
+    public Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
@@ -93,6 +93,9 @@ public class NotePageActivity extends AppCompatActivity {
                     }
                     myAdapter = new NoteAdapter(NotePageActivity.this, listItems);
                     mListView.setAdapter(myAdapter);
+                    break;
+                case 2:
+                    updateItem();
                     break;
                 default:
                     //do something
@@ -131,6 +134,8 @@ public class NotePageActivity extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 menu.collapse();
                 final int p = position;
+                click_position = position;
+                note_id = String.valueOf(local_notes_id[position]);
                 final AlertDialog.Builder builder = new AlertDialog.Builder(NotePageActivity.this);
                 final LayoutInflater layoutInflater = LayoutInflater.from(NotePageActivity.this);
                 final View myView = layoutInflater.inflate(R.layout.new_notebook, null);
@@ -147,13 +152,17 @@ public class NotePageActivity extends AppCompatActivity {
                                     s = Notebook_Name.getText().toString();
                                 }
                                 boolean isSync = needSync();
-                                Note_LitePal note_litePal = noteService.updateNoteTitleById(s, local_notes_id[p], isSync);
-                                if (note_litePal != null) {
-                                    listItems.remove(p);
-                                    local_notes_id = ArrayUtil.deleteIdInArray(local_notes_id, p);
-                                    local_notes_id = ArrayUtil.insert2Array(local_notes_id, note_litePal.getId());
-                                    addListItem(note_litePal.getTitle(), TimeUtil.Date2String(note_litePal.getUpdateTime()), isSync);
-                                    myAdapter.notifyDataSetChanged();
+                                noteService.updateNoteTitleById(s, local_notes_id[p], isSync);
+                                List<Note_LitePal> noteList = LitePal.where("id = ?", String.valueOf(local_notes_id[p])).find(Note_LitePal.class);
+                                for (Note_LitePal note_litePal : noteList) {
+                                    Note_Bmob note_bmob = new Note_Bmob();
+                                    note_bmob.setTitle(s);
+                                    note_bmob.update(note_litePal.getBmob_note_id(), new UpdateListener() {
+                                        @Override
+                                        public void done(BmobException e) {
+                                            handler.sendEmptyMessage(2);
+                                        }
+                                    });
                                 }
 //                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
                             }
@@ -224,7 +233,7 @@ public class NotePageActivity extends AppCompatActivity {
                                                 note_litePal.setCreateTime(new Date());
                                                 note_litePal.setUpdateTime(new Date());
                                                 note_litePal.save();
-                                                hander.sendEmptyMessage(1);
+                                                handler.sendEmptyMessage(1);
                                             }
                                         });
 //                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
@@ -232,13 +241,13 @@ public class NotePageActivity extends AppCompatActivity {
                                         Note_LitePal note_litePal = noteService.insert2Note("", null, local_notebook_id, NoteParttionActivity.local_user_id, false);
                                         userService.updateUserByUser(NoteParttionActivity.current_user);
                                         local_notes_id = ArrayUtil.insert2Array(local_notes_id, note_litePal.getId());
-                                        hander.sendEmptyMessage(1);
+                                        handler.sendEmptyMessage(1);
                                     }
                                 } else {
                                     Note_LitePal note_litePal = noteService.insert2Note("", "", local_notebook_id, NoteParttionActivity.local_user_id, true);
                                     userService.updateUserByUser(NoteParttionActivity.current_user);
                                     local_notes_id = ArrayUtil.insert2Array(local_notes_id, note_litePal.getId());
-                                    hander.sendEmptyMessage(1);
+                                    handler.sendEmptyMessage(1);
                                 }
                             }
                         }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -292,7 +301,7 @@ public class NotePageActivity extends AppCompatActivity {
                                 note_litePal.setCreateTime(new Date());
                                 note_litePal.setUpdateTime(new Date());
                                 note_litePal.save();
-                                hander.sendEmptyMessage(1);
+                                handler.sendEmptyMessage(1);
                             }
                         });
                     } else {
@@ -309,7 +318,7 @@ public class NotePageActivity extends AppCompatActivity {
                         note_litePal.setCreateTime(new Date());
                         note_litePal.setUpdateTime(new Date());
                         note_litePal.save();
-                        hander.sendEmptyMessage(1);
+                        handler.sendEmptyMessage(1);
                     }
                 } else {
                     String Bmob_notebook_id = "";
@@ -361,12 +370,12 @@ public class NotePageActivity extends AppCompatActivity {
                                             note_litePal.save();
                                         }
                                     }
-                                    hander.sendEmptyMessage(1);
+                                    handler.sendEmptyMessage(1);
                                 }
                             }
                         });
                     } else {
-                        hander.sendEmptyMessage(1);
+                        handler.sendEmptyMessage(1);
                     }
                 }
             }
@@ -403,12 +412,12 @@ public class NotePageActivity extends AppCompatActivity {
                 listItems.remove(click_position);
                 local_notes_id = ArrayUtil.deleteIdInArray(local_notes_id, click_position);
                 boolean isSync = needSync();
-                List<NoteBook_LitePal> noteBookList = LitePal.where("id = ?", note_id).find(NoteBook_LitePal.class);
-                for (NoteBook_LitePal noteBook_litePal : noteBookList) {
-                    local_notes_id = ArrayUtil.insert2Array(local_notes_id, noteBook_litePal.getId());
-                    addListItem(noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()), isSync);
+                List<Note_LitePal> noteList = LitePal.where("id = ?", note_id).find(Note_LitePal.class);
+                for (Note_LitePal note_litePal : noteList) {
+                    local_notes_id = ArrayUtil.insert2Array(local_notes_id, note_litePal.getId());
+                    addListItem(note_litePal.getTitle(), TimeUtil.Date2String(note_litePal.getUpdateTime()), isSync);
                 }
-                hander.sendEmptyMessage(0);
+                handler.sendEmptyMessage(0);
             }
         };
         mThread.start();

@@ -91,7 +91,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
     private INoteBookDao_LitePal noteBookService = new INoteBookDaoImpl_LitePal();
     private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
     private Thread mThread;
-    private Handler hander = new Handler(new Handler.Callback() {
+    public Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
@@ -140,6 +140,9 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                     intent.putExtra("notebook_id", local_notebooks_id[0] + "");
                     intent.putExtra("new_note", "NEWNOTE");
                     startActivityForResult(intent, NOTEPAGE_ACTIVITY);
+                    break;
+                case 4:
+                    updateItem();
                     break;
                 default:
                     //do something
@@ -211,7 +214,19 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                     s = Notebook_Name.getText().toString();
                                 }
                                 noteBookService.updateNoteBookNameById(s, local_notebooks_id[p]);
-                                updateItem();
+                                List<NoteBook_LitePal> noteBookList = LitePal.where("id = ?", String.valueOf(local_notebooks_id[p])).find(NoteBook_LitePal.class);
+                                for (NoteBook_LitePal noteBook_litePal : noteBookList) {
+                                    String bmob_notebookid = noteBook_litePal.getBmob_notebook_id();
+                                    NoteBook_Bmob noteBook_bmob = new NoteBook_Bmob();
+                                    noteBook_bmob.setNoteBookName(s);
+                                    noteBook_bmob.update(bmob_notebookid, new UpdateListener() {
+                                        @Override
+                                        public void done(BmobException e) {
+                                            handler.sendEmptyMessage(4);
+                                        }
+                                    });
+                                }
+
 //                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
                             }
                         })
@@ -262,7 +277,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                                             NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook(Notebook_Name.getText().toString(), s, local_user_id);
                                                             userService.updateUserByUser(current_user);
                                                             local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
-                                                            hander.sendEmptyMessage(2);
+                                                            handler.sendEmptyMessage(2);
                                                         }
                                                     }
                                                 });
@@ -270,13 +285,13 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                                 NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook(Notebook_Name.getText().toString(), null, local_user_id);
                                                 userService.updateUserByUser(current_user);
                                                 local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
-                                                hander.sendEmptyMessage(2);
+                                                handler.sendEmptyMessage(2);
                                             }
                                         } else {
                                             NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook(Notebook_Name.getText().toString(), null, local_user_id);
                                             userService.updateUserByUser(current_user);
                                             local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
-                                            hander.sendEmptyMessage(2);
+                                            handler.sendEmptyMessage(2);
                                         }
 
                                     }
@@ -330,7 +345,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                                             userService.updateUserByUser(current_user);
                                                             local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
                                                             notebook_objectid = s;
-                                                            hander.sendEmptyMessage(3);
+                                                            handler.sendEmptyMessage(3);
                                                         }
                                                     }
                                                 });
@@ -338,13 +353,13 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                                 NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("", null, local_user_id);
                                                 userService.updateUserByUser(current_user);
                                                 local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
-                                                hander.sendEmptyMessage(3);
+                                                handler.sendEmptyMessage(3);
                                             }
                                         } else {
                                             NoteBook_LitePal noteBook_litePal = noteBookService.insert2NoteBook("", null, local_user_id);
                                             userService.updateUserByUser(current_user);
                                             local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
-                                            hander.sendEmptyMessage(3);
+                                            handler.sendEmptyMessage(3);
                                         }
                                     }
                                 };
@@ -410,7 +425,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                                             noteBook_litePal.save();
                                         }
                                     }
-                                    hander.sendEmptyMessage(2);
+                                    handler.sendEmptyMessage(2);
                                 }
                             }
                         });
@@ -444,9 +459,9 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                     if (!isAdd) {
                         listItems.clear();
                         addListItem(noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()));
-                        hander.sendEmptyMessage(1);
+                        handler.sendEmptyMessage(1);
                     } else {
-                        hander.sendEmptyMessage(2);
+                        handler.sendEmptyMessage(2);
                     }
                 }
             }
@@ -486,7 +501,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                     local_notebooks_id = ArrayUtil.insert2Array(local_notebooks_id, noteBook_litePal.getId());
                     addListItem(noteBook_litePal.getNoteBookName(), TimeUtil.Date2String(noteBook_litePal.getUpdateTime()));
                 }
-                hander.sendEmptyMessage(0);
+                handler.sendEmptyMessage(0);
             }
         };
         mThread.start();
