@@ -37,7 +37,7 @@ public class NoteContentActivity extends AppCompatActivity {
     private INoteDao_LitePal noteDao_litePal = new INoteDaoImpl_LitePal();
     private List<Note_LitePal> noteList;
     private Thread mThread;
-    private Handler hander = new Handler(new Handler.Callback() {
+    private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
@@ -288,7 +288,7 @@ public class NoteContentActivity extends AppCompatActivity {
                 local_note_id = Integer.parseInt(NoteContentActivity.this.getIntent().getStringExtra("note_id"));
                 String noteid = String.valueOf((local_note_id));
                 noteList = LitePal.where("id = ?", noteid).find(Note_LitePal.class);
-                hander.sendEmptyMessage(0);
+                handler.sendEmptyMessage(0);
             }
         };
         mThread.start();
@@ -302,7 +302,7 @@ public class NoteContentActivity extends AppCompatActivity {
     }
 
     private void saveNote() {
-        mThread = new Thread(){
+        mThread = new Thread() {
             @Override
             public void run() {
                 String noteid = String.valueOf((local_note_id));
@@ -358,7 +358,7 @@ public class NoteContentActivity extends AppCompatActivity {
 
     private void setResult() {
         Intent result = new Intent(NoteContentActivity.this, NotePageActivity.class);
-        result.putExtra("note_id",local_note_id);
+        result.putExtra("note_id", local_note_id);
         if (isChange == 1) {
             setResult(RESULT_OK, result);
         } else {

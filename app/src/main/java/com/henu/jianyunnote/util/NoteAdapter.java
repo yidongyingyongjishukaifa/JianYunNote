@@ -2,6 +2,8 @@ package com.henu.jianyunnote.util;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,15 +23,36 @@ import com.henu.jianyunnote.dao.LitePal.impl.INoteDaoImpl_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.IUserDaoImpl_LitePal;
 import com.henu.jianyunnote.activity.notePage.NotePageActivity;
 import com.henu.jianyunnote.R;
+import com.henu.jianyunnote.model.Bmob.Note_Bmob;
+import com.henu.jianyunnote.model.LitePal.Note_LitePal;
+
+import org.litepal.LitePal;
 
 import java.util.List;
 import java.util.Map;
+
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.UpdateListener;
 
 public class NoteAdapter extends BaseSwipeAdapter {
     private List<Map<String, Object>> mDatas;
     private Context mContext;
     private IUserDao_LitePal userService = new IUserDaoImpl_LitePal();
     private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
+    public Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            switch (msg.what) {
+                case 0:
+                    notifyDataSetChanged();
+                    break;
+                default:
+                    //do something
+                    break;
+            }
+            return false;
+        }
+    });
 
     public NoteAdapter(Context context, List<Map<String, Object>> data) {
         this.mContext = context;
@@ -83,8 +106,20 @@ public class NoteAdapter extends BaseSwipeAdapter {
                         int id = NotePageActivity.local_notes_id[p];
                         noteService.setNoteIsDeleteById(id);
                         userService.updateUserByUser(NoteParttionActivity.current_user);
+                        String note_id = String.valueOf(NotePageActivity.local_notes_id[p]);
                         NotePageActivity.local_notes_id = ArrayUtil.deleteIdInArray(NotePageActivity.local_notes_id, p);
-                        notifyDataSetChanged();
+                        List<Note_LitePal> noteList = LitePal.where("id = ?", note_id).find(Note_LitePal.class);
+                        for (Note_LitePal note_litePal : noteList) {
+                            Note_Bmob note_bmob = new Note_Bmob();
+                            note_bmob.setIsDelete(Integer.valueOf(Const.ISDELETE));
+                            note_bmob.update(note_litePal.getBmob_note_id(), new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+                                    handler.sendEmptyMessage(0);
+                                }
+                            });
+                        }
+
                         Toast.makeText(MyApplication.getContext(), "删除成功", Toast.LENGTH_SHORT).show();
                         sl.close();
                     }
