@@ -81,6 +81,7 @@ public class NotePageActivity extends AppCompatActivity {
                 case 1:
                     List<Note_LitePal> notes = LitePal.where("noteBookId = ? and isDelete = ?", notebookid, Const.NOTDELETE).order("updateTime asc").find(Note_LitePal.class);
                     if (notes != null && notes.size() != 0) {
+                        listItems.clear();
                         int local_count = notes.size() - 1;
                         local_notes_id = new int[notes.size()];
                         for (Note_LitePal note : notes) {
@@ -192,46 +193,53 @@ public class NotePageActivity extends AppCompatActivity {
                                     }
                                 }
                                 notebookid = String.valueOf(local_notebook_id);
-                                String Bmob_notebook_id;
-                                if (!"未登录".equals(NoteParttionActivity.login_email)) {
-                                    List<NoteBook_LitePal> noteBooks = LitePal.where("id = ?", notebookid).order("updateTime asc").find(NoteBook_LitePal.class);
-                                    for (NoteBook_LitePal noteBook_litePal : noteBooks) {
-                                        Bmob_notebook_id = noteBook_litePal.getBmob_notebook_id();
-                                    }
-                                }
-                                final Note_Bmob note = new Note_Bmob();
-                                if ("".equals(NoteParttionActivity.note_title)) {
-                                    note.setTitle("无标题笔记");
-                                } else {
-                                    note.setTitle(NoteParttionActivity.note_title);
-                                }
-                                note.setUserId(NoteParttionActivity.current_user.getBmob_user_id());
-                                note.setNoteBookId(NoteParttionActivity.notebook_objectid);
-                                note.setIsDelete(Integer.valueOf(Const.NOTDELETE));
-                                note.save(new SaveListener<String>() {
-                                    @Override
-                                    public void done(String s, BmobException e) {
-                                        Note_LitePal note_litePal = new Note_LitePal();
-                                        note_litePal.setBmob_note_id(s);
-                                        note_litePal.setIsSync(Integer.parseInt(Const.NOTNEEDSYNC));
-                                        note_litePal.setTitle(note.getTitle());
-                                        note_litePal.setUserId(NoteParttionActivity.current_user.getId());
-                                        note_litePal.setBmob_notebook_id(NoteParttionActivity.notebook_objectid);
-                                        note_litePal.setBmob_user_id(NoteParttionActivity.current_user.getBmob_user_id());
-                                        note_litePal.setIsDelete(Integer.parseInt(Const.NOTDELETE));
-                                        note_litePal.setNoteBookId(Integer.parseInt(notebookid));
-                                        boolean flag = needSync();
-                                        if (flag) {
-                                            note_litePal.setIsSync(Integer.parseInt(Const.NEEDSYNC));
+                                if (!needSync()) {
+                                    if (!"未登录".equals(NoteParttionActivity.login_email)) {
+                                        final Note_Bmob note = new Note_Bmob();
+                                        if ("".equals(NoteParttionActivity.note_title)) {
+                                            note.setTitle("无标题笔记");
+                                        } else {
+                                            note.setTitle(NoteParttionActivity.note_title);
                                         }
-                                        note_litePal.setIsDownload(Integer.parseInt(Const.ISDOWNLOAD));
-                                        note_litePal.setCreateTime(new Date());
-                                        note_litePal.setUpdateTime(new Date());
-                                        note_litePal.save();
+                                        note.setUserId(NoteParttionActivity.current_user.getBmob_user_id());
+                                        note.setNoteBookId(NoteParttionActivity.notebook_objectid);
+                                        note.setIsDelete(Integer.valueOf(Const.NOTDELETE));
+                                        note.save(new SaveListener<String>() {
+                                            @Override
+                                            public void done(String s, BmobException e) {
+                                                Note_LitePal note_litePal = new Note_LitePal();
+                                                note_litePal.setBmob_note_id(s);
+                                                note_litePal.setIsSync(Integer.parseInt(Const.NOTNEEDSYNC));
+                                                note_litePal.setTitle(note.getTitle());
+                                                note_litePal.setUserId(NoteParttionActivity.current_user.getId());
+                                                note_litePal.setBmob_notebook_id(NoteParttionActivity.notebook_objectid);
+                                                note_litePal.setBmob_user_id(NoteParttionActivity.current_user.getBmob_user_id());
+                                                note_litePal.setIsDelete(Integer.parseInt(Const.NOTDELETE));
+                                                note_litePal.setNoteBookId(Integer.parseInt(notebookid));
+                                                boolean flag = needSync();
+                                                if (flag) {
+                                                    note_litePal.setIsSync(Integer.parseInt(Const.NEEDSYNC));
+                                                }
+                                                note_litePal.setIsDownload(Integer.parseInt(Const.ISDOWNLOAD));
+                                                note_litePal.setCreateTime(new Date());
+                                                note_litePal.setUpdateTime(new Date());
+                                                note_litePal.save();
+                                                hander.sendEmptyMessage(1);
+                                            }
+                                        });
+//                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
+                                    } else {
+                                        Note_LitePal note_litePal = noteService.insert2Note("", null, local_notebook_id, NoteParttionActivity.local_user_id, false);
+                                        userService.updateUserByUser(NoteParttionActivity.current_user);
+                                        local_notes_id = ArrayUtil.insert2Array(local_notes_id, note_litePal.getId());
                                         hander.sendEmptyMessage(1);
                                     }
-                                });
-//                Snackbar.make( view, "Replace with your own action", Snackbar.LENGTH_LONG ).setAction( "Action", null ).show();
+                                } else {
+                                    Note_LitePal note_litePal = noteService.insert2Note("", "", local_notebook_id, NoteParttionActivity.local_user_id, true);
+                                    userService.updateUserByUser(NoteParttionActivity.current_user);
+                                    local_notes_id = ArrayUtil.insert2Array(local_notes_id, note_litePal.getId());
+                                    hander.sendEmptyMessage(1);
+                                }
                             }
                         }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
@@ -315,7 +323,7 @@ public class NotePageActivity extends AppCompatActivity {
                     }
                     notebookid = String.valueOf(local_notebook_id);
                     if (!"未登录".equals(NoteParttionActivity.login_email)) {
-                        List<NoteBook_LitePal> noteBooks = LitePal.where("id = ?", notebookid).order("updateTime asc").find(NoteBook_LitePal.class);
+                        List<NoteBook_LitePal> noteBooks = LitePal.where("id = ?", notebookid).find(NoteBook_LitePal.class);
                         for (NoteBook_LitePal noteBook_litePal : noteBooks) {
                             Bmob_notebook_id = noteBook_litePal.getBmob_notebook_id();
                         }

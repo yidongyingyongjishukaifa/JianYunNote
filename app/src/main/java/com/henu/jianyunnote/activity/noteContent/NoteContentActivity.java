@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.henu.jianyunnote.activity.notePage.NotePageActivity;
 import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.INoteDaoImpl_LitePal;
+import com.henu.jianyunnote.model.Bmob.Note_Bmob;
 import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.util.AtyUtil;
@@ -24,6 +25,8 @@ import org.litepal.LitePal;
 import java.util.Date;
 import java.util.List;
 
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.richeditor.RichEditor;
 
 public class NoteContentActivity extends AppCompatActivity {
@@ -303,6 +306,7 @@ public class NoteContentActivity extends AppCompatActivity {
             @Override
             public void run() {
                 String noteid = String.valueOf((local_note_id));
+                String bmob_note_id = "";
                 List<Note_LitePal> noteList = LitePal.where("id = ?", noteid).find(Note_LitePal.class);
                 if (noteList != null && noteList.size() != 0) {
                     for (Note_LitePal note : noteList) {
@@ -311,10 +315,20 @@ public class NoteContentActivity extends AppCompatActivity {
                             note.setUpdateTime(new Date());
                         }
                         note.setContent(mPreview.getText().toString());
+                        bmob_note_id = note.getBmob_note_id();
                         note.save();
                         noteDao_litePal.updateNoteBookByNote(note);
                     }
                 }
+                Note_Bmob note_bmob = new Note_Bmob();
+                note_bmob.setContent(mPreview.getText().toString());
+                note_bmob.update(bmob_note_id, new UpdateListener() {
+                    @Override
+                    public void done(BmobException e) {
+
+                    }
+
+                });
             }
         };
         mThread.start();
