@@ -590,7 +590,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                         public void run() {
                             List<Note_LitePal> noteList = LitePal.where("isSync = ? and isDelete = ?", Const.NEEDSYNC, Const.NOTDELETE).find(Note_LitePal.class);
                             for (final Note_LitePal note_litePal : noteList) {
-                                note_litePal.setIsChange(Integer.parseInt(Const.ISCHANGE));
+                                note_litePal.setIsChange(Integer.parseInt(Const.NOTCHANGE));
                                 note_litePal.setIsSync(Integer.parseInt(Const.NOTNEEDSYNC));
                                 note_litePal.save();
                                 if (note_litePal.getBmob_note_id() == null) {

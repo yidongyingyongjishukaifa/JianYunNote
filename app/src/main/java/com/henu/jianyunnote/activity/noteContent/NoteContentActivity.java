@@ -1,15 +1,22 @@
 package com.henu.jianyunnote.activity.noteContent;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.pdf.PdfDocument;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.henu.jianyunnote.activity.notePage.NotePageActivity;
 import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
@@ -18,10 +25,13 @@ import com.henu.jianyunnote.model.Bmob.Note_Bmob;
 import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.util.AtyUtil;
+import com.henu.jianyunnote.util.PdfItextUtil;
+import com.itextpdf.text.DocumentException;
 
 
 import org.litepal.LitePal;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -30,7 +40,8 @@ import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.richeditor.RichEditor;
 
 public class NoteContentActivity extends AppCompatActivity {
-    private int local_note_id;
+    private static int local_note_id;
+    private static String note_title;
     private RichEditor mEditor;
     private TextView mPreview;
     private int isChange = 0;
@@ -44,6 +55,7 @@ public class NoteContentActivity extends AppCompatActivity {
                 case 0:
                     if (noteList != null && noteList.size() != 0) {
                         for (Note_LitePal note : noteList) {
+                            note_title = note.getTitle();
                             if (note.getContent() != null) {
                                 mEditor.setHtml(note.getContent());
                                 mPreview.setText(mEditor.getHtml());
@@ -69,13 +81,8 @@ public class NoteContentActivity extends AppCompatActivity {
         mEditor.setEditorHeight(200);
         mEditor.setEditorFontSize(22);
         mEditor.setEditorFontColor(Color.RED);
-        //mEditor.setEditorBackgroundColor(Color.BLUE);
-        //mEditor.setBackgroundColor(Color.BLUE);
-        //mEditor.setBackgroundResource(R.drawable.bg);
         mEditor.setPadding(10, 10, 10, 10);
-        //mEditor.setBackground("https://raw.githubusercontent.com/wasabeef/art/master/chip.jpg");
         mEditor.setPlaceholder("Insert text here...");
-        //mEditor.setInputEnabled(false);
         isChange = 0;
         mPreview = findViewById(R.id.preview);
         mEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
@@ -262,15 +269,6 @@ public class NoteContentActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.action_insert_image).setOnClickListener(new View.OnClickListener() {
-            //            拍照或打开相册
-            @Override
-            public void onClick(View v) {
-                mEditor.insertImage("http://www.1honeywan.com/dachshund/image/7.21/7.21_3_thumb.JPG",
-                        "dachshund");
-            }
-        });
-
         findViewById(R.id.action_insert_checkbox).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -349,11 +347,39 @@ public class NoteContentActivity extends AppCompatActivity {
             case R.id.photo:
                 //
                 break;
+            case R.id.pdf:
+                Download_PDF();
+                break;
             case android.R.id.home:
                 setResult();
                 break;
         }
         return true;
+    }
+
+    private void Download_PDF() {
+        PdfItextUtil pdfItextUtil = null;
+        try {
+            pdfItextUtil = new PdfItextUtil(getSavePdfFilePath())
+                    .addTitleToPdf(getTvString(note_title))
+                    .addTextToPdf(getTvString(mEditor.getHtml()))
+            ;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        } finally {
+            if (pdfItextUtil != null)
+                pdfItextUtil.close();
+        }
+    }
+
+    private String getSavePdfFilePath() {
+        return "/savedPdf/" + note_title + "_" + local_note_id + ".pdf";
+    }
+
+    private String getTvString(String s) {
+        return s;
     }
 
     private void setResult() {
