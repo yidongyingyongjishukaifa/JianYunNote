@@ -1,15 +1,28 @@
 package com.henu.jianyunnote.activity.noteContent;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.ContactsContract;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.henu.jianyunnote.activity.notePage.NotePageActivity;
 import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
@@ -339,7 +352,10 @@ public class NoteContentActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.toolbar_forcontent, menu);
         return true;
     }
-
+    String[] mPermissionList = new String[]{
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    };
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -347,7 +363,12 @@ public class NoteContentActivity extends AppCompatActivity {
                 //
                 break;
             case R.id.photo:
-                //
+                mEditor.focusEditor();
+                ActivityCompat.requestPermissions(NoteContentActivity.this, mPermissionList, 101);
+                break;
+            case R.id.up_pic:
+                mEditor.focusEditor();
+                ActivityCompat.requestPermissions(NoteContentActivity.this, mPermissionList, 100);
                 break;
             case android.R.id.home:
                 setResult();
@@ -355,7 +376,97 @@ public class NoteContentActivity extends AppCompatActivity {
         }
         return true;
     }
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 100:
+                boolean writeExternalStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                boolean readExternalStorage = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                if (grantResults.length > 0 && writeExternalStorage && readExternalStorage) {
+                    getImagealbum();
+                } else {
+                    Toast.makeText(this, "请设置必要权限", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case 101:
+                boolean photo1 = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                boolean photo2 = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                if (grantResults.length > 0 && photo1 && photo2) {
+                    getImagephoto();
+                } else {
+                    Toast.makeText(this, "请设置必要权限", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
+    private void getImagealbum() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            startActivityForResult(new Intent(Intent.ACTION_GET_CONTENT).setType("image/*"),
+                    100);
+        } else {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("image/*");
+            startActivityForResult(intent, 1);
+        }
+    }
+    Uri photoUri;
+    private void getImagephoto() {
+        Intent intent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        ContentValues values = new ContentValues();
+        photoUri = this.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, photoUri);
+        startActivityForResult(intent, 2);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            switch (requestCode) {
+                case 1:
+                    if (data != null) {
+                        String realPathFromUri = RealPathFromUriUtils.getRealPathFromUri(this, data.getData());
+//                        mEditor.insertImage("https://unsplash.it/2000/2000?random&58",
+//                                "huangxiaoguo\" style=\"max-width:100%");
+                        mEditor.insertImage(realPathFromUri, realPathFromUri + "\" style=\"max-width:100%");
+//                        mEditor.insertImage(realPathFromUri, realPathFromUri + "\" style=\"max-width:100%;max-height:100%");
+                    } else {
+                        Toast.makeText(this, "图片损坏，请重新选择", Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case 2:
+                    String filePath = pathFromPhoto();
+                    mEditor.insertImage(filePath, filePath + "\" style=\"max-width:100%");
+                    break;
+            }
+        }
+    }
+    private String pathFromPhoto() {
 
+        String picPath=null;
+        String[] pojo = {MediaStore.Images.Media.DATA};
+        Cursor cursor = managedQuery(photoUri, pojo, null, null,null);
+        if(cursor != null )
+        {
+            int columnIndex = cursor.getColumnIndexOrThrow(pojo[0]);
+            cursor.moveToFirst();
+            picPath = cursor.getString(columnIndex);
+
+            try {
+
+                if(Integer.parseInt(Build.VERSION.SDK) <14){
+
+                    cursor.close();
+                }
+
+            } catch (NumberFormatException e) {
+
+                Log.v("qin","error:"+e);
+            }
+
+        }
+        return picPath;
+    }
     private void setResult() {
         Intent result = new Intent(NoteContentActivity.this, NotePageActivity.class);
         result.putExtra("note_id", local_note_id);
