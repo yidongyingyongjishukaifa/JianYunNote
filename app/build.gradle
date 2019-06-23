@@ -10,6 +10,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -18,13 +19,43 @@ android {
         }
     }
 }
+MobSDK {
+    appKey "2b55618a4b840"
+    appSecret "71e3bc362326a41bacbf3b248c6a51fd"
 
+    ShareSDK {
+        //平台配置信息
+        devInfo {
+            SinaWeibo {
+                appKey "568898243"
+                appSecret "38a4f8204cc784f81f9f0daaf31e02e3"
+                callbackUri "http://www.sharesdk.cn"
+                shareByAppClient false
+            }
+            Wechat {
+                appId "wx4868b35061f87885"
+                appSecret "64020361b8ec4c99936c0e3999a9f249"
+            }
+            QQ {
+                appId "101598324"
+                appKey "84e575db5ed0d63f48fd78ddab9929ff"
+                shareByAppClient true
+            }
+            Facebook {
+                appKey "1412473428822331"
+                appSecret "a42f4f3f867dc947b9ed6020c2e93558"
+                callbackUri "https://mob.com"
+            }
+        }
+    }
+}
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.android.support:multidex:1.0.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -37,6 +68,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.12.0'
     implementation files('libs/BASE64Encoder.jar')
     implementation files('libs/iTextpdf.jar')
+    implementation files('libs/ocr-sdk.jar')
     implementation files('libs/nineoldandroids-2.4.0.jar')
     implementation 'org.litepal.android:java:3.0.0'
     implementation 'com.getbase:floatingactionbutton:1.10.1'
@@ -44,37 +76,5 @@ dependencies {
     implementation 'com.daimajia.easing:library:2.0@aar'
     implementation 'com.daimajia.androidanimations:library:2.3@aar'
     implementation 'jp.wasabeef:richeditor-android:1.2.2'
-
-    MobSDK {
-        appKey "2b55618a4b840"
-        appSecret "71e3bc362326a41bacbf3b248c6a51fd"
-
-        ShareSDK {
-            //平台配置信息
-            devInfo {
-                SinaWeibo {
-                    appKey "568898243"
-                    appSecret "38a4f8204cc784f81f9f0daaf31e02e3"
-                    callbackUri "http://www.sharesdk.cn"
-                    shareByAppClient false
-                }
-                Wechat {
-                    appId "wx4868b35061f87885"
-                    appSecret "64020361b8ec4c99936c0e3999a9f249"
-                }
-                QQ {
-                    appId "101598324"
-                    appKey "84e575db5ed0d63f48fd78ddab9929ff"
-                    shareByAppClient true
-                }
-                Facebook {
-                    appKey "1412473428822331"
-                    appSecret "a42f4f3f867dc947b9ed6020c2e93558"
-                    callbackUri "https://mob.com"
-                }
-            }
-        }
-
-    }
-
+    implementation project(":ocr_ui")
 }
