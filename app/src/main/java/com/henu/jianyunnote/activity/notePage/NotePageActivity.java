@@ -116,6 +116,7 @@ public class NotePageActivity extends AppCompatActivity {
         flag = false;
         mListView = findViewById(R.id.note_listview);
         initNotePage();
+
         final FloatingActionsMenu menu = findViewById(R.id.fab_menu);
         final com.getbase.floatingactionbutton.FloatingActionButton actionA = findViewById(R.id.fab_1);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
