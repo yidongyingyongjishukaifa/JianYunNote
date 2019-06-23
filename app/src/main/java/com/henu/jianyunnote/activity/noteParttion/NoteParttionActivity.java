@@ -144,6 +144,9 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                 case 4:
                     updateItem();
                     break;
+                case 5:
+                    Toast.makeText(NoteParttionActivity.this, "同步完成", Toast.LENGTH_LONG).show();
+                    break;
                 default:
                     //do something
                     break;
@@ -584,48 +587,57 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                 break;
             case R.id.syns:
                 //
-                if (needSync()) {
-                    mThread = new Thread() {
-                        @Override
-                        public void run() {
-                            List<Note_LitePal> noteList = LitePal.where("isSync = ? and isDelete = ?", Const.NEEDSYNC, Const.NOTDELETE).find(Note_LitePal.class);
-                            for (final Note_LitePal note_litePal : noteList) {
-                                note_litePal.setIsChange(Integer.parseInt(Const.NOTCHANGE));
-                                note_litePal.setIsSync(Integer.parseInt(Const.NOTNEEDSYNC));
-                                note_litePal.save();
-                                if (note_litePal.getBmob_note_id() == null) {
-                                    Note_Bmob note_bmob = new Note_Bmob();
-                                    note_bmob.setUserId(current_user.getBmob_user_id());
-                                    note_bmob.setNoteBookId(String.valueOf(note_litePal.getNoteBookId()));
-                                    note_bmob.setContent(note_litePal.getContent());
-                                    note_bmob.setTitle(note_litePal.getTitle());
-                                    note_bmob.save(new SaveListener<String>() {
-                                        @Override
-                                        public void done(String objectId, BmobException e) {
-                                            note_litePal.setBmob_note_id(objectId);
-                                            note_litePal.save();
-                                        }
-                                    });
-                                } else {
-                                    Note_Bmob note_bmob = new Note_Bmob();
-                                    note_bmob.setUserId(current_user.getBmob_user_id());
-                                    note_bmob.setContent(note_litePal.getContent());
-                                    note_bmob.setTitle(note_litePal.getTitle());
-                                    note_bmob.setNoteBookId(String.valueOf(note_litePal.getBmob_notebook_id()));
-                                    note_bmob.update(note_litePal.getBmob_note_id(), new UpdateListener() {
-                                        @Override
-                                        public void done(BmobException e) {
-                                        }
-                                    });
-                                }
-                            }
-                        }
-                    };
-                    mThread.start();
-                }
+                Sync();
                 break;
         }
         return true;
+    }
+
+    private void Sync() {
+        if (!"未登录".equals(login_email)) {
+            if (needSync()) {
+                mThread = new Thread() {
+                    @Override
+                    public void run() {
+                        List<Note_LitePal> noteList = LitePal.where("isSync = ? and isDelete = ?", Const.NEEDSYNC, Const.NOTDELETE).find(Note_LitePal.class);
+                        for (final Note_LitePal note_litePal : noteList) {
+                            note_litePal.setIsChange(Integer.parseInt(Const.NOTCHANGE));
+                            note_litePal.setIsSync(Integer.parseInt(Const.NOTNEEDSYNC));
+                            note_litePal.save();
+                            if (note_litePal.getBmob_note_id() == null) {
+                                Note_Bmob note_bmob = new Note_Bmob();
+                                note_bmob.setUserId(current_user.getBmob_user_id());
+                                note_bmob.setNoteBookId(String.valueOf(note_litePal.getNoteBookId()));
+                                note_bmob.setContent(note_litePal.getContent());
+                                note_bmob.setTitle(note_litePal.getTitle());
+                                note_bmob.save(new SaveListener<String>() {
+                                    @Override
+                                    public void done(String objectId, BmobException e) {
+                                        note_litePal.setBmob_note_id(objectId);
+                                        note_litePal.save();
+                                    }
+                                });
+                            } else {
+                                Note_Bmob note_bmob = new Note_Bmob();
+                                note_bmob.setUserId(current_user.getBmob_user_id());
+                                note_bmob.setContent(note_litePal.getContent());
+                                note_bmob.setTitle(note_litePal.getTitle());
+                                note_bmob.setNoteBookId(String.valueOf(note_litePal.getBmob_notebook_id()));
+                                note_bmob.update(note_litePal.getBmob_note_id(), new UpdateListener() {
+                                    @Override
+                                    public void done(BmobException e) {
+                                    }
+                                });
+                            }
+                        }
+                        handler.sendEmptyMessage(5);
+                    }
+                };
+                mThread.start();
+            }
+        }else{
+            Toast.makeText(NoteParttionActivity.this, "请先登录账号再使用同步功能!", Toast.LENGTH_LONG).show();
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -634,9 +646,11 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.login) {
             LoginActivity.ActionStart(NoteParttionActivity.this);
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.sync) {
+            Sync();
+        } else if (id == R.id.wastebasket) {
 
         } else if (id == R.id.nav_slideshow) {
             if ("未登录".equals(login_email)) {
