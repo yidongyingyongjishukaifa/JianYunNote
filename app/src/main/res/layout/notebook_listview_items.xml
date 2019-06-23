@@ -7,6 +7,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        android:background="@drawable/shape_bg_listview"
         android:gravity="center"
         android:weightSum="10">
         <ImageView
@@ -35,6 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="80sp"
         android:orientation="horizontal"
+        android:background="@drawable/shape_bg_listview"
         android:gravity="center"
         android:weightSum="10">
         <LinearLayout
@@ -43,14 +45,6 @@
             android:orientation="vertical"
             android:layout_weight="8"
             >
-            <TextView
-                android:id="@+id/is_notebook_sync"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:textColor="@color/red"
-                android:visibility="gone"
-                />
             <!-- 定义一个TextView，用于作为列表项的一部分。 -->
             <TextView
                 android:id="@+id/notebook_message"

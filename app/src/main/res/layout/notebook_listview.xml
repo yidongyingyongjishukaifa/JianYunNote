@@ -13,8 +13,12 @@
         android:id="@+id/notebook_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fadingEdge="none"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="5dp"
+        android:listSelector="#00000000"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp"/>
+        tools:layout_editor_absoluteY="0dp" />
 
 
 </android.support.constraint.ConstraintLayout>

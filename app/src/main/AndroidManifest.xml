@@ -43,10 +43,8 @@
         </activity>
         <activity
             android:name=".activity.noteParttion.NoteParttionActivity"
-            android:label="笔记分区"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:label="笔记本列表"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.index.FindPasswordActivity" />
         <activity android:name=".activity.index.LoginActivity" />
         <activity
