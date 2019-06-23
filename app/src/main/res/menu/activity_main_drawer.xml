@@ -5,13 +5,17 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/login"
             android:icon="@drawable/user"
             android:title="登陆" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/sync"
             android:icon="@drawable/cloud"
             android:title="同步" />
+        <item
+            android:id="@+id/wastebasket"
+            android:icon="@drawable/wastebasket"
+            android:title="废纸篓" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_menu_manage"
