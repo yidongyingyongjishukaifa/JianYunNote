@@ -70,7 +70,7 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
-import cn.sharesdk.onekeyshare.OnekeyShare;
+//import cn.sharesdk.onekeyshare.OnekeyShare;
 
 public class NoteParttionActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     public static int[] local_notebooks_id;
