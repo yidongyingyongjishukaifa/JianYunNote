@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
 
-import com.mob.MobSDK;
+//import com.mob.MobSDK;
 
 import org.litepal.LitePal;
 
@@ -18,7 +18,7 @@ public class MyApplication extends Application {
         super.onCreate();
         context = getApplicationContext();
         LitePal.initialize(this);
-        MobSDK.init(this);
+//        MobSDK.init(this);
         MultiDex.install(this);
     }
 
