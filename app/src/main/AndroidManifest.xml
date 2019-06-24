@@ -33,6 +33,8 @@
         </provider>
 
         <activity android:name=".activity.setting.AboutSettingActivity" />
+        <activity android:name=".activity.noteTrash.NoteTrashActivity"
+            android:label="废纸篓"/>
         <activity android:name=".activity.setting.SettingActivity" />
         <activity
             android:name=".activity.start.StartActivity"

@@ -11,11 +11,36 @@ import java.util.Date;
 import java.util.List;
 
 public class INoteDaoImpl_LitePal implements INoteDao_LitePal {
+
     @Override
     public void setNoteIsDeleteById(Integer id) {
         List<Note_LitePal> noteList = LitePal.where("id = ?", String.valueOf(id)).find(Note_LitePal.class);
         for (Note_LitePal note : noteList) {
             note.setIsDelete(Integer.parseInt(Const.ISDELETE));
+            note.setIsChange(Integer.parseInt(Const.ISCHANGE));
+            note.setUpdateTime(new Date());
+            note.save();
+        }
+    }
+
+    @Override
+    public void setNoteUnDeleteById(Integer id) {
+        List<Note_LitePal> noteList = LitePal.where("id = ?", String.valueOf(id)).find(Note_LitePal.class);
+        for (Note_LitePal note : noteList) {
+            int notebook_id = note.getNoteBookId();
+            List<NoteBook_LitePal> noteBookList = LitePal.where("id = ?", String.valueOf(notebook_id)).find(NoteBook_LitePal.class);
+            if (noteBookList == null || noteBookList.size() == 0) {
+                NoteBook_LitePal notebook = new NoteBook_LitePal();
+                notebook.setUserId(note.getUserId());
+                notebook.setNoteBookName("无标题笔记本");
+                notebook.setCreateTime(new Date());
+                notebook.setUpdateTime(new Date());
+                notebook.setIsDelete(Integer.parseInt(Const.NOTDELETE));
+                notebook.setNoteNumber(1);
+                notebook.save();
+                note.setNoteBookId(notebook.getId());
+            }
+            note.setIsDelete(Integer.parseInt(Const.NOTDELETE));
             note.setIsChange(Integer.parseInt(Const.ISCHANGE));
             note.setUpdateTime(new Date());
             note.save();
