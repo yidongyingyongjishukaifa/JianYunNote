@@ -31,6 +31,8 @@ import android.widget.Toast;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.henu.jianyunnote.activity.index.LoginActivity;
 import com.henu.jianyunnote.activity.notePage.NotePageActivity;
+import com.henu.jianyunnote.activity.noteTrash.NoteTrashActivity;
+import com.henu.jianyunnote.activity.start.StartActivity;
 import com.henu.jianyunnote.dao.Bmob.INoteBookDao_Bmob;
 import com.henu.jianyunnote.dao.Bmob.INoteDao_Bmob;
 import com.henu.jianyunnote.dao.Bmob.impl.INoteBookDaoImpl_Bmob;
@@ -75,6 +77,7 @@ import cn.bmob.v3.listener.UpdateListener;
 public class NoteParttionActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     public static int[] local_notebooks_id;
     private static final int NOTEPAGE_ACTIVITY = 1;
+    private static final int NOTETRASH_ACTIVITY = 2;
     private int p;
     private NoteBookAdapter myAdapter;
     private TextView login_Email;
@@ -517,7 +520,22 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
             if (resultCode == Activity.RESULT_OK) {
                 updateItem();
             }
+        } else if (requestCode == NOTETRASH_ACTIVITY) {
+            if (resultCode == Activity.RESULT_OK) {
+                updateItem2();
+            }
         }
+    }
+
+    private void updateItem2() {
+        mThread = new Thread() {
+            @Override
+            public void run() {
+                userService.updateUserByUser(current_user);
+                handler.sendEmptyMessage(2);
+            }
+        };
+        mThread.start();
     }
 
     @Override
@@ -635,7 +653,7 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
                 };
                 mThread.start();
             }
-        }else{
+        } else {
             Toast.makeText(NoteParttionActivity.this, "请先登录账号再使用同步功能!", Toast.LENGTH_LONG).show();
         }
     }
@@ -651,7 +669,8 @@ public class NoteParttionActivity extends AppCompatActivity implements Navigatio
         } else if (id == R.id.sync) {
             Sync();
         } else if (id == R.id.wastebasket) {
-
+            Intent intent = new Intent(NoteParttionActivity.this, NoteTrashActivity.class);
+            startActivityForResult(intent, NOTETRASH_ACTIVITY);
         } else if (id == R.id.nav_slideshow) {
             if ("未登录".equals(login_email)) {
                 LoginActivity.ActionStart(NoteParttionActivity.this);

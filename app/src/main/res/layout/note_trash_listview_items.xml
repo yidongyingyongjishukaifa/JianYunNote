@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:id="@+id/swipe"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:id="@+id/swipe">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,62 +10,69 @@
         android:background="@drawable/shape_bg_listview"
         android:gravity="center"
         android:weightSum="10">
+
         <ImageView
             android:id="@+id/trash"
             android:layout_width="27dp"
             android:layout_height="20dp"
             android:layout_weight="1"
             android:src="@drawable/rest_fill" />
+
         <TextView
             android:layout_width="0dp"
             android:layout_height="20dp"
             android:layout_weight="5"
-            android:text="移到废纸篓?"
+            android:text="彻底删除?"
             android:textSize="17sp" />
 
         <Button
-            android:id="@+id/delete"
-            android:text="确认"
-            android:background="@color/colorPrimary"
+            android:id="@+id/note_delete"
             android:layout_width="0dp"
             android:layout_height="40dp"
-            android:layout_weight="4"/>
+            android:layout_weight="4"
+            android:background="@color/colorPrimary"
+            android:text="确认" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="80sp"
-        android:orientation="horizontal"
         android:background="@drawable/shape_bg_listview"
         android:gravity="center"
+        android:orientation="horizontal"
         android:weightSum="10">
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_weight="8"
-            >
-            <!-- 定义一个TextView，用于作为列表项的一部分。 -->
+            android:orientation="vertical">
+
             <TextView
-                android:id="@+id/notebook_message"
+                android:id="@+id/is_note_sync"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="25sp"
-                />
+                android:textColor="@color/red"
+                android:textSize="15sp"
+                android:visibility="gone" />
             <!-- 定义一个TextView，用于作为列表项的一部分。 -->
             <TextView
-                android:id="@+id/notebook_update_time"
+                android:id="@+id/note_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="25sp" />
+            <!-- 定义一个TextView，用于作为列表项的一部分。 -->
+            <TextView
+                android:id="@+id/note_update_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="12sp" />
         </LinearLayout>
+
         <ImageView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:src="@drawable/notebook"
             android:layout_weight="2"
-            />
-
+            android:src="@drawable/note" />
     </LinearLayout>
-
 </com.daimajia.swipe.SwipeLayout>
