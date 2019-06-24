@@ -20,4 +20,8 @@
         android:id="@+id/pdf"
         android:title="打印PDF"
         />
+    <item
+        android:id="@+id/ocr"
+        android:title="图片识别"
+        />
 </menu>
