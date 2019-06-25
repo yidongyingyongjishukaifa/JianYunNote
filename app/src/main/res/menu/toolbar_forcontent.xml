@@ -24,4 +24,8 @@
         android:id="@+id/ocr"
         android:title="图片识别"
         />
+    <item
+        android:id="@+id/note_share"
+        android:title="分享笔记"
+        />
 </menu>

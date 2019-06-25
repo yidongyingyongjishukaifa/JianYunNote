@@ -273,7 +273,7 @@ public class NotePageActivity extends AppCompatActivity {
                     }
                     notebookid = String.valueOf(local_notebook_id);
                     if (!"未登录".equals(NoteParttionActivity.login_email)) {
-                        if(NoteParttionActivity.current_user.getBmob_user_id()!=null){
+                        if (NoteParttionActivity.current_user.getBmob_user_id() != null) {
                             final Note_Bmob note = new Note_Bmob();
                             if ("".equals(NoteParttionActivity.note_title)) {
                                 note.setTitle("无标题笔记");
@@ -380,7 +380,7 @@ public class NotePageActivity extends AppCompatActivity {
                         } else {
                             handler.sendEmptyMessage(1);
                         }
-                    }else{
+                    } else {
                         handler.sendEmptyMessage(1);
                     }
                 }
