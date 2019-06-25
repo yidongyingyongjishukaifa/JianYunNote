@@ -46,6 +46,7 @@ import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.util.AtyUtil;
 import com.henu.jianyunnote.util.FileUtil;
+import com.henu.jianyunnote.util.NetWorkUtil;
 import com.henu.jianyunnote.util.OCRUtil;
 import com.henu.jianyunnote.util.PdfItextUtil;
 import com.itextpdf.text.DocumentException;
@@ -62,6 +63,7 @@ import java.util.Map;
 
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.UpdateListener;
+import cn.sharesdk.onekeyshare.OnekeyShare;
 import jp.wasabeef.richeditor.RichEditor;
 
 import static com.henu.jianyunnote.util.JsonUtil.parseJsonToMap;
@@ -356,14 +358,14 @@ public class NoteContentActivity extends AppCompatActivity {
                             note.setUpdateTime(new Date());
                         }
                         note.setContent(mPreview.getText().toString());
-                        if(note.getBmob_note_id()!=null){
+                        if (note.getBmob_note_id() != null) {
                             bmob_note_id = note.getBmob_note_id();
                         }
                         note.save();
                         noteDao_litePal.updateNoteBookByNote(note);
                     }
                 }
-                if(!"".equals(bmob_note_id)){
+                if (!"".equals(bmob_note_id)) {
                     Note_Bmob note_bmob = new Note_Bmob();
                     note_bmob.setContent(mPreview.getText().toString());
                     note_bmob.update(bmob_note_id, new UpdateListener() {
@@ -405,6 +407,7 @@ public class NoteContentActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(NoteContentActivity.this, mPermissionList, 100);
                 break;
             case R.id.pdf:
+                Toast.makeText(NoteContentActivity.this,"请等待打印完成！",Toast.LENGTH_LONG).show();
                 mThread = new Thread() {
                     @Override
                     public void run() {
@@ -425,15 +428,43 @@ public class NoteContentActivity extends AppCompatActivity {
                 setResult();
                 break;
             case R.id.ocr:
-                Intent intent = new Intent(NoteContentActivity.this, CameraActivity.class);
+                if (NetWorkUtil.isNetworkConnected(NoteContentActivity.this)) {
+                    Intent intent = new Intent(NoteContentActivity.this, CameraActivity.class);
 
-                // 设置临时存储
-                intent.putExtra(CameraActivity.KEY_OUTPUT_FILE_PATH, FileUtil.getSaveFile(getApplication()).getAbsolutePath());
+                    // 设置临时存储
+                    intent.putExtra(CameraActivity.KEY_OUTPUT_FILE_PATH, FileUtil.getSaveFile(getApplication()).getAbsolutePath());
 
-                // 调用除银行卡，身份证等识别的activity
-                intent.putExtra(CameraActivity.KEY_CONTENT_TYPE, CameraActivity.CONTENT_TYPE_GENERAL);
+                    // 调用除银行卡，身份证等识别的activity
+                    intent.putExtra(CameraActivity.KEY_CONTENT_TYPE, CameraActivity.CONTENT_TYPE_GENERAL);
 
-                startActivityForResult(intent, 111);
+                    startActivityForResult(intent, 111);
+                } else {
+                    Toast.makeText(NoteContentActivity.this, "请先联网！", Toast.LENGTH_LONG).show();
+                }
+                break;
+            case R.id.note_share:
+                if (NetWorkUtil.isNetworkConnected(NoteContentActivity.this)) {
+                    OnekeyShare oks = new OnekeyShare();
+                    //关闭sso授权
+                    oks.disableSSOWhenAuthorize();
+
+                    // title标题，微信、QQ和QQ空间等平台使用8
+                    oks.setTitle(note_title);
+                    // titleUrl QQ和QQ空间跳转链接
+                    oks.setTitleUrl("http://www.baixdu.com");
+                    // text是分享文本，所有平台都需要这个字段
+                    oks.setText(mEditor.getHtml());
+                    // imagePath是图片的本地路径，Linked-In以外的平台都支持此参数
+                    oks.setImagePath("/sdcard/test.jpg");//确保SDcard下面存在此张图片
+                    // url在微信、微博，Facebook等平台中使用
+                    oks.setUrl("http://sharesdk.cn");
+                    // comment是我对这条分享的评论，仅在人人网使用
+                    oks.setComment("我是测试评论文本");
+                    // 启动分享GUI
+                    oks.show(this);
+                }else {
+                    Toast.makeText(NoteContentActivity.this, "请先联网！", Toast.LENGTH_LONG).show();
+                }
                 break;
         }
         return true;

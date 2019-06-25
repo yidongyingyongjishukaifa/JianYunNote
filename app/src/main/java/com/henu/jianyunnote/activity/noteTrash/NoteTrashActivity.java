@@ -52,9 +52,7 @@ public class NoteTrashActivity extends AppCompatActivity {
     public static String note_id;
     public static int[] local_notes_id;
     public static boolean flag = false;
-    private IUserDao_LitePal userService = new IUserDaoImpl_LitePal();
     private INoteDao_LitePal noteService = new INoteDaoImpl_LitePal();
-    private INoteBookDao_LitePal noteBookService = new INoteBookDaoImpl_LitePal();
     private Thread mThread;
     public Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -83,6 +81,7 @@ public class NoteTrashActivity extends AppCompatActivity {
                     }
                     myAdapter = new NoteTrashAdapter(NoteTrashActivity.this, listItems);
                     mListView.setAdapter(myAdapter);
+                    Toast.makeText(NoteTrashActivity.this,"恢复成功！",Toast.LENGTH_LONG).show();
                     break;
                 default:
                     //do something
