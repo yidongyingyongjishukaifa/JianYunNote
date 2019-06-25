@@ -32,6 +32,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.ocr.sdk.OCR;
+import com.baidu.ocr.sdk.OnResultListener;
+import com.baidu.ocr.sdk.exception.OCRError;
+import com.baidu.ocr.sdk.model.AccessToken;
+import com.baidu.ocr.sdk.model.GeneralResult;
+import com.baidu.ocr.ui.camera.CameraActivity;
 import com.henu.jianyunnote.activity.notePage.NotePageActivity;
 import com.henu.jianyunnote.dao.LitePal.INoteDao_LitePal;
 import com.henu.jianyunnote.dao.LitePal.impl.INoteDaoImpl_LitePal;
@@ -39,6 +45,8 @@ import com.henu.jianyunnote.model.Bmob.Note_Bmob;
 import com.henu.jianyunnote.model.LitePal.Note_LitePal;
 import com.henu.jianyunnote.R;
 import com.henu.jianyunnote.util.AtyUtil;
+import com.henu.jianyunnote.util.FileUtil;
+import com.henu.jianyunnote.util.OCRUtil;
 import com.henu.jianyunnote.util.PdfItextUtil;
 import com.itextpdf.text.DocumentException;
 
@@ -48,13 +56,18 @@ import org.litepal.LitePal;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.UpdateListener;
 import jp.wasabeef.richeditor.RichEditor;
 
+import static com.henu.jianyunnote.util.JsonUtil.parseJsonToMap;
+
 public class NoteContentActivity extends AppCompatActivity {
+    final static String TAG = "OCR";
     private static int local_note_id;
     private static String filePath;
     private static String note_title;
@@ -93,6 +106,20 @@ public class NoteContentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_note_content);
         AtyUtil.getInstance().addActivity(this);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        OCR.getInstance(this).initAccessToken(new OnResultListener<AccessToken>() {
+            @Override
+            public void onResult(AccessToken result) {
+                // 调用成功，返回AccessToken对象
+                String token = result.getAccessToken();
+                Log.e(TAG, result.toString());
+            }
+
+            @Override
+            public void onError(OCRError error) {
+                // 调用失败，返回OCRError子类SDKError对象
+                Log.e(TAG, error.toString());
+            }
+        }, getApplicationContext());
         mEditor = findViewById(R.id.editor);
         mEditor.setEditorHeight(200);
         mEditor.setEditorFontSize(22);
@@ -329,20 +356,24 @@ public class NoteContentActivity extends AppCompatActivity {
                             note.setUpdateTime(new Date());
                         }
                         note.setContent(mPreview.getText().toString());
-                        bmob_note_id = note.getBmob_note_id();
+                        if(note.getBmob_note_id()!=null){
+                            bmob_note_id = note.getBmob_note_id();
+                        }
                         note.save();
                         noteDao_litePal.updateNoteBookByNote(note);
                     }
                 }
-                Note_Bmob note_bmob = new Note_Bmob();
-                note_bmob.setContent(mPreview.getText().toString());
-                note_bmob.update(bmob_note_id, new UpdateListener() {
-                    @Override
-                    public void done(BmobException e) {
+                if(!"".equals(bmob_note_id)){
+                    Note_Bmob note_bmob = new Note_Bmob();
+                    note_bmob.setContent(mPreview.getText().toString());
+                    note_bmob.update(bmob_note_id, new UpdateListener() {
+                        @Override
+                        public void done(BmobException e) {
 
-                    }
+                        }
 
-                });
+                    });
+                }
             }
         };
         mThread.start();
@@ -393,6 +424,17 @@ public class NoteContentActivity extends AppCompatActivity {
             case android.R.id.home:
                 setResult();
                 break;
+            case R.id.ocr:
+                Intent intent = new Intent(NoteContentActivity.this, CameraActivity.class);
+
+                // 设置临时存储
+                intent.putExtra(CameraActivity.KEY_OUTPUT_FILE_PATH, FileUtil.getSaveFile(getApplication()).getAbsolutePath());
+
+                // 调用除银行卡，身份证等识别的activity
+                intent.putExtra(CameraActivity.KEY_CONTENT_TYPE, CameraActivity.CONTENT_TYPE_GENERAL);
+
+                startActivityForResult(intent, 111);
+                break;
         }
         return true;
     }
@@ -407,90 +449,90 @@ public class NoteContentActivity extends AppCompatActivity {
     }
 
     private String getMIMEType(File file) {
-        String type="*/*";
+        String type = "*/*";
         String fName = file.getName();
         //获取后缀名前的分隔符"."在fName中的位置。
         int dotIndex = fName.lastIndexOf(".");
-        if(dotIndex < 0)
+        if (dotIndex < 0)
             return type;
         /* 获取文件的后缀名 */
-        String fileType = fName.substring(dotIndex,fName.length()).toLowerCase();
-        if(fileType == null || "".equals(fileType))
+        String fileType = fName.substring(dotIndex, fName.length()).toLowerCase();
+        if (fileType == null || "".equals(fileType))
             return type;
         //在MIME和文件类型的匹配表中找到对应的MIME类型。
-        for(int i=0;i<MIME_MapTable.length;i++){
-            if(fileType.equals(MIME_MapTable[i][0]))
+        for (int i = 0; i < MIME_MapTable.length; i++) {
+            if (fileType.equals(MIME_MapTable[i][0]))
                 type = MIME_MapTable[i][1];
         }
         return type;
     }
 
-    private static final String[][] MIME_MapTable={
+    private static final String[][] MIME_MapTable = {
             //{后缀名，    MIME类型}
-            {".3gp",    "video/3gpp"},
-            {".apk",    "application/vnd.android.package-archive"},
-            {".asf",    "video/x-ms-asf"},
-            {".avi",    "video/x-msvideo"},
-            {".bin",    "application/octet-stream"},
-            {".bmp",      "image/bmp"},
-            {".c",        "text/plain"},
-            {".class",    "application/octet-stream"},
-            {".conf",    "text/plain"},
-            {".cpp",    "text/plain"},
-            {".doc",    "application/msword"},
-            {".exe",    "application/octet-stream"},
-            {".gif",    "image/gif"},
-            {".gtar",    "application/x-gtar"},
-            {".gz",        "application/x-gzip"},
-            {".h",        "text/plain"},
-            {".htm",    "text/html"},
-            {".html",    "text/html"},
-            {".jar",    "application/java-archive"},
-            {".java",    "text/plain"},
-            {".jpeg",    "image/jpeg"},
-            {".jpg",    "image/jpeg"},
-            {".js",        "application/x-javascript"},
-            {".log",    "text/plain"},
-            {".m3u",    "audio/x-mpegurl"},
-            {".m4a",    "audio/mp4a-latm"},
-            {".m4b",    "audio/mp4a-latm"},
-            {".m4p",    "audio/mp4a-latm"},
-            {".m4u",    "video/vnd.mpegurl"},
-            {".m4v",    "video/x-m4v"},
-            {".mov",    "video/quicktime"},
-            {".mp2",    "audio/x-mpeg"},
-            {".mp3",    "audio/x-mpeg"},
-            {".mp4",    "video/mp4"},
-            {".mpc",    "application/vnd.mpohun.certificate"},
-            {".mpe",    "video/mpeg"},
-            {".mpeg",    "video/mpeg"},
-            {".mpg",    "video/mpeg"},
-            {".mpg4",    "video/mp4"},
-            {".mpga",    "audio/mpeg"},
-            {".msg",    "application/vnd.ms-outlook"},
-            {".ogg",    "audio/ogg"},
-            {".pdf",    "application/pdf"},
-            {".png",    "image/png"},
-            {".pps",    "application/vnd.ms-powerpoint"},
-            {".ppt",    "application/vnd.ms-powerpoint"},
-            {".prop",    "text/plain"},
-            {".rar",    "application/x-rar-compressed"},
-            {".rc",        "text/plain"},
-            {".rmvb",    "audio/x-pn-realaudio"},
-            {".rtf",    "application/rtf"},
-            {".sh",        "text/plain"},
-            {".tar",    "application/x-tar"},
-            {".tgz",    "application/x-compressed"},
-            {".txt",    "text/plain"},
-            {".wav",    "audio/x-wav"},
-            {".wma",    "audio/x-ms-wma"},
-            {".wmv",    "audio/x-ms-wmv"},
-            {".wps",    "application/vnd.ms-works"},
+            {".3gp", "video/3gpp"},
+            {".apk", "application/vnd.android.package-archive"},
+            {".asf", "video/x-ms-asf"},
+            {".avi", "video/x-msvideo"},
+            {".bin", "application/octet-stream"},
+            {".bmp", "image/bmp"},
+            {".c", "text/plain"},
+            {".class", "application/octet-stream"},
+            {".conf", "text/plain"},
+            {".cpp", "text/plain"},
+            {".doc", "application/msword"},
+            {".exe", "application/octet-stream"},
+            {".gif", "image/gif"},
+            {".gtar", "application/x-gtar"},
+            {".gz", "application/x-gzip"},
+            {".h", "text/plain"},
+            {".htm", "text/html"},
+            {".html", "text/html"},
+            {".jar", "application/java-archive"},
+            {".java", "text/plain"},
+            {".jpeg", "image/jpeg"},
+            {".jpg", "image/jpeg"},
+            {".js", "application/x-javascript"},
+            {".log", "text/plain"},
+            {".m3u", "audio/x-mpegurl"},
+            {".m4a", "audio/mp4a-latm"},
+            {".m4b", "audio/mp4a-latm"},
+            {".m4p", "audio/mp4a-latm"},
+            {".m4u", "video/vnd.mpegurl"},
+            {".m4v", "video/x-m4v"},
+            {".mov", "video/quicktime"},
+            {".mp2", "audio/x-mpeg"},
+            {".mp3", "audio/x-mpeg"},
+            {".mp4", "video/mp4"},
+            {".mpc", "application/vnd.mpohun.certificate"},
+            {".mpe", "video/mpeg"},
+            {".mpeg", "video/mpeg"},
+            {".mpg", "video/mpeg"},
+            {".mpg4", "video/mp4"},
+            {".mpga", "audio/mpeg"},
+            {".msg", "application/vnd.ms-outlook"},
+            {".ogg", "audio/ogg"},
+            {".pdf", "application/pdf"},
+            {".png", "image/png"},
+            {".pps", "application/vnd.ms-powerpoint"},
+            {".ppt", "application/vnd.ms-powerpoint"},
+            {".prop", "text/plain"},
+            {".rar", "application/x-rar-compressed"},
+            {".rc", "text/plain"},
+            {".rmvb", "audio/x-pn-realaudio"},
+            {".rtf", "application/rtf"},
+            {".sh", "text/plain"},
+            {".tar", "application/x-tar"},
+            {".tgz", "application/x-compressed"},
+            {".txt", "text/plain"},
+            {".wav", "audio/x-wav"},
+            {".wma", "audio/x-ms-wma"},
+            {".wmv", "audio/x-ms-wmv"},
+            {".wps", "application/vnd.ms-works"},
             //{".xml",    "text/xml"},
-            {".xml",    "text/plain"},
-            {".z",        "application/x-compress"},
-            {".zip",    "application/zip"},
-            {"",        "*/*"}
+            {".xml", "text/plain"},
+            {".z", "application/x-compress"},
+            {".zip", "application/zip"},
+            {"", "*/*"}
     };
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -557,6 +599,49 @@ public class NoteContentActivity extends AppCompatActivity {
                     mEditor.insertImage(filePath, filePath + "\" style=\"max-width:100%");
                     break;
             }
+        }
+        if (requestCode == 111 && resultCode == Activity.RESULT_OK) {
+            // 获取调用参数
+            String contentType = data.getStringExtra(CameraActivity.KEY_CONTENT_TYPE);
+            // 通过临时文件获取拍摄的图片
+            String filePath = FileUtil.getSaveFile(getApplicationContext()).getAbsolutePath();
+
+            OCRUtil.recognizeAccurateBasic(this, filePath, new OCRUtil.OCRCallBack<GeneralResult>() {
+                @Override
+                public void succeed(GeneralResult data) {
+                    // 调用成功，返回GeneralResult对象
+                    String content = OCRUtil.getResult(data);
+                    HashMap<String, Object> stringObjectHashMap = parseJsonToMap(content);
+                    for (Map.Entry<String, Object> entry : stringObjectHashMap.entrySet()) {
+                        if (entry.getKey().equals("words_result")) {
+                            String[] strings = entry.getValue().toString().split(",");
+                            int count = strings.length;
+                            StringBuilder re = new StringBuilder();
+                            for (int i = 0; i < count; i++) {
+                                if (i == count - 1) {
+                                    String s = strings[i].split("words=")[1];
+                                    re.append(s.substring(0, s.length() - 2));
+                                    re.append("\n");
+                                } else {
+                                    String s = strings[i].split("words=")[1];
+                                    re.append(s.substring(0, s.length() - 1));
+                                    re.append("\n");
+                                }
+                            }
+                            mEditor.setHtml(mPreview.getText().toString() + "\n" + re);
+                            mPreview.setText(mEditor.getHtml());
+                        }
+                    }
+
+                    Log.e(TAG, content + "");
+                }
+
+                @Override
+                public void failed(OCRError error) {
+                    // 调用失败，返回OCRError对象
+                    Log.e(TAG, "错误信息：" + error.getMessage());
+                }
+            });
         }
     }
 
