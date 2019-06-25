@@ -380,6 +380,8 @@ public class NotePageActivity extends AppCompatActivity {
                         } else {
                             handler.sendEmptyMessage(1);
                         }
+                    }else{
+                        handler.sendEmptyMessage(1);
                     }
                 }
             }
